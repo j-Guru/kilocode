@@ -35,3 +35,12 @@ For mode-specific guidance, see the following files:
     - Use Tailwind CSS classes instead of inline style objects for new markup
     - VSCode CSS variables must be added to webview-ui/src/index.css before using them in Tailwind classes
     - Example: `<div className="text-md text-vscode-descriptionForeground mb-2" />` instead of style objects
+
+## JetBrains Plugin Rules
+
+1. Production Build:
+
+    - Always use the `build-jetbrains-plugin.sh` script in the root directory for production-ready builds
+    - The final plugin artifact must be approximately 300MB - 400MB in size
+    - A significantly smaller size (e.g., ~5MB) indicates a failed bundle that is missing the Extension Host or VSCode dependencies
+    - Ensure `platform.zip` is generated before building if it's missing or if dependencies changed

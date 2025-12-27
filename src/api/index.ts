@@ -1,7 +1,8 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 
-import type { ProviderSettings, ModelInfo, ToolProtocol } from "@roo-code/types"
+import type { ProviderSettings, ModelInfo, ToolProtocol, VertexModelId } from "@roo-code/types"
+import { vertexModels } from "@roo-code/types"
 
 import { ApiStream } from "./transform/stream"
 
@@ -12,6 +13,7 @@ import {
 	CerebrasHandler,
 	OpenRouterHandler,
 	VertexHandler,
+	VertexMaaSHandler,
 	AnthropicVertexHandler,
 	OpenAiHandler,
 	LmStudioHandler,
@@ -164,10 +166,17 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			return new OpenRouterHandler(options)
 		case "bedrock":
 			return new AwsBedrockHandler(options)
-		case "vertex":
-			return options.apiModelId?.startsWith("claude")
-				? new AnthropicVertexHandler(options)
-				: new VertexHandler(options)
+		case "vertex": {
+			if (options.apiModelId?.startsWith("claude")) {
+				return new AnthropicVertexHandler(options)
+			}
+			const modelId = options.apiModelId as VertexModelId
+			const info = vertexModels[modelId] as ModelInfo | undefined
+			if (info?.vertexPublisher && info.vertexPublisher !== "google") {
+				return new VertexMaaSHandler(options)
+			}
+			return new VertexHandler(options)
+		}
 		case "openai":
 			return new OpenAiHandler(options)
 		case "ollama":

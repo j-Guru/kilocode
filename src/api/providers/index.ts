@@ -26,6 +26,7 @@ export { RequestyHandler } from "./requesty"
 export { SambaNovaHandler } from "./sambanova"
 export { UnboundHandler } from "./unbound"
 export { VertexHandler } from "./vertex"
+export { VertexMaaSHandler } from "./vertex-maas"
 // kilocode_change start
 export { OVHcloudAIEndpointsHandler } from "./ovhcloud"
 export { GeminiCliHandler } from "./gemini-cli"
