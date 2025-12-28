@@ -1,5 +1,5 @@
 import { streamSse } from "../../../fetch/stream.js"
-import { logError, logInfo, logDebug } from "../../../services/telemetry/logging"
+import { vertexModels } from "@roo-code/types"
 import { AuthClient, GoogleAuth, JWT, auth } from "google-auth-library"
 import {
 	ChatCompletion,
@@ -110,7 +110,7 @@ export class VertexAIApi implements BaseLlmApi {
 	}
 
 	private getApiBase(provider?: string): string {
-		logDebug("VertexAI.getApiBase", { provider, apiKey: !!this.config.apiKey, env: this.config.env })
+		console.debug("VertexAI.getApiBase", { provider, apiKey: !!this.config.apiKey, env: this.config.env })
 		const { apiKey, env } = this.config
 
 		if (this.config.apiBase) {
@@ -123,49 +123,80 @@ export class VertexAIApi implements BaseLlmApi {
 		} else {
 			// Standard mode
 			let { region, projectId } = env!
-
-			// kilocode_change start
-			// Handle region normalization for different provider types
 			if (region === "global") {
-				// For MaaS providers (non-Google), force us-central1 as global is not typically supported
-				if (provider && provider !== "gemini" && provider !== "anthropic") {
-					console.warn(`[VertexAI] MaaS provider ${provider} switching from global to us-central1 region`)
-					region = "us-central1"
-				}
-				// For Google providers in global region, use the global endpoint format
 				return `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/`
 			}
-			// kilocode_change end
 
 			// Standard regional endpoint format
 			return `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/`
 		}
 	}
 
-	private determineVertexProvider(
-		model: string,
-	): "mistral" | "anthropic" | "gemini" | "qwen" | "llama" | "deepseek" | "kimi" | "minimax" | "unknown" {
-		// kilocode_change
+	private getVertexModelPublisher(model: string): string | undefined {
+		const modelInfo = (vertexModels as Record<string, { vertexPublisher?: string | null }>)[model]
+		return modelInfo?.vertexPublisher ?? undefined
+	}
+
+	private determineVertexProvider(model: string): "mistral" | "anthropic" | "gemini" | "openai" | "unknown" {
+		const publisher = this.getVertexModelPublisher(model)
+		if (publisher === "google") {
+			return "gemini"
+		}
+		if (publisher === "anthropic") {
+			return "anthropic"
+		}
+		if (publisher === "mistralai") {
+			return "mistral"
+		}
+
 		if (model.includes("mistral") || model.includes("codestral") || model.includes("mixtral")) {
 			return "mistral"
 		} else if (model.includes("claude")) {
 			return "anthropic"
 		} else if (model.includes("gemini")) {
 			return "gemini"
-			// kilocode_change start
-		} else if (model.includes("qwen")) {
-			return "qwen"
-		} else if (model.includes("llama")) {
-			return "llama"
-		} else if (model.includes("deepseek")) {
-			return "deepseek"
-		} else if (model.includes("kimi")) {
-			return "kimi"
-		} else if (model.includes("minimax")) {
-			return "minimax"
 		}
-		// kilocode_change end
+		if (publisher) {
+			return "openai"
+		}
 		return "unknown"
+	}
+
+	private getPublisherForProvider(provider: "mistral" | "anthropic" | "gemini", model: string): string {
+		const publisher = this.getVertexModelPublisher(model)
+		if (publisher) {
+			return publisher
+		}
+		switch (provider) {
+			case "mistral":
+				return "mistralai"
+			case "anthropic":
+				return "anthropic"
+			case "gemini":
+				return "google"
+		}
+	}
+
+	private buildOpenAiChatCompletionUrl(): URL {
+		const { env } = this.config
+		const { region, projectId } = env || {}
+		if (!region || !projectId) {
+			throw new Error("region and projectId are required for VertexAI OpenAI-compatible endpoints")
+		}
+
+		if (this.config.apiBase) {
+			const basePath = new URL(this.config.apiBase).pathname
+			const hasProjectPath = basePath.includes("/projects/")
+			const endpoint = hasProjectPath
+				? "endpoints/openapi/chat/completions"
+				: `projects/${projectId}/locations/${region}/endpoints/openapi/chat/completions`
+			return this.buildUrl(endpoint)
+		}
+
+		const host = region === "global" ? "aiplatform.googleapis.com" : `${region}-aiplatform.googleapis.com`
+		return new URL(
+			`https://${host}/v1/projects/${projectId}/locations/${region}/endpoints/openapi/chat/completions`,
+		)
 	}
 
 	private async getAuthHeaders(): Promise<Record<string, string>> {
@@ -231,39 +262,30 @@ export class VertexAIApi implements BaseLlmApi {
 
 		switch (vertexProvider) {
 			case "anthropic":
-				url = this.buildUrl(`publishers/anthropic/models/${body.model}:rawPredict`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("anthropic", body.model)}/models/${body.model}:rawPredict`,
+					vertexProvider,
+				)
 				requestBody = this.convertAnthropicBody(body)
 				break
 			case "gemini":
-				url = this.buildUrl(`publishers/google/models/${body.model}:generateContent`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("gemini", body.model)}/models/${body.model}:generateContent`,
+					vertexProvider,
+				)
 				requestBody = this.convertGeminiBody(body, url)
 				break
 			case "mistral":
-				url = this.buildUrl(`publishers/mistralai/models/${body.model}:rawPredict`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("mistral", body.model)}/models/${body.model}:rawPredict`,
+					vertexProvider,
+				)
 				requestBody = body
 				break
-			// kilocode_change start
-			case "qwen":
-				url = this.buildUrl(`publishers/qwen/models/${body.model}:rawPredict`, vertexProvider)
+			case "openai":
+				url = this.buildOpenAiChatCompletionUrl()
 				requestBody = body
 				break
-			case "llama":
-				url = this.buildUrl(`publishers/meta/models/${body.model}:rawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "deepseek":
-				url = this.buildUrl(`publishers/deepseek-ai/models/${body.model}:rawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "kimi":
-				url = this.buildUrl(`publishers/moonshotai/models/${body.model}:rawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "minimax":
-				url = this.buildUrl(`publishers/minimaxai/models/${body.model}:rawPredict`, vertexProvider)
-				requestBody = body
-				break
-			// kilocode_change end
 			default:
 				throw new Error(`Unsupported model: ${body.model}`)
 		}
@@ -282,7 +304,7 @@ export class VertexAIApi implements BaseLlmApi {
 		const data = await response.json()
 
 		if (!response.ok) {
-			logError("VertexAI API Error", {
+			console.error("VertexAI API Error", {
 				status: response.status,
 				statusText: response.statusText,
 				data,
@@ -304,11 +326,7 @@ export class VertexAIApi implements BaseLlmApi {
 					model: body.model,
 				})
 			case "mistral":
-			case "qwen":
-			case "llama":
-			case "deepseek":
-			case "kimi":
-			case "minimax":
+			case "openai":
 				return chatCompletion({
 					content: data.choices?.[0]?.message?.content || "",
 					model: body.model,
@@ -334,62 +352,39 @@ export class VertexAIApi implements BaseLlmApi {
 
 		switch (vertexProvider) {
 			case "anthropic":
-				url = this.buildUrl(`publishers/anthropic/models/${body.model}:streamRawPredict`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("anthropic", body.model)}/models/${body.model}:streamRawPredict`,
+					vertexProvider,
+				)
 				requestBody = this.convertAnthropicBody(body)
 				break
 			case "gemini":
-				url = this.buildUrl(`publishers/google/models/${body.model}:streamGenerateContent`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("gemini", body.model)}/models/${body.model}:streamGenerateContent`,
+					vertexProvider,
+				)
 				requestBody = this.convertGeminiBody(body, url)
 				break
 			case "mistral":
-				url = this.buildUrl(`publishers/mistralai/models/${body.model}:streamRawPredict`, vertexProvider)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("mistral", body.model)}/models/${body.model}:streamRawPredict`,
+					vertexProvider,
+				)
 				requestBody = body
 				break
-			case "qwen":
-				url = this.buildUrl(`publishers/qwen/models/${body.model}:streamRawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "llama":
-				url = this.buildUrl(`publishers/meta/models/${body.model}:streamRawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "deepseek":
-				url = this.buildUrl(`publishers/deepseek-ai/models/${body.model}:streamRawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "kimi":
-				url = this.buildUrl(`publishers/moonshotai/models/${body.model}:streamRawPredict`, vertexProvider)
-				requestBody = body
-				break
-			case "minimax":
-				url = this.buildUrl(`publishers/minimaxai/models/${body.model}:streamRawPredict`, vertexProvider)
-				requestBody = body
+			case "openai":
+				url = this.buildOpenAiChatCompletionUrl()
+				requestBody = this.mistralInstance.modifyChatBody({ ...body })
 				break
 			default:
 				throw new Error(`Unsupported model: ${body.model}`)
 		}
 
 		switch (vertexProvider) {
-			case "mistral":
-			case "qwen":
-			case "llama":
-			case "deepseek":
-			case "kimi":
-			case "minimax": {
-				const openaiResponse = await this.mistralInstance.openai.chat.completions.create(
-					this.mistralInstance.modifyChatBody(body),
-					{
-						signal,
-						headers,
-					},
-				)
-				for await (const result of openaiResponse) {
-					yield result
-				}
-				break
-			}
 			case "anthropic":
-			case "gemini": {
+			case "gemini":
+			case "mistral":
+			case "openai": {
 				const response = await fetch(url.toString(), {
 					method: "POST",
 					headers,
@@ -409,8 +404,12 @@ export class VertexAIApi implements BaseLlmApi {
 				}
 				if (vertexProvider === "gemini") {
 					yield* this.geminiInstance.handleStreamResponse(response, body.model)
-				} else {
+				} else if (vertexProvider === "anthropic") {
 					yield* this.anthropicInstance.handleStreamResponse(response, body.model)
+				} else {
+					for await (const chunk of streamSse(response)) {
+						yield chunk
+					}
 				}
 				break
 			}
