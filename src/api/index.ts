@@ -2,7 +2,7 @@ import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 
 import type { ProviderSettings, ModelInfo, ToolProtocol, VertexModelId } from "@roo-code/types"
-import { vertexModels } from "@roo-code/types"
+import { vertexDefaultModelId, vertexModels } from "@roo-code/types"
 
 import { ApiStream } from "./transform/stream"
 
