@@ -129,7 +129,8 @@ export class UseMcpToolTool extends BaseTool<"use_mcp_tool"> {
 				} catch (error) {
 					task.consecutiveMistakeCount++
 					task.recordToolError("use_mcp_tool")
-					await task.say("error", t("mcp:errors.invalidJsonArgument", { toolName: params.tool_name }))
+					// Do not show this recoverable error to the user in the UI
+					// await task.say("error", t("mcp:errors.invalidJsonArgument", { toolName: params.tool_name }))
 					task.didToolFailInCurrentTurn = true
 
 					pushToolResult(

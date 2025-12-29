@@ -170,12 +170,14 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			if (options.apiModelId?.startsWith("claude")) {
 				return new AnthropicVertexHandler(options)
 			}
-			const modelId = options.apiModelId as VertexModelId
+			// kilocode_change start
+			const modelId = (options.apiModelId as VertexModelId) ?? vertexDefaultModelId
 			const info = vertexModels[modelId] as ModelInfo | undefined
 			if (info?.vertexPublisher && info.vertexPublisher !== "google") {
 				return new VertexMaaSHandler(options)
 			}
 			return new VertexHandler(options)
+			// kilocode_change end
 		}
 		case "openai":
 			return new OpenAiHandler(options)

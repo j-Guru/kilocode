@@ -61,25 +61,42 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 		const location = this.options.vertexRegion ?? "not-provided"
 		const apiKey = this.options.geminiApiKey ?? "not-provided"
 
-		this.client = this.options.vertexJsonCredentials
-			? new GoogleGenAI({
-					vertexai: true,
-					project,
-					location,
-					googleAuthOptions: {
-						credentials: safeJsonParse<JWTInput>(this.options.vertexJsonCredentials, undefined),
-					},
-				})
-			: this.options.vertexKeyFile
-				? new GoogleGenAI({
-						vertexai: true,
-						project,
-						location,
-						googleAuthOptions: { keyFile: this.options.vertexKeyFile },
-					})
-				: isVertex
-					? new GoogleGenAI({ vertexai: true, project, location })
-					: new GoogleGenAI({ apiKey })
+		// kilocode_change start
+		const hasJsonCredentials =
+			this.options.vertexJsonCredentials && this.options.vertexJsonCredentials.trim() !== ""
+
+		if (hasJsonCredentials) {
+			let credentials: JWTInput
+			try {
+				credentials = JSON.parse(this.options.vertexJsonCredentials!) as JWTInput
+				if (credentials?.private_key) {
+					credentials.private_key = credentials.private_key.replace(/\\n/g, "\n")
+				}
+			} catch (error) {
+				throw new Error(
+					"Vertex AI: vertexJsonCredentials is invalid JSON. Please check your service account file.",
+				)
+			}
+			this.client = new GoogleGenAI({
+				vertexai: true,
+				project,
+				location,
+				googleAuthOptions: { credentials },
+			})
+		} else if (this.options.vertexKeyFile) {
+			this.client = new GoogleGenAI({
+				vertexai: true,
+				project,
+				location,
+				googleAuthOptions: { keyFile: this.options.vertexKeyFile },
+			})
+		} else if (isVertex) {
+			// This will use Application Default Credentials
+			this.client = new GoogleGenAI({ vertexai: true, project, location })
+		} else {
+			this.client = new GoogleGenAI({ apiKey })
+		}
+		// kilocode_change end
 	}
 
 	// kilocode_change start
