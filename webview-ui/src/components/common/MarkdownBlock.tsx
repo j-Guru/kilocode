@@ -204,6 +204,10 @@ const StyledMarkdown = styled.div`
 `
 
 const MarkdownBlock = memo(({ markdown }: MarkdownBlockProps) => {
+	const cleanedMarkdown = useMemo(() => {
+		return markdown?.replace(/<function_calls>[\s\S]*?(?:<\/function_calls>|$)|<\/function_calls>/g, "")
+	}, [markdown])
+
 	const components = useMemo(
 		() => ({
 			table: ({ children, ...props }: any) => {
@@ -323,7 +327,7 @@ const MarkdownBlock = memo(({ markdown }: MarkdownBlockProps) => {
 				]}
 				rehypePlugins={[rehypeKatex as any]}
 				components={components}>
-				{markdown || ""}
+				{cleanedMarkdown || ""}
 			</ReactMarkdown>
 		</StyledMarkdown>
 	)

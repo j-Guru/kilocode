@@ -67,18 +67,29 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 		// Parsing a tool parameter
 		if (currentToolUse && currentParamName) {
 			const closeTag = `</${currentParamName}>`
+			const geminiCloseTag = `</parameter>` // kilocode_change
 			// Check if the string *ending* at index `i` matches the closing tag
 			if (
-				currentCharIndex >= closeTag.length - 1 &&
-				assistantMessage.startsWith(
-					closeTag,
-					currentCharIndex - closeTag.length + 1, // Start checking from potential start of tag.
-				)
+				(currentCharIndex >= closeTag.length - 1 &&
+					assistantMessage.startsWith(
+						closeTag,
+						currentCharIndex - closeTag.length + 1, // Start checking from potential start of tag.
+					)) ||
+				// kilocode_change start
+				(currentCharIndex >= geminiCloseTag.length - 1 &&
+					assistantMessage.startsWith(geminiCloseTag, currentCharIndex - geminiCloseTag.length + 1))
+				// kilocode_change end
 			) {
 				// Found the closing tag for the parameter.
+				// kilocode_change start
+				const matchedTag = assistantMessage.startsWith(closeTag, currentCharIndex - closeTag.length + 1)
+					? closeTag
+					: geminiCloseTag
+				// kilocode_change end
+
 				const value = assistantMessage.slice(
 					currentParamValueStart, // Start after the opening tag.
-					currentCharIndex - closeTag.length + 1, // End before the closing tag.
+					currentCharIndex - matchedTag.length + 1, // End before the closing tag.
 				)
 				// Don't trim content parameters to preserve newlines, but strip first and last newline only
 				currentToolUse.params[currentParamName] =
@@ -108,23 +119,50 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 				}
 			}
 
+			// kilocode_change start
+			if (!startedNewParam) {
+				const paramMatch = assistantMessage
+					.slice(0, currentCharIndex + 1)
+					.match(/<parameter name="([^"]+)"[^>]*>$/)
+				if (paramMatch) {
+					const paramName = paramMatch[1] as ToolParamName
+					if (toolParamNames.includes(paramName)) {
+						currentParamName = paramName
+						currentParamValueStart = currentCharIndex + 1
+						startedNewParam = true
+					}
+				}
+			}
+			// kilocode_change end
+
 			if (startedNewParam) {
 				continue // Handled start of param, move to next char.
 			}
 
 			// Check if closing the current tool use.
 			const toolCloseTag = `</${currentToolUse.name}>`
+			const geminiToolCloseTag = `</invoke>` // kilocode_change
 
 			if (
-				currentCharIndex >= toolCloseTag.length - 1 &&
-				assistantMessage.startsWith(toolCloseTag, currentCharIndex - toolCloseTag.length + 1)
+				(currentCharIndex >= toolCloseTag.length - 1 &&
+					assistantMessage.startsWith(toolCloseTag, currentCharIndex - toolCloseTag.length + 1)) ||
+				// kilocode_change start
+				(currentCharIndex >= geminiToolCloseTag.length - 1 &&
+					assistantMessage.startsWith(geminiToolCloseTag, currentCharIndex - geminiToolCloseTag.length + 1))
+				// kilocode_change end
 			) {
 				// End of the tool use found.
+				// kilocode_change start
+				const matchedTag = assistantMessage.startsWith(toolCloseTag, currentCharIndex - toolCloseTag.length + 1)
+					? toolCloseTag
+					: geminiToolCloseTag
+				// kilocode_change end
+
 				// Special handling for content params *before* finalizing the
 				// tool.
 				const toolContentSlice = assistantMessage.slice(
 					currentToolUseStart, // From after the tool opening tag.
-					currentCharIndex - toolCloseTag.length + 1, // To before the tool closing tag.
+					currentCharIndex - matchedTag.length + 1, // To before the tool closing tag.
 				)
 
 				// Check if content parameter needs special handling
@@ -133,14 +171,23 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 				// missed by the parameter parsing logic (e.g., if content is
 				// empty or parsing logic prioritizes tool close).
 				const contentParamName: ToolParamName = "content"
+				const isGeminiParam = toolContentSlice.includes(`</parameter>`) // kilocode_change
 				if (
 					currentToolUse.name === "write_to_file" /* || currentToolUse.name === "new_rule" */ &&
 					// !(contentParamName in currentToolUse.params) && // Only if not already parsed.
-					toolContentSlice.includes(`<${contentParamName}>`) // Check if tag exists.
+					(toolContentSlice.includes(`<${contentParamName}>`) || isGeminiParam) // Check if tag exists. // kilocode_change
 				) {
 					const contentStartTag = `<${contentParamName}>`
 					const contentEndTag = `</${contentParamName}>`
+					// kilocode_change start
 					const contentStart = toolContentSlice.indexOf(contentStartTag)
+					// This is simplistic for Gemini, assumes standard content tag inside param?
+					// Or relies on standard parsing logic?
+					// If using <parameter name="content">, we should look for that.
+					// But our parameter parsing logic should have caught it.
+					// This fallback block is specifically for when param parsing FAILED or was interrupted.
+					// For now, let's keep standard behavior primarily, as Gemini parsing handles </parameter> above.
+					// kilocode_change end
 
 					// Use `lastIndexOf` for robustness against nested tags.
 					const contentEnd = toolContentSlice.lastIndexOf(contentEndTag)
@@ -225,6 +272,49 @@ export function parseAssistantMessageV2(assistantMessage: string): AssistantMess
 					break
 				}
 			}
+
+			// kilocode_change start
+			if (!startedNewTool) {
+				const invokeMatch = assistantMessage.slice(0, currentCharIndex + 1).match(/<invoke name="([^"]+)">$/)
+				if (invokeMatch) {
+					const toolName = invokeMatch[1] as ToolName
+					if (toolNames.includes(toolName)) {
+						// End current text block if one was active.
+						if (currentTextContent) {
+							currentTextContent.content = assistantMessage
+								.slice(currentTextContentStart, currentCharIndex - invokeMatch[0].length + 1)
+								.trim()
+							currentTextContent.partial = false
+							if (currentTextContent.content.length > 0) {
+								contentBlocks.push(currentTextContent)
+							}
+							currentTextContent = undefined
+						} else {
+							// Check for text between last block and this tag
+							const potentialText = assistantMessage
+								.slice(currentTextContentStart, currentCharIndex - invokeMatch[0].length + 1)
+								.trim()
+							if (potentialText.length > 0) {
+								contentBlocks.push({
+									type: "text",
+									content: potentialText,
+									partial: false,
+								})
+							}
+						}
+
+						currentToolUse = {
+							type: "tool_use",
+							name: toolName,
+							params: {},
+							partial: true,
+						}
+						currentToolUseStart = currentCharIndex + 1
+						startedNewTool = true
+					}
+				}
+			}
+			// kilocode_change end
 
 			if (startedNewTool) {
 				continue // Handled start of tool, move to next char.

@@ -22,10 +22,17 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 		if (currentToolUse && currentParamName) {
 			const currentParamValue = accumulator.slice(currentParamValueStartIndex)
 			const paramClosingTag = `</${currentParamName}>`
-			if (currentParamValue.endsWith(paramClosingTag)) {
+			const geminiParamClosingTag = `</parameter>` // kilocode_change
+			if (currentParamValue.endsWith(paramClosingTag) || currentParamValue.endsWith(geminiParamClosingTag)) {
+				// kilocode_change
 				// End of param value.
 				// Don't trim content parameters to preserve newlines, but strip first and last newline only
-				let paramValue = currentParamValue.slice(0, -paramClosingTag.length).trim()
+				// kilocode_change start
+				let closingTagLength = currentParamValue.endsWith(paramClosingTag)
+					? paramClosingTag.length
+					: geminiParamClosingTag.length
+				let paramValue = currentParamValue.slice(0, -closingTagLength).trim()
+				// kilocode_change end
 
 				// kilocode_change start
 				if (currentToolUse.name === "execute_command" && currentParamName === "command") {
@@ -54,7 +61,9 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 		if (currentToolUse) {
 			const currentToolValue = accumulator.slice(currentToolUseStartIndex)
 			const toolUseClosingTag = `</${currentToolUse.name}>`
-			if (currentToolValue.endsWith(toolUseClosingTag)) {
+			const geminiToolClosingTag = `</invoke>` // kilocode_change
+			if (currentToolValue.endsWith(toolUseClosingTag) || currentToolValue.endsWith(geminiToolClosingTag)) {
+				// kilocode_change
 				// End of a tool use.
 				currentToolUse.partial = false
 				contentBlocks.push(currentToolUse)
@@ -71,6 +80,19 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 					}
 				}
 
+				// kilocode_change start
+				if (!currentParamName) {
+					const geminiParamMatch = accumulator.match(/<parameter name="([^"]+)"[^>]*>$/)
+					if (geminiParamMatch) {
+						const paramName = geminiParamMatch[1] as ToolParamName
+						if (toolParamNames.includes(paramName)) {
+							currentParamName = paramName
+							currentParamValueStartIndex = accumulator.length
+						}
+					}
+				}
+				// kilocode_change end
+
 				// There's no current param, and not starting a new param.
 
 				// Special case for write_to_file where file contents could
@@ -79,10 +101,14 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 				// To work around this, we get the string between the starting
 				// content tag and the LAST content tag.
 				const contentParamName: ToolParamName = "content"
+				// kilocode_change start
+				// Check for both standard and Gemini param tags
+				const isGeminiParam = accumulator.endsWith(`</parameter>`)
 				if (
-					(currentToolUse.name === "write_to_file" || currentToolUse.name === "new_rule") && // kilocode_change
-					accumulator.endsWith(`</${contentParamName}>`)
+					(currentToolUse.name === "write_to_file" || currentToolUse.name === "new_rule") &&
+					(accumulator.endsWith(`</${contentParamName}>`) || isGeminiParam)
 				) {
+					// kilocode_change end
 					const toolContent = accumulator.slice(currentToolUseStartIndex)
 					const contentStartTag = `<${contentParamName}>`
 					const contentEndTag = `</${contentParamName}>`
@@ -138,6 +164,35 @@ export function parseAssistantMessage(assistantMessage: string): AssistantMessag
 				break
 			}
 		}
+
+		// kilocode_change start
+		if (!didStartToolUse) {
+			const geminiInvokeMatch = accumulator.match(/<invoke name="([^"]+)">$/)
+			if (geminiInvokeMatch) {
+				const toolName = geminiInvokeMatch[1] as ToolName
+				if (toolNames.includes(toolName)) {
+					currentToolUse = {
+						type: "tool_use",
+						name: toolName,
+						params: {},
+						partial: true,
+					}
+					currentToolUseStartIndex = accumulator.length
+
+					if (currentTextContent) {
+						currentTextContent.partial = false
+						// Remove <invoke name="...">
+						currentTextContent.content = currentTextContent.content
+							.slice(0, -geminiInvokeMatch[0].length)
+							.trim()
+						contentBlocks.push(currentTextContent)
+						currentTextContent = undefined
+					}
+					didStartToolUse = true
+				}
+			}
+		}
+		// kilocode_change end
 
 		if (!didStartToolUse) {
 			// No tool use, so it must be text either at the beginning or
