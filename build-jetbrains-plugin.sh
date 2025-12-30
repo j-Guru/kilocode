@@ -3,8 +3,8 @@
 # Configuration
 MIN_SIZE_MB=300
 MAX_SIZE_MB=400
-PLUGIN_VERSION=$(grep 'pluginVersion=' jetbrains/plugin/gradle.properties | cut -d'=' -f2)
-BUILD_PATH="jetbrains/plugin/build/distributions/Kilo Code-${PLUGIN_VERSION}.zip"
+ARTIFACT_DIR="jetbrains/plugin/build/distributions"
+ARTIFACT_NAME_PATTERN="Kilo Code-*.zip"
 
 echo "🚀 Starting JetBrains Plugin Production Build..."
 
@@ -50,9 +50,15 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# 4. Size Validation
-if [ -f "$BUILD_PATH" ]; then
-    FILE_SIZE_BYTES=$(stat -c%s "$BUILD_PATH")
+# 4. Size Validation and version extraction
+FOUND_ARTIFACT=$(find "$ARTIFACT_DIR" -maxdepth 1 -name "$ARTIFACT_NAME_PATTERN" | head -n 1)
+
+if [ -f "$FOUND_ARTIFACT" ]; then
+    # Extract version from the found artifact name
+    ARTIFACT_FILENAME=$(basename "$FOUND_ARTIFACT")
+    EXTRACTED_VERSION=$(echo "$ARTIFACT_FILENAME" | sed -E 's/Kilo Code-(.*)\.zip/\1/')
+
+    FILE_SIZE_BYTES=$(stat -c%s "$FOUND_ARTIFACT")
     FILE_SIZE_MB=$((FILE_SIZE_BYTES / 1024 / 1024))
 
     echo "📊 Build complete. Final size: ${FILE_SIZE_MB}MB"
@@ -65,9 +71,10 @@ if [ -f "$BUILD_PATH" ]; then
         echo "✅ Build size is within the healthy range."
     fi
 
-    echo "📍 Artifact location: $BUILD_PATH"
+    echo "📍 Artifact location: $FOUND_ARTIFACT"
+    echo "✅ Plugin - version ${EXTRACTED_VERSION} is built successfully!"
 else
-    echo "❌ Error: Build artifact not found at $BUILD_PATH"
+    echo "❌ Error: Build artifact not found in $ARTIFACT_DIR with pattern $ARTIFACT_NAME_PATTERN"
     exit 1
 fi
 
