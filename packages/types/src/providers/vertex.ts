@@ -347,6 +347,16 @@ export const vertexModels = {
 		vertexPublisher: "deepseek-ai",
 		description: "DeepSeek V3.2 model (MaaS). Available globally",
 	},
+	"deepseek-r1-0528-maas": {
+		maxTokens: 32_768,
+		contextWindow: 163_840,
+		supportsImages: false,
+		supportsPromptCache: false,
+		inputPrice: 1.35,
+		outputPrice: 5.4,
+		vertexPublisher: "deepseek-ai",
+		description: "DeepSeek R1 model (MaaS). Available us-central1",
+	},
 	// "mistral-medium-3@001": {
 	// 	maxTokens: 8192,
 	// 	contextWindow: 128_000,
