@@ -70,7 +70,7 @@ qdrant_storage/
 # Act Secret Files
 .secrets
 # Architect plans
-plans/
+./plans/
 
 # TypeScript/JavaScript SDK for Gemini and Vertex AI.
 docs

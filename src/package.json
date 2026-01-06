@@ -3,7 +3,7 @@
 	"displayName": "%extension.displayName%",
 	"description": "%extension.description%",
 	"publisher": "kilocode",
-	"version": "4.140.3",
+	"version": "4.142.0",
 	"icon": "assets/icons/logo-outline-black.png",
 	"galleryBanner": {
 		"color": "#FFFFFF",
@@ -201,11 +201,6 @@
 			{
 				"command": "kilo-code.addToContext",
 				"title": "%command.addToContext.title%",
-				"category": "%configuration.title%"
-			},
-			{
-				"command": "kilo-code.addToContextAndFocus",
-				"title": "Add to Context and Focus",
 				"category": "%configuration.title%"
 			},
 			{
@@ -474,20 +469,6 @@
 				"win": "ctrl+k ctrl+a",
 				"linux": "ctrl+k ctrl+a",
 				"when": "editorTextFocus && editorHasSelection"
-			},
-			{
-				"command": "kilo-code.addToContextAndFocus",
-				"key": "ctrl+i",
-				"mac": "cmd+i",
-				"win": "ctrl+i",
-				"linux": "ctrl+i",
-				"when": "editorTextFocus && !github.copilot.completions.enabled && kilocode.ghost.enableQuickInlineTaskKeybinding"
-			},
-			{
-				"command": "kilo-code.ghost.showIncompatibilityExtensionPopup",
-				"key": "ctrl+i",
-				"mac": "cmd+i",
-				"when": "editorTextFocus && github.copilot.completions.enabled && kilocode.ghost.enableQuickInlineTaskKeybinding"
 			},
 			{
 				"command": "kilo-code.toggleAutoApprove",
