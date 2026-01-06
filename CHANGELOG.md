@@ -1,5 +1,55 @@
 # kilo-code
 
+## 4.142.0
+
+### Minor Changes
+
+- [#4587](https://github.com/Kilo-Org/kilocode/pull/4587) [`d1c35c5`](https://github.com/Kilo-Org/kilocode/commit/d1c35c54c253b22a264ee4ce90fd25f5d93343da) Thanks [@hassoncs](https://github.com/hassoncs)! - Improve the initial setup experience for the speech-to-text feature by adding an inline setup tooltip
+
+### Patch Changes
+
+- [#4785](https://github.com/Kilo-Org/kilocode/pull/4785) [`acc529e`](https://github.com/Kilo-Org/kilocode/commit/acc529e884be601d635ad9e714a0f3b2a4e9b639) Thanks [@markijbema](https://github.com/markijbema)! - Removed the cmd-i (quick inline task) functionality, as cmd-k-a (add to context) is now equivalent
+
+- [#4765](https://github.com/Kilo-Org/kilocode/pull/4765) [`725b0bc`](https://github.com/Kilo-Org/kilocode/commit/725b0bc56d1262b9e847861db86a3609c40479d9) Thanks [@Drilmo](https://github.com/Drilmo)! - Fixed exit prompt showing "Cmd+C" instead of "Ctrl+C" on Mac. Ctrl+C is the universal terminal interrupt signal on all platforms.
+
+- [#4787](https://github.com/Kilo-Org/kilocode/pull/4787) [`84033fa`](https://github.com/Kilo-Org/kilocode/commit/84033fa3015a757b358cc4799308b8209646ec5e) Thanks [@markijbema](https://github.com/markijbema)! - Keep config screen in sync with whether chat autocomplete is enabled
+
+- [#4800](https://github.com/Kilo-Org/kilocode/pull/4800) [`c089dc2`](https://github.com/Kilo-Org/kilocode/commit/c089dc2351daefe7690adf1a3f01cc8b82a27409) Thanks [@hassoncs](https://github.com/hassoncs)! - Add fuzzy matching to / commands
+
+## 4.141.2
+
+### Patch Changes
+
+- [#4747](https://github.com/Kilo-Org/kilocode/pull/4747) [`e4f9e65`](https://github.com/Kilo-Org/kilocode/commit/e4f9e65e130d0ef34cbf110b64b44f2156d0a425) Thanks [@chrarnoldus](https://github.com/chrarnoldus)! - Fixed no checkpoint being created before a file is edited
+
+- [#4754](https://github.com/Kilo-Org/kilocode/pull/4754) [`d936b50`](https://github.com/Kilo-Org/kilocode/commit/d936b50f6c28592a910c83c52433eb59aa019cf5) Thanks [@keeganwitt](https://github.com/keeganwitt)! - Added ability to use Codestral for autocomplete from HuggingFace, LiteLLM, LM Studio and Ollama
+
+## 4.141.1
+
+### Patch Changes
+
+- [#4736](https://github.com/Kilo-Org/kilocode/pull/4736) [`c7bd7b7`](https://github.com/Kilo-Org/kilocode/commit/c7bd7b7ad385d32e114f75dfffa6d5d4168ca073) Thanks [@marius-kilocode](https://github.com/marius-kilocode)! - Skip VSCode-specific diagnostic operations in CLI mode for improved performance
+
+- [#4725](https://github.com/Kilo-Org/kilocode/pull/4725) [`2dcce20`](https://github.com/Kilo-Org/kilocode/commit/2dcce2020b645b8c839a763d4ec97a03f8811aef) Thanks [@marius-kilocode](https://github.com/marius-kilocode)! - Prevent empty checkpoints from being created on every tool use
+
+- [#4723](https://github.com/Kilo-Org/kilocode/pull/4723) [`b9d0d16`](https://github.com/Kilo-Org/kilocode/commit/b9d0d164bd5a3feaab000a040fb9a04f4cd65f77) Thanks [@kiloconnect](https://github.com/apps/kiloconnect)! - Enable chat autocomplete by default
+
+- [#4681](https://github.com/Kilo-Org/kilocode/pull/4681) [`2be56b8`](https://github.com/Kilo-Org/kilocode/commit/2be56b8b09a0cab177adf18c8dd8998f6362cc2d) Thanks [@catrielmuller](https://github.com/catrielmuller)! - Jetbrains IDEs - Improve intialization process
+
+## 4.141.0
+
+### Minor Changes
+
+- [#4702](https://github.com/Kilo-Org/kilocode/pull/4702) [`b84a66f`](https://github.com/Kilo-Org/kilocode/commit/b84a66f5923cf2600a6d5c8e2b5fd49759406696) Thanks [@chrarnoldus](https://github.com/chrarnoldus)! - Add support for skills
+
+### Patch Changes
+
+- [#4710](https://github.com/Kilo-Org/kilocode/pull/4710) [`c128319`](https://github.com/Kilo-Org/kilocode/commit/c1283192df1b0e59fef8b9ab2d3442bf4a07abde) Thanks [@sebastiand-cerebras](https://github.com/sebastiand-cerebras)! - Update Cerebras maxTokens from 8192 to 16384 for all models
+
+- [#4718](https://github.com/Kilo-Org/kilocode/pull/4718) [`9a465b0`](https://github.com/Kilo-Org/kilocode/commit/9a465b06fe401f70dd166fb5b320a8070f07c727) Thanks [@marius-kilocode](https://github.com/marius-kilocode)! - Fix terminal scroll-flicker in CLI by disabling streaming output and enabling Ink incremental rendering
+
+- [#4719](https://github.com/Kilo-Org/kilocode/pull/4719) [`57b0873`](https://github.com/Kilo-Org/kilocode/commit/57b08737788cd504954563d46eb1e6323d619301) Thanks [@marius-kilocode](https://github.com/marius-kilocode)! - Confirm before exiting the CLI on Ctrl+C/Cmd+C.
+
 ## 4.140.3
 
 ### Patch Changes
