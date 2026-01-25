@@ -135,6 +135,9 @@ export class ExtensionService extends EventEmitter {
 		if (this.options.identity) {
 			hostOptions.identity = this.options.identity
 		}
+		if (this.options.mode) {
+			hostOptions.mode = this.options.mode
+		}
 		if (this.options.customModes) {
 			hostOptions.customModes = this.options.customModes
 		}

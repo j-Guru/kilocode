@@ -246,7 +246,13 @@ async function main(): Promise<void> {
 		process.exit(1)
 	}
 
-	logs.info("Starting agent process", "AgentProcess", { workspace: config.workspace })
+	const customModeSlugs = config.customModes?.map((m) => m.slug).join(", ") || "none"
+	logs.info("Starting agent process", "AgentProcess", {
+		workspace: config.workspace,
+		mode: config.mode,
+		customModesCount: config.customModes?.length || 0,
+		customModeSlugs,
+	})
 
 	let agent: ExtensionService | null = null
 
