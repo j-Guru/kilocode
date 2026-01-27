@@ -1159,9 +1159,6 @@
 	},
 	"includeMaxOutputTokens": "Include max output tokens",
 	"includeMaxOutputTokensDescription": "Send max output tokens parameter in API requests. Some providers may not support this.",
-	"disableNativeTools": "Disable Native Tool Calling",
-	"disableNativeToolsDescription": "Force the model to use XML-based tool calling instead of native function calling. Useful for models (like DeepSeek on Azure) that struggle with native tools or output JSON in text.",
-
 	"limitMaxTokensDescription": "Limit the maximum number of tokens in the response",
 	"maxOutputTokensLabel": "Max output tokens",
 	"maxTokensGenerateDescription": "Maximum tokens to generate in response",

@@ -217,7 +217,6 @@ const baseProviderSettingsSchema = z.object({
 
 	// Tool protocol override for this profile.
 	toolProtocol: z.enum(["xml", "native"]).optional(),
-	disableNativeTools: z.boolean().optional(),
 })
 
 // Several of the providers share common model config properties.
