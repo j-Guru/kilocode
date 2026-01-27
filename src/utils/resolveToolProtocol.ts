@@ -39,7 +39,13 @@ export function resolveToolProtocol(
 		return lockedProtocol
 	}
 
-	// 2. Always return Native protocol for new tasks
+	// 2. Disable Native Tools Override
+	// User has explicitly requested to force XML protocol
+	if (_providerSettings.disableNativeTools) {
+		return TOOL_PROTOCOL.XML
+	}
+
+	// 3. Always return Native protocol for new tasks
 	// All models now support native tools; XML is deprecated
 	return TOOL_PROTOCOL.NATIVE
 }
