@@ -1,4 +1,4 @@
-import { reactConfig } from "@roo-code/config-eslint/react"
+import { reactConfig } from "../packages/config-eslint/react.js"
 
 /** @type {import("eslint").Linter.Config} */
 export default [

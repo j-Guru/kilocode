@@ -1,4 +1,4 @@
-import { config } from "@roo-code/config-eslint/base"
+import { config } from "../config-eslint/base.js"
 
 /** @type {import("eslint").Linter.Config} */
 export default [...config]
