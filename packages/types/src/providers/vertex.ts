@@ -15,8 +15,7 @@ export const vertexModels = {
 		supportsPromptCache: true,
 		supportsReasoningEffort: ["low", "high"],
 		reasoningEffort: "low",
-		includedTools: ["write_file", "edit_file"],
-		excludedTools: ["apply_diff"],
+
 		supportsTemperature: true,
 		defaultTemperature: 1,
 		inputPrice: 4.0,
@@ -43,8 +42,7 @@ export const vertexModels = {
 		supportsPromptCache: true,
 		supportsReasoningEffort: ["minimal", "low", "medium", "high"],
 		reasoningEffort: "medium",
-		includedTools: ["write_file", "edit_file"],
-		excludedTools: ["apply_diff"],
+
 		supportsTemperature: true,
 		defaultTemperature: 1,
 		inputPrice: 0.3,
@@ -59,8 +57,7 @@ export const vertexModels = {
 		supportsNativeTools: true,
 		defaultToolProtocol: "native",
 		supportsPromptCache: true,
-		includedTools: ["write_file", "edit_file"],
-		excludedTools: ["apply_diff"],
+
 		inputPrice: 0.3,
 		outputPrice: 2.5,
 		cacheReadsPrice: 0.075,
@@ -75,8 +72,7 @@ export const vertexModels = {
 		supportsNativeTools: true,
 		defaultToolProtocol: "native",
 		supportsPromptCache: true,
-		includedTools: ["write_file", "edit_file"],
-		excludedTools: ["apply_diff"],
+
 		inputPrice: 2.5,
 		outputPrice: 15,
 		maxThinkingTokens: 32_768,
@@ -89,8 +85,7 @@ export const vertexModels = {
 		supportsNativeTools: true,
 		defaultToolProtocol: "native",
 		supportsPromptCache: true,
-		includedTools: ["write_file", "edit_file"],
-		excludedTools: ["apply_diff"],
+
 		inputPrice: 2.5,
 		outputPrice: 15,
 		maxThinkingTokens: 32_768,
