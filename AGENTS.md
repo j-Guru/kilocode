@@ -93,7 +93,7 @@ The Agent Manager follows a **read-shared, write-isolated** pattern:
 
 ```typescript
 fork(agentRuntimePath, [], {
-  env: { AGENT_CONFIG: JSON.stringify({ workspace, providerSettings, mode, sessionId }) }
+	env: { AGENT_CONFIG: JSON.stringify({ workspace, providerSettings, mode, sessionId }) },
 })
 ```
 

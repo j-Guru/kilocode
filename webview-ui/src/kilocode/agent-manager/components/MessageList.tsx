@@ -18,6 +18,7 @@ import { FollowUpSuggestions } from "./FollowUpSuggestions"
 import { CommandExecutionBlock } from "./CommandExecutionBlock"
 import { ProgressIndicator } from "./ProgressIndicator"
 import { ReasoningBlock } from "./ReasoningBlock"
+import MessageThumbnails from "./MessageThumbnails"
 import { vscode } from "../utils/vscode"
 import {
 	MessageCircle,
@@ -243,7 +244,14 @@ function MessageItem({ message, isLast, commandExecutionByTs, onSuggestionClick,
 			case "user_feedback": {
 				icon = <User size={16} />
 				title = t("messages.youSaid")
-				content = <SimpleMarkdown content={messageText} />
+				content = (
+					<>
+						<SimpleMarkdown content={messageText} />
+						{message.images && message.images.length > 0 && (
+							<MessageThumbnails images={message.images} style={{ marginTop: "8px" }} />
+						)}
+					</>
+				)
 				break
 			}
 			case "completion_result": {
@@ -411,6 +419,9 @@ function QueuedMessageItem({ queuedMessage, isSending: _isSending, onRetry, onDi
 				</div>
 				<div className="am-message-body">
 					<SimpleMarkdown content={queuedMessage.content} />
+					{queuedMessage.images && queuedMessage.images.length > 0 && (
+						<MessageThumbnails images={queuedMessage.images} style={{ marginTop: "8px" }} />
+					)}
 				</div>
 				{queuedMessage.status === "failed" && (
 					<div className="mt-2 space-y-2">

@@ -1,4 +1,4 @@
-import { config } from "@roo-code/config-eslint/base"
+import { config } from "../config-eslint/base.js"
 import globals from "globals"
 
 /** @type {import("eslint").Linter.Config} */
