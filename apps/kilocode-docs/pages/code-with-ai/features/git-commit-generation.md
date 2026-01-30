@@ -78,7 +78,11 @@ You can configure which API profile to use for commit message generation:
 2. Select a specific profile or use the currently selected one
 
 {% callout type="tip" %}
+<<<<<<< HEAD
 Consider creating a dedicated [API configuration profile](/features/api-configuration-profiles) with a faster, more cost-effective model specifically for commit message generation.
+=======
+Consider creating a dedicated [API configuration profile](/docs/ai-providers) with a faster, more cost-effective model specifically for commit message generation.
+>>>>>>> main
 {% /callout %}
 
 ## Best Practices
@@ -158,5 +162,10 @@ The feature integrates with VS Code's built-in git functionality. If you encount
 
 ## Related Features
 
+<<<<<<< HEAD
 - [API Configuration Profiles](/features/api-configuration-profiles) - Use different models for commit generation
 - [Settings Management](/features/settings-management) - Manage all your Kilo Code preferences
+=======
+- [API Configuration Profiles](/docs/ai-providers) - Use different models for commit generation
+- [Settings Management](/docs/getting-started/settings) - Manage all your Kilo Code preferences
+>>>>>>> main

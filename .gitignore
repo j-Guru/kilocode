@@ -73,5 +73,3 @@ qdrant_storage/
 ./plans/
 
 roo-cli-*.tar.gz*
-# TypeScript/JavaScript SDK for Gemini and Vertex AI.
-docs

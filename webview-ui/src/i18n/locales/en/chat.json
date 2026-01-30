@@ -386,6 +386,11 @@
 		"total": "Total Cost: ${{cost}}",
 		"includesSubtasks": "Includes subtask costs"
 	},
+	"costs": {
+		"totalWithSubtasks": "Total Cost (including subtasks): ${{cost}}",
+		"total": "Total Cost: ${{cost}}",
+		"includesSubtasks": "Includes subtask costs"
+	},
 	"browser": {
 		"session": "Browser Session",
 		"active": "Active",

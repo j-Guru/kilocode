@@ -2,7 +2,7 @@
 	"welcome": {
 		"greeting": "Bem-vindo ao Kilo Code!",
 		"introText1": "Kilo Code é um agente de codificação AI gratuito e de código aberto.",
-		"introText2": "Funciona com os mais recentes modelos de IA como Claude Sonnet 4.5, Gemini 2.5 Pro, GPT-5, e mais de 450 outros.",
+		"introText2": "Funciona com os mais recentes modelos de IA como Claude Opus 4.5, Gemini 3 Pro, GPT-5.2, e mais de 450 outros.",
 		"introText3": "Crie uma conta gratuita e receba $20 em créditos bônus ao recarregar pela primeira vez.",
 		"ctaButton": "Começar",
 		"manualModeButton": "Use sua própria chave de API",
@@ -26,6 +26,11 @@
 		"continueWith": "Continuar com {{model}}",
 		"continue": "Continuar"
 	},
+	"unauthorizedError": {
+		"title": "Você precisa fazer login para usar o modelo {{modelId}}",
+		"message": "Faça login ou crie uma conta para acessar mais de 500 modelos, usar créditos a preço de custo ou trazer sua própria chave.",
+		"loginButton": "Fazer Login"
+	},
 	"pricing": {
 		"costUnknown": "custo desconhecido",
 		"costUnknownDescription": "O Provedor de API não forneceu dados de custo ou a solicitação foi cancelada.",
@@ -47,6 +52,10 @@
 			"apiKey": "Chave de API do Kilo Code",
 			"login": "Entrar no Kilo Code",
 			"logout": "Sair do Kilo Code",
+<<<<<<< HEAD
+=======
+			"loginForPremiumModels": "Faça login para acessar modelos e recursos premium",
+>>>>>>> main
 			"providerRouting": {
 				"title": "Roteamento de Provedor",
 				"managedByOrganization": "Gerenciar roteamento de provedor em nível de organização",
@@ -210,6 +219,8 @@
 	},
 	"ideaSuggestionsBox": {
 		"newHere": "Novo aqui?",
+		"tryOneOfThese": "Experimente uma dessas ideias para começar:",
+		"clickToInsert": "Clique em qualquer sugestão para começar a trabalhar nela imediatamente",
 		"suggestionText": "<suggestionButton>Clique aqui</suggestionButton> para uma ideia legal, depois toque em <sendIcon /> e me veja fazer mágica!",
 		"ideas": {
 			"idea1": "Crie uma esfera 3D giratória e brilhante que responde aos movimentos do mouse. Faça o app funcionar no navegador.",
