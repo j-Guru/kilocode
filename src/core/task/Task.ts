@@ -16,6 +16,7 @@ import pWaitFor from "p-wait-for"
 import { serializeError } from "serialize-error"
 import { Package } from "../../shared/package"
 import { formatToolInvocation } from "../tools/helpers/toolResultFormatting"
+import { parseLenientXmlToolCalls, extractTextFromXml } from "../tools/xml-parser/lenient-parser"
 
 import {
 	type TaskLike,
@@ -3796,6 +3797,64 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					// }
 
 					await pWaitFor(() => this.userMessageContentReady)
+
+					// Check if lenient XML parsing is enabled for this model/task
+					const useLenientParsing =
+						this.providerSettings?.enableXmlToolParsing ||
+						this.model?.requiresLenientParsing ||
+						this._taskToolProtocol === "xml"
+
+					// If using XML protocol and lenient parsing is enabled, try to parse malformed tool calls
+					if (useLenientParsing && this._taskToolProtocol === "xml") {
+						// Get the raw assistant message text
+						const assistantText = this.assistantMessageContent
+							.filter((block) => block.type === "text")
+							.map((block) => (block as any).text)
+							.join("")
+
+						if (assistantText.trim()) {
+							// Try lenient XML parsing
+							const parseResult = parseLenientXmlToolCalls(assistantText)
+
+							if (parseResult.toolCalls.length > 0) {
+								// Log any parsing warnings
+								if (parseResult.errors.length > 0) {
+									console.warn(`[Task#${this.taskId}] XML parsing warnings:`, parseResult.errors)
+									await this.say(
+										"text",
+										`⚠️ Model response had formatting issues (recovered ${parseResult.toolCalls.length} tool calls)`,
+									)
+								}
+
+								// Convert parsed tool calls to internal format
+								for (const toolCall of parseResult.toolCalls) {
+									try {
+										const toolUseIndex = this.assistantMessageContent.length
+
+										this.assistantMessageContent.push({
+											type: "tool_use",
+											id: `toolu_xml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+											name: toolCall.name,
+											input: JSON.parse(toolCall.arguments),
+											partial: false,
+										})
+									} catch (error) {
+										console.warn(
+											`[Task#${this.taskId}] Failed to parse tool call "${toolCall.name}":`,
+											error,
+										)
+									}
+								}
+
+								// Update text content (removing tool call XML)
+								const cleanText = extractTextFromXml(assistantText)
+								const textBlocks = this.assistantMessageContent.filter((b) => b.type === "text")
+								if (textBlocks.length > 0 && cleanText) {
+									;(textBlocks[textBlocks.length - 1] as any).text = cleanText
+								}
+							}
+						}
+					}
 
 					// If the model did not tool use, then we need to tell it to
 					// either use a tool or attempt_completion.

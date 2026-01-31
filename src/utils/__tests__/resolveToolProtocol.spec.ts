@@ -155,6 +155,79 @@ describe("resolveToolProtocol", () => {
 			expect(result).toBe(TOOL_PROTOCOL.NATIVE)
 		})
 	})
+
+	describe("DeepSeek Lenient Parsing Support", () => {
+		it("should use XML protocol for models with requiresLenientParsing flag", () => {
+			const settings: ProviderSettings = {
+				apiProvider: "vertex",
+			}
+			const modelInfo: ModelInfo = {
+				maxTokens: 32768,
+				contextWindow: 163840,
+				supportsPromptCache: false,
+				supportsNativeTools: true,
+				requiresLenientParsing: true,
+			}
+			const result = resolveToolProtocol(settings, modelInfo)
+			expect(result).toBe(TOOL_PROTOCOL.XML)
+		})
+
+		it("should use XML protocol for models with defaultToolProtocol set to xml", () => {
+			const settings: ProviderSettings = {
+				apiProvider: "vertex",
+			}
+			const modelInfo: ModelInfo = {
+				maxTokens: 32768,
+				contextWindow: 163840,
+				supportsPromptCache: false,
+				supportsNativeTools: true,
+				defaultToolProtocol: "xml",
+			}
+			const result = resolveToolProtocol(settings, modelInfo)
+			expect(result).toBe(TOOL_PROTOCOL.XML)
+		})
+
+		it("should use XML protocol when enableXmlToolParsing is true", () => {
+			const settings: ProviderSettings = {
+				apiProvider: "openai",
+				enableXmlToolParsing: true,
+			}
+			const modelInfo: ModelInfo = {
+				maxTokens: 32768,
+				contextWindow: 163840,
+				supportsPromptCache: false,
+				supportsNativeTools: true,
+			}
+			const result = resolveToolProtocol(settings, modelInfo)
+			expect(result).toBe(TOOL_PROTOCOL.XML)
+		})
+
+		it("should use XML protocol when user explicitly sets toolProtocol to xml", () => {
+			const settings: ProviderSettings = {
+				apiProvider: "openai",
+				toolProtocol: "xml",
+			}
+			const result = resolveToolProtocol(settings)
+			expect(result).toBe(TOOL_PROTOCOL.XML)
+		})
+
+		it("should prioritize locked protocol over model defaults", () => {
+			const settings: ProviderSettings = {
+				apiProvider: "vertex",
+				enableXmlToolParsing: true,
+			}
+			const modelInfo: ModelInfo = {
+				maxTokens: 32768,
+				contextWindow: 163840,
+				supportsPromptCache: false,
+				requiresLenientParsing: true,
+				defaultToolProtocol: "xml",
+			}
+			// Locked protocol should override everything
+			const result = resolveToolProtocol(settings, modelInfo, "native")
+			expect(result).toBe(TOOL_PROTOCOL.NATIVE)
+		})
+	})
 })
 
 describe("detectToolProtocolFromHistory", () => {

@@ -119,6 +119,8 @@ export const modelInfoSchema = z.object({
 	supportsNativeTools: z.boolean().optional(),
 	// Default tool protocol preferred by this model (if not specified, falls back to capability/provider defaults)
 	defaultToolProtocol: z.enum(["xml", "native"]).optional(),
+	// Flag to indicate if the model requires lenient XML parsing for malformed tool responses
+	requiresLenientParsing: z.boolean().optional(),
 	// Exclude specific native tools from being available (only applies to native protocol)
 	// These tools will be removed from the set of tools available to the model
 	excludedTools: z.array(z.string()).optional(),

@@ -211,6 +211,8 @@ export const vertexModels = {
 		supportsImages: false,
 		supportsPromptCache: false,
 		supportsNativeTools: true, // kilocode_change - supports function calling per Vertex MaaS docs
+		defaultToolProtocol: "xml", // kilocode_change - DeepSeek v3.2 has XML formatting issues
+		requiresLenientParsing: true, // kilocode_change - Enable lenient XML parsing for malformed responses
 		inputPrice: 0.6,
 		outputPrice: 1.7,
 		vertexPublisher: "deepseek-ai",

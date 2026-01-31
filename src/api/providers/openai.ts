@@ -315,10 +315,21 @@ export class OpenAiHandler extends BaseProvider implements SingleCompletionHandl
 		// Ensure OpenAI-compatible models default to supporting native tool calling.
 		// This is required for [`Task.attemptApiRequest()`](src/core/task/Task.ts:3817) to
 		// include tool definitions in the request.
-		const info: ModelInfo = {
+		let info: ModelInfo = {
 			...NATIVE_TOOL_DEFAULTS,
 			...(this.options.openAiCustomModelInfo ?? openAiModelInfoSaneDefaults),
 		}
+
+		// Apply lenient parsing for DeepSeek models (v3.2 MaaS via Azure OpenAI Foundry)
+		// These models have known XML formatting issues when accessed through OpenAI-compatible endpoints
+		if (id.toLowerCase().includes("deepseek") && id.toLowerCase().includes("v3")) {
+			info = {
+				...info,
+				defaultToolProtocol: "xml",
+				requiresLenientParsing: true,
+			}
+		}
+
 		const params = getModelParams({ format: "openai", modelId: id, model: info, settings: this.options })
 		return { id, info, ...params }
 	}

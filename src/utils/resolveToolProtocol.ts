@@ -1,4 +1,4 @@
-import { ToolProtocol, TOOL_PROTOCOL } from "@roo-code/types"
+import { ToolProtocol, TOOL_PROTOCOL, type ModelInfo } from "@roo-code/types"
 import type { ProviderSettings } from "@roo-code/types"
 import type { Anthropic } from "@anthropic-ai/sdk"
 import { findLast, findLastIndex } from "../shared/array"
@@ -14,23 +14,25 @@ type ApiMessageForDetection = Anthropic.MessageParam & {
 /**
  * Resolve the effective tool protocol.
  *
- * **Deprecation Note (XML Protocol):**
- * XML tool protocol has been deprecated. All models now use Native tool calling.
- * User/profile preferences (`providerSettings.toolProtocol`) and model defaults
- * (`modelInfo.defaultToolProtocol`) are ignored.
+ * **Updated Behavior:**
+ * While native tool protocol is preferred, some models (like DeepSeek-v3.2 MaaS)
+ * require XML protocol due to formatting issues. We now respect model-specific
+ * requirements while defaulting to native for all other cases.
  *
  * Precedence:
  * 1. Locked Protocol (task-level lock for resumed tasks - highest priority)
- * 2. Native (always, for all new tasks)
+ * 2. User/Profile Override (providerSettings.toolProtocol or enableXmlToolParsing)
+ * 3. Model Default (modelInfo.defaultToolProtocol for models with known issues)
+ * 4. Native (default for all other cases)
  *
- * @param _providerSettings - The provider settings (toolProtocol field is ignored)
- * @param _modelInfo - Unused, kept for API compatibility
+ * @param providerSettings - The provider settings
+ * @param modelInfo - Model information including defaultToolProtocol
  * @param lockedProtocol - Optional task-locked protocol that takes absolute precedence
  * @returns The resolved tool protocol (either "xml" or "native")
  */
 export function resolveToolProtocol(
-	_providerSettings: ProviderSettings,
-	_modelInfo?: unknown,
+	providerSettings: ProviderSettings,
+	modelInfo?: ModelInfo,
 	lockedProtocol?: ToolProtocol,
 ): ToolProtocol {
 	// 1. Locked Protocol - task-level lock takes absolute precedence
@@ -39,8 +41,20 @@ export function resolveToolProtocol(
 		return lockedProtocol
 	}
 
-	// 2. Always return Native protocol for new tasks
-	// All models now support native tools; XML is deprecated
+	// 2. User/Profile Override - explicit user preference
+	// If user has enabled XML tool parsing or set XML protocol, honor it
+	if (providerSettings.enableXmlToolParsing || providerSettings.toolProtocol === "xml") {
+		return TOOL_PROTOCOL.XML
+	}
+
+	// 3. Model Default - respect model's preferred protocol
+	// Some models (like DeepSeek-v3.2 MaaS) have known XML formatting issues
+	// and need XML protocol with lenient parsing
+	if (modelInfo?.defaultToolProtocol === "xml" || modelInfo?.requiresLenientParsing) {
+		return TOOL_PROTOCOL.XML
+	}
+
+	// 4. Native (default) - all other cases use native tool calling
 	return TOOL_PROTOCOL.NATIVE
 }
 
