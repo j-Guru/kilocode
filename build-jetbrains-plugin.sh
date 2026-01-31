@@ -9,12 +9,17 @@ ARTIFACT_NAME_PATTERN="Kilo Code-*.zip"
 
 cd "$(dirname "$0")"
 
-TARGET_SCRIPT="${1:-jetbrains:bundle}"
+BUILD_MODE="${1:-release}"
 
-case "$TARGET_SCRIPT" in
-	jetbrains:bundle|jetbrains:build|jetbrains:run-bundle|jetbrains:run) ;;
+case "$BUILD_MODE" in
+	release|idea|none) ;;
 	*)
-		echo "Usage: $0 [jetbrains:bundle|jetbrains:build|jetbrains:run-bundle|jetbrains:run]"
+		echo "Usage: $0 [release|idea|none]"
+		echo ""
+		echo "Build modes:"
+		echo "  release - Production build (default)"
+		echo "  idea    - Development build with hot-reloading"
+		echo "  none    - Lightweight build for testing"
 		exit 1
 		;;
 esac
@@ -23,10 +28,10 @@ echo "📦 Stopping any existing Gradle daemons..."
 (cd jetbrains/plugin && ./gradlew --stop)
 
 echo "📦 Generating platform files..."
-(cd jetbrains/plugin && ./gradlew genPlatform --info --stacktrace)
+(cd jetbrains/plugin && ./gradlew genPlatform)
 
-echo "🛠️  Building with pnpm ${TARGET_SCRIPT}..."
-GRADLE_OPTS="-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dkotlin.compiler.execution.strategy=in-process" pnpm "$TARGET_SCRIPT"
+echo "🛠️  Building plugin with Gradle (mode: ${BUILD_MODE})..."
+(cd jetbrains/plugin && ./gradlew buildPlugin -PdebugMode="${BUILD_MODE}")
 
 FOUND_ARTIFACT=$(find "$ARTIFACT_DIR" -maxdepth 1 -name "$ARTIFACT_NAME_PATTERN" | head -n 1)
 
