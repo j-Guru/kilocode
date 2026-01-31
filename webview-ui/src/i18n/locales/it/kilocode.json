@@ -52,10 +52,7 @@
 			"apiKey": "Chiave API Kilo Code",
 			"login": "Accedi a Kilo Code",
 			"logout": "Disconnetti da Kilo Code",
-<<<<<<< HEAD
-=======
 			"loginForPremiumModels": "Accedi per sbloccare modelli e funzionalità premium",
->>>>>>> main
 			"providerRouting": {
 				"title": "Routing dei provider",
 				"managedByOrganization": "Gestisci routing dei provider a livello di organizzazione",

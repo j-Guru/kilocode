@@ -1872,12 +1872,9 @@ export const ChatRowContent = ({
 
 				case "payment_required_prompt": {
 					return <LowCreditWarning message={message} />
-<<<<<<< HEAD
-=======
 				}
 				case "unauthorized_prompt": {
 					return <UnauthorizedWarning message={message} />
->>>>>>> main
 				}
 				case "invalid_model": {
 					return <InvalidModelWarning message={message} isLast={isLast} />

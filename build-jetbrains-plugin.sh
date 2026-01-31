@@ -19,11 +19,14 @@ case "$TARGET_SCRIPT" in
 		;;
 esac
 
+echo "📦 Stopping any existing Gradle daemons..."
+(cd jetbrains/plugin && ./gradlew --stop)
+
 echo "📦 Generating platform files..."
-(cd jetbrains/plugin && ./gradlew genPlatform)
+(cd jetbrains/plugin && ./gradlew genPlatform --info --stacktrace)
 
 echo "🛠️  Building with pnpm ${TARGET_SCRIPT}..."
-pnpm "$TARGET_SCRIPT"
+GRADLE_OPTS="-Dorg.gradle.daemon=true -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Dkotlin.compiler.execution.strategy=in-process" pnpm "$TARGET_SCRIPT"
 
 FOUND_ARTIFACT=$(find "$ARTIFACT_DIR" -maxdepth 1 -name "$ARTIFACT_NAME_PATTERN" | head -n 1)
 

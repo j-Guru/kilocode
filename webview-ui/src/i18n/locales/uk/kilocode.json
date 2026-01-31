@@ -64,10 +64,7 @@
 			"apiKey": "Kilo Code API Key",
 			"login": "Увійти в Kilo Code",
 			"logout": "Вийти з Kilo Code",
-<<<<<<< HEAD
-=======
 			"loginForPremiumModels": "Увійдіть, щоб отримати доступ до преміум моделей та функцій",
->>>>>>> main
 			"providerRouting": {
 				"title": "Маршрутизація провайдерів",
 				"managedByOrganization": "Керувати маршрутизацією провайдерів на рівні організації",

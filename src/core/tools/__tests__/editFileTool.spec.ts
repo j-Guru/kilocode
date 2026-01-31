@@ -476,14 +476,7 @@ describe("editFileTool", () => {
 			)
 
 			expect(mockTask.consecutiveMistakeCountForEditFile.get(testFilePath)).toBe(2)
-<<<<<<< HEAD
-			expect(mockTask.say).toHaveBeenCalledWith(
-				"diff_error",
-				expect.stringContaining("Occurrence count mismatch"),
-			)
-=======
 			expect(mockTask.say).toHaveBeenCalledWith("diff_error", expect.stringContaining("Occurrence count mismatch"))
->>>>>>> main
 		})
 
 		it("resets consecutive error counter on successful edit", async () => {

@@ -21,10 +21,7 @@ import type { GitCommit } from "./git.js"
 import type { McpServer } from "./mcp.js"
 import type { ModelRecord, RouterModels, ModelInfo } from "./model.js"
 import type { CommitRange } from "./kilocode/kilocode.js"
-<<<<<<< HEAD
-=======
 import type { OpenAiCodexRateLimitInfo } from "./providers/openai-codex-rate-limits.js"
->>>>>>> main
 
 // kilocode_change start: Type definitions for Kilo Code-specific features
 // SAP AI Core deployment types
@@ -262,10 +259,7 @@ export interface ExtensionMessage {
 		| "taskWithAggregatedCosts"
 		| "skillsData"
 		| "askReviewScope" // kilocode_change: Review mode scope selection
-<<<<<<< HEAD
-=======
 		| "openAiCodexRateLimits"
->>>>>>> main
 	text?: string
 	// kilocode_change start
 	completionRequestId?: string // Correlation ID from request
@@ -346,13 +340,9 @@ export interface ExtensionMessage {
 	customMode?: ModeConfig
 	slug?: string
 	success?: boolean
-<<<<<<< HEAD
-	values?: Record<string, any> // eslint-disable-line @typescript-eslint/no-explicit-any
-=======
 	/** Generic payload for extension messages that use `values` */
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	values?: Record<string, any>
->>>>>>> main
 	requestId?: string
 	promptText?: string
 	results?:
@@ -476,15 +466,12 @@ export interface ExtensionMessage {
 	// kilocode_change end: Review mode
 }
 
-<<<<<<< HEAD
-=======
 export interface OpenAiCodexRateLimitsMessage {
 	type: "openAiCodexRateLimits"
 	values?: OpenAiCodexRateLimitInfo
 	error?: string
 }
 
->>>>>>> main
 export type ExtensionState = Pick<
 	GlobalSettings,
 	| "currentApiConfigName"
@@ -966,10 +953,7 @@ export interface WebviewMessage {
 		| "chatCompletionAccepted" // kilocode_change: User accepted a chat completion suggestion
 		| "downloadErrorDiagnostics"
 		| "requestClaudeCodeRateLimits"
-<<<<<<< HEAD
-=======
 		| "requestOpenAiCodexRateLimits"
->>>>>>> main
 		| "refreshCustomTools"
 		| "requestModes"
 		| "switchMode"
@@ -1022,10 +1006,7 @@ export interface WebviewMessage {
 	promptMode?: string | "enhance"
 	customPrompt?: PromptComponent
 	dataUrls?: string[]
-<<<<<<< HEAD
-=======
 	/** Generic payload for webview messages that use `values` */
->>>>>>> main
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	values?: Record<string, any>
 	query?: string
@@ -1173,13 +1154,10 @@ export interface TaskHistoryResponsePayload {
 }
 // kilocode_change end
 
-<<<<<<< HEAD
-=======
 export interface RequestOpenAiCodexRateLimitsMessage {
 	type: "requestOpenAiCodexRateLimits"
 }
 
->>>>>>> main
 export const checkoutDiffPayloadSchema = z.object({
 	ts: z.number().optional(),
 	previousCommitHash: z.string().optional(),

@@ -26,11 +26,8 @@ import type { ModelRecord } from "@roo-code/types"
 import { webviewMessageHandler } from "../webviewMessageHandler"
 import type { ClineProvider } from "../ClineProvider"
 import { getModels } from "../../../api/providers/fetchers/modelCache"
-<<<<<<< HEAD
-=======
 const { openAiCodexOAuthManager } = await import("../../../integrations/openai-codex/oauth")
 const { fetchOpenAiCodexRateLimitInfo } = await import("../../../integrations/openai-codex/rate-limits")
->>>>>>> main
 
 const mockGetModels = getModels as Mock<typeof getModels>
 const mockGetAccessToken = vi.mocked(openAiCodexOAuthManager.getAccessToken)

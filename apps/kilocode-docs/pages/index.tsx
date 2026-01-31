@@ -316,11 +316,7 @@ export default function HomePage() {
 						<span className="footer-icon">📝</span>
 						<div>
 							<strong>Check out our</strong>
-<<<<<<< HEAD
-							<Link href="/changelog" className="footer-link">
-=======
 							<Link href="https://github.com/Kilo-Org/kilocode/releases" className="footer-link">
->>>>>>> main
 								Changelog
 							</Link>
 						</div>
@@ -329,11 +325,7 @@ export default function HomePage() {
 						<span className="footer-icon">🐛</span>
 						<div>
 							<strong>Found a bug?</strong>
-<<<<<<< HEAD
-							<Link href="https://github.com/kilocode/kilocode/issues" className="footer-link">
-=======
 							<Link href="https://github.com/Kilo-Org/kilocode/issues" className="footer-link">
->>>>>>> main
 								Report an issue
 							</Link>
 						</div>
