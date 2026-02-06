@@ -3799,9 +3799,10 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					await pWaitFor(() => this.userMessageContentReady)
 
 					// Check if lenient XML parsing is enabled for this model/task
+					const modelInfo = this.api.getModel().info
 					const useLenientParsing =
-						this.providerSettings?.enableXmlToolParsing ||
-						this.model?.requiresLenientParsing ||
+						this.apiConfiguration?.enableXmlToolParsing ||
+						modelInfo?.requiresLenientParsing ||
 						this._taskToolProtocol === "xml"
 
 					// If using XML protocol and lenient parsing is enabled, try to parse malformed tool calls
@@ -3834,8 +3835,8 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 										this.assistantMessageContent.push({
 											type: "tool_use",
 											id: `toolu_xml_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-											name: toolCall.name,
-											input: JSON.parse(toolCall.arguments),
+											name: toolCall.name as any,
+											params: JSON.parse(toolCall.arguments),
 											partial: false,
 										})
 									} catch (error) {
