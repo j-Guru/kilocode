@@ -130,6 +130,7 @@ import { ThinkingBudget } from "./ThinkingBudget"
 import { Verbosity } from "./Verbosity"
 import { DiffSettingsControl } from "./DiffSettingsControl"
 import { TodoListSettingsControl } from "./TodoListSettingsControl"
+import { LenientXmlParsingControl } from "./LenientXmlParsingControl" // kilocode_change
 import { TemperatureControl } from "./TemperatureControl"
 import { RateLimitSecondsControl } from "./RateLimitSecondsControl"
 import { ConsecutiveMistakeLimitControl } from "./ConsecutiveMistakeLimitControl"
@@ -1069,6 +1070,12 @@ const ApiOptions = ({
 							fuzzyMatchThreshold={apiConfiguration.fuzzyMatchThreshold}
 							onChange={(field, value) => setApiConfigurationField(field, value)}
 						/>
+						{/* kilocode_change start */}
+						<LenientXmlParsingControl
+							enableXmlToolParsing={apiConfiguration.enableXmlToolParsing}
+							onChange={(field, value) => setApiConfigurationField(field, value)}
+						/>
+						{/* kilocode_change end */}
 						{selectedModelInfo?.supportsTemperature !== false && (
 							<TemperatureControl
 								value={apiConfiguration.modelTemperature}

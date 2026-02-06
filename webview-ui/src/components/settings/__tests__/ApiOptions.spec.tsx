@@ -209,6 +209,24 @@ vi.mock("../TodoListSettingsControl", () => ({
 	),
 }))
 
+// kilocode_change start
+// Mock LenientXmlParsingControl for tests
+vi.mock("../LenientXmlParsingControl", () => ({
+	LenientXmlParsingControl: ({ enableXmlToolParsing, onChange }: any) => (
+		<div data-testid="lenient-xml-parsing-control">
+			<label>
+				Enable lenient XML tool parsing
+				<input
+					type="checkbox"
+					checked={enableXmlToolParsing}
+					onChange={(e) => onChange("enableXmlToolParsing", e.target.checked)}
+				/>
+			</label>
+		</div>
+	),
+}))
+// kilocode_change end
+
 // Mock ThinkingBudget component
 vi.mock("../ThinkingBudget", () => ({
 	ThinkingBudget: ({ modelInfo }: any) => {
