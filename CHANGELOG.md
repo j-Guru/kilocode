@@ -1,5 +1,11 @@
 # kilo-code
 
+## 5.4.1
+
+### Patch Changes
+
+- [#4770](https://github.com/Kilo-Org/kilocode/pull/4770) [`abaf633`](https://github.com/Kilo-Org/kilocode/commit/abaf6334f22d14496e38151c329887346525f090) Thanks [@JustinReyes28](https://github.com/JustinReyes28)! - feat: Add new "devstral-2512" Mistral model configuration
+
 ## 5.4.0
 
 ### Minor Changes
