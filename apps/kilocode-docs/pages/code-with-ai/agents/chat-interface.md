@@ -10,11 +10,7 @@ description: "Learn how to use the Kilo Code chat interface effectively"
 {% /callout %}
 
 {% callout type="note" title="Prefer quick completions?" %}
-<<<<<<< HEAD
-If you're typing code in the editor and want AI to finish your line or block, check out [Autocomplete](/basic-usage/autocomplete) instead. Chat is best for larger tasks, explanations, and multi-file changes.
-=======
 If you're typing code in the editor and want AI to finish your line or block, check out [Autocomplete](/docs/basic-usage/autocomplete) instead. Chat is best for larger tasks, explanations, and multi-file changes.
->>>>>>> main
 {% /callout %}
 
 ## Quick Setup
@@ -53,11 +49,7 @@ find all instances of the variable oldValue in @/src/App.js and replace them wit
 {% callout type="info" title="Chat vs Autocomplete" %}
 **Use chat** when you need to describe what you want, ask questions, or make changes across multiple files.
 
-<<<<<<< HEAD
-**Use [autocomplete](/basic-usage/autocomplete)** when you're already typing code and want the AI to finish your thought inline.
-=======
 **Use [autocomplete](/docs/basic-usage/autocomplete)** when you're already typing code and want the AI to finish your thought inline.
->>>>>>> main
 {% /callout %}
 
 ## The Chat Interface

@@ -5,11 +5,7 @@ description: "Using Kilo Code in the browser"
 
 # {% $markdoc.frontmatter.title %}
 
-<<<<<<< HEAD
-Cloud Agents let you run Kilo Code in the cloud from any device, without relying on your local machine. They provide a remote development environment that can read and modify your GitHub repositories, run commands, and auto-commit changes as work progresses.
-=======
 Cloud Agents let you run Kilo Code in the cloud from any device, without relying on your local machine. They provide a remote development environment that can read and modify your GitHub and GitLab repositories, run commands, and auto-commit changes as work progresses.
->>>>>>> main
 
 ## What Cloud Agents Enable
 
@@ -22,13 +18,8 @@ Cloud Agents let you run Kilo Code in the cloud from any device, without relying
 
 Before using Cloud Agents:
 
-<<<<<<< HEAD
-**GitHub Integration must be configured**  
- Connect your account via the [Integrations tab](https://app.kilo.ai/integrations) so that Cloud Agents can access your repositories.
-=======
 - **GitHub or GitLab Integration must be configured**
   Connect your account via the [Integrations tab](https://app.kilo.ai/integrations) so that Cloud Agents can access your repositories.
->>>>>>> main
 
 ## Cost
 
@@ -98,11 +89,7 @@ You can customize each Cloud Agent session by also defining env vars and startup
 
 ## Skills
 
-<<<<<<< HEAD
-Cloud Agents support project-level [skills](./cli#skills) stored in your repository. When your repo is cloned, any skills in `.kilocode/skills/` are automatically available.
-=======
 Cloud Agents support project-level [skills](/docs/code-with-ai/platforms/cli#skills) stored in your repository. When your repo is cloned, any skills in `.kilocode/skills/` are automatically available.
->>>>>>> main
 
 {% callout type="note" %}
 Global skills (`~/.kilocode/skills/`) are not available in Cloud Agents since there is no persistent user home directory.

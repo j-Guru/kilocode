@@ -37,12 +37,6 @@ Orchestrator Mode provides a powerful way to manage complex development workflow
 Use subtasks to maintain clarity. If a request significantly shifts focus or requires a different expertise (mode), consider creating a subtask rather than overloading the current one.
 {% /callout %}
 
-<<<<<<< HEAD
-1. This context is passed via the `message` parameter of the [`new_task`](/features/tools/new-task) tool.
-2. The mode for the subtask is specified via the `mode` parameter of the [`new_task`](/features/tools/new-task) tool during initiation.
-3. This summary is passed via the `result` parameter of the [`attempt_completion`](/features/tools/attempt-completion) tool when the subtask finishes.
-=======
 1. This context is passed via the `message` parameter of the [`new_task`](/docs/features/tools/new-task) tool.
 2. The mode for the subtask is specified via the `mode` parameter of the [`new_task`](/docs/features/tools/new-task) tool during initiation.
 3. This summary is passed via the `result` parameter of the [`attempt_completion`](/docs/features/tools/attempt-completion) tool when the subtask finishes.
->>>>>>> main
