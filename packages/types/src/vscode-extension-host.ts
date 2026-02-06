@@ -194,6 +194,7 @@ export interface ExtensionMessage {
 		| "stt:statusResponse" // kilocode_change: Response to stt:checkAvailability request
 		| "stt:devices" // kilocode_change: Microphone devices list
 		| "stt:deviceSelected" // kilocode_change: Device selection confirmation
+		| "settingsImported" // kilocode_change
 		| "setHistoryPreviewCollapsed"
 		| "commandExecutionStatus"
 		| "mcpExecutionStatus"
@@ -639,6 +640,7 @@ export type ExtensionState = Pick<
 	marketplaceInstalledMetadata?: { project: Record<string, any>; global: Record<string, any> }
 	profileThresholds: Record<string, number>
 	hasOpenedModeSelector: boolean
+	hasCompletedOnboarding?: boolean // kilocode_change: Track if user has completed onboarding flow
 	openRouterImageApiKey?: string
 	kiloCodeImageApiKey?: string
 	openRouterUseMiddleOutTransform?: boolean
@@ -843,6 +845,7 @@ export interface WebviewMessage {
 		| "searchFiles"
 		| "toggleApiConfigPin"
 		| "hasOpenedModeSelector"
+		| "hasCompletedOnboarding" // kilocode_change: Mark onboarding as completed
 		| "clearCloudAuthSkipModel"
 		| "cloudButtonClicked"
 		| "rooCloudSignIn"
