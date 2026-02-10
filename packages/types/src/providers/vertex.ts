@@ -7,7 +7,7 @@ export const vertexDefaultModelId: VertexModelId = "gemini-3-flash-preview"
 
 export const vertexModels = {
 	// kilocode_change start
-	"claude-opus-4-6@vertex": {
+	"claude-opus-4-6@default": {
 		maxTokens: 128_000,
 		contextWindow: 200_000,
 		supportsImages: true,
