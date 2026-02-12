@@ -1,4 +1,4 @@
-import { VertexAIApi } from "../../../../../ghost/continuedev/core/llm/openai-adapters/apis/VertexAI.js" // kilocode_change
+import { VertexAIApi } from "../../../../../autocomplete/continuedev/core/llm/openai-adapters/apis/VertexAI.js" // kilocode_change
 
 const makeKeyJson = () =>
 	JSON.stringify({
