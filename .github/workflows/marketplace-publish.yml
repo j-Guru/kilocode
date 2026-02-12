@@ -13,6 +13,8 @@ env:
 jobs:
     build-assets:
         runs-on: ubuntu-latest
+        permissions:
+            contents: write
         steps:
             - name: Checkout code
               uses: actions/checkout@v6
@@ -67,6 +69,17 @@ jobs:
                   echo "version=${current_package_version}" >> "$GITHUB_OUTPUT"
                   echo "Version: ${current_package_version}"
 
+            - name: Build release metadata
+              id: release_meta
+              run: |
+                  utc_stamp=$(date -u +'%Y%m%d-%H%M%S')
+                  release_tag="vertex-v${{ steps.get_version.outputs.version }}-${utc_stamp}"
+                  release_name="Vertex ${release_tag}"
+                  echo "utc_stamp=${utc_stamp}" >> "$GITHUB_OUTPUT"
+                  echo "release_tag=${release_tag}" >> "$GITHUB_OUTPUT"
+                  echo "release_name=${release_name}" >> "$GITHUB_OUTPUT"
+                  echo "Release tag: ${release_tag}"
+
             - name: Build VS Code extension package
               run: pnpm vsix:production
 
@@ -87,6 +100,17 @@ jobs:
             - name: Verify JetBrains bundle exists
               run: |
                   test -f "jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}"
+
+            - name: Create immutable GitHub Release
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  gh release create "${{ steps.release_meta.outputs.release_tag }}" \
+                    --title "${{ steps.release_meta.outputs.release_name }}" \
+                    --notes "Automated internal build release for main-vertex. Version: ${{ steps.get_version.outputs.version }}. UTC build timestamp: ${{ steps.release_meta.outputs.utc_stamp }}." \
+                    --target "${{ github.sha }}" \
+                    "bin/kilo-code-${{ steps.get_version.outputs.version }}.vsix#kilo-code-${{ steps.get_version.outputs.version }}.vsix" \
+                    "jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}#JetBrains Plugin"
 
             - name: Upload VSIX artifact
               uses: actions/upload-artifact@v6
