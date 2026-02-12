@@ -1,5 +1,13 @@
 # kilo-code
 
+## 5.7.1
+
+### Patch Changes
+
+- [#5639](https://github.com/Kilo-Org/kilocode/pull/5639) [`853b03f`](https://github.com/Kilo-Org/kilocode/commit/853b03f4c6e340c26e9cddd13dae958815560c18) Thanks [@mikij](https://github.com/mikij)! - Updates some visual bugs in Agent Behaviour settings page
+
+- [#5630](https://github.com/Kilo-Org/kilocode/pull/5630) [`29f287a`](https://github.com/Kilo-Org/kilocode/commit/29f287a65fa9b02de3ddfe52a38317f77411fd34) Thanks [@SenatusSPQR1](https://github.com/SenatusSPQR1)! - fix(nano-gpt): Add native reasoning field extraction
+
 ## 5.7.0
 
 ### Minor Changes
