@@ -109,13 +109,13 @@ jobs:
                     --title "${{ steps.release_meta.outputs.release_name }}" \
                     --notes "Automated internal build release for main-vertex. Version: ${{ steps.get_version.outputs.version }}. UTC build timestamp: ${{ steps.release_meta.outputs.utc_stamp }}." \
                     --target "${{ github.sha }}" \
-                    "bin/kilo-code-${{ steps.get_version.outputs.version }}.vsix#kilo-code-${{ steps.get_version.outputs.version }}.vsix" \
-                    "jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}#JetBrains Plugin"
+                    "bin/kilo-code-${{ steps.get_version.outputs.version }}.vsix#VS Code plugin (${{ steps.get_version.outputs.version }}).vsix" \
+                    "jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}#JetBrains plugin (${{ steps.get_version.outputs.version }})"
 
             - name: Upload VSIX artifact
               uses: actions/upload-artifact@v6
               with:
-                  name: kilo-code-vsix-${{ steps.get_version.outputs.version }}
+                  name: VS Code plugin (${{ steps.get_version.outputs.version }})
                   path: bin/kilo-code-${{ steps.get_version.outputs.version }}.vsix
                   if-no-files-found: error
                   retention-days: 14
@@ -123,7 +123,7 @@ jobs:
             - name: Upload JetBrains plugin artifact
               uses: actions/upload-artifact@v6
               with:
-                  name: jetbrains-plugin-${{ steps.get_version.outputs.version }}
+                  name: JetBrains plugin (${{ steps.get_version.outputs.version }})
                   path: jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}
                   if-no-files-found: error
                   retention-days: 14
