@@ -166,6 +166,21 @@ cd webview-ui && pnpm test src/path/to/test-file
 
 - **Add Missing Translations**: `.kilocode/workflows/add-missing-translations.md` - Run `/add-missing-translations` to find and fix missing translations
 
+### Release Sync Trigger (Important)
+
+When the user says phrases like "new version was released", "we have new version", or similar, interpret this as the following required workflow:
+
+1. Update branch `main` from upstream latest (`Kilo-Org/kilocode` `main`).
+2. Merge latest `main` into `main-vertex`.
+3. Resolve merge conflicts with priority to project-specific fixes:
+    - Vertex AI fix
+    - Lenient XML processing fix
+4. If any conflict is unclear, stop and ask the user explicitly how to resolve it before continuing.
+5. After merge/conflict resolution, run a local VS Code plugin build.
+6. If build succeeds, send this exact confirmation format:
+   `New VS Code plugin (version x.y.z) is READY TO TEST!`
+   Replace `x.y.z` with the actual built version.
+
 ## Changesets
 
 Each PR requires a changeset unless it's documentation-only or internal tooling. Create one with:
