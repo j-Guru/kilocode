@@ -5,7 +5,7 @@
 	"fixed": [["kilo-code"]],
 	"linked": [],
 	"access": "restricted",
-	"baseBranch": "main",
+	"baseBranch": "main-vertex",
 	"updateInternalDependencies": "patch",
 	"ignore": ["@roo-code/cli"]
 }
