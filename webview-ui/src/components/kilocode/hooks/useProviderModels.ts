@@ -53,6 +53,7 @@ import {
 	cerebrasModels,
 	cerebrasDefaultModelId,
 	nanoGptDefaultModelId, //kilocode_change
+	apertisDefaultModelId, // kilocode_change
 	ovhCloudAiEndpointsDefaultModelId,
 	inceptionDefaultModelId,
 	minimaxModels,
@@ -102,6 +103,14 @@ export const getModelsByProvider = ({
 				defaultModel: glamaDefaultModelId,
 			}
 		}
+		// kilocode_change start
+		case "apertis": {
+			return {
+				models: routerModels.apertis,
+				defaultModel: apertisDefaultModelId,
+			}
+		}
+		// kilocode_change end
 		case "unbound": {
 			return {
 				models: routerModels.unbound,
@@ -362,7 +371,7 @@ export const getOptionsForProvider = (provider: ProviderName, apiConfiguration?:
 				isChina:
 					apiConfiguration?.zaiApiLine === "china_coding" || apiConfiguration?.zaiApiLine === "china_api",
 			}
-			// kilocode_change end
+		// kilocode_change end
 		default:
 			return {}
 	}

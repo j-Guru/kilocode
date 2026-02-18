@@ -24,7 +24,7 @@ Kilo Code's paid plans provide powerful team management features:
 
 - [**About Plans**](/docs/collaborate/teams/about-plans) — Compare Teams and Enterprise plans
 - **Teams ($15/user/month)** — Zero markup on AI costs, centralized billing, team analytics
-- **Enterprise ($150/user/month)** — Model controls, audit logs, SSO, dedicated support
+- **Enterprise ([Contact Sales](https://kilo.ai/contact-sales))** — Model controls, audit logs, SSO, dedicated support
 
 ### Team Management
 
@@ -56,10 +56,9 @@ Understand how your team is using AI:
 ## Get Started with Teams
 
 1. [Install Kilo Code](/docs/getting-started/installing) in your preferred environment
-<<<<<<< HEAD
-2. [Connect an AI provider](/docs/getting-started/ai-providers)
-=======
-2. [Connect an AI provider](/docs/ai-providers)
->>>>>>> main
-3. [Choose a plan](/docs/collaborate/teams/about-plans) that fits your needs
-4. Invite your team members and start collaborating
+   <<<<<<< HEAD
+2. # [Connect an AI provider](/docs/getting-started/ai-providers)
+3. [Connect an AI provider](/docs/ai-providers)
+    > > > > > > > main
+4. [Choose a plan](/docs/collaborate/teams/about-plans) that fits your needs
+5. Invite your team members and start collaborating

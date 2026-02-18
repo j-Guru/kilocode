@@ -321,9 +321,8 @@ function getSelectedModel({
 			const isKimiCodingEndpoint = apiConfiguration.moonshotBaseUrl === "https://api.kimi.com/coding/v1"
 			const firstNonCodingMoonshotModelId =
 				Object.keys(moonshotModels).find((modelId) => modelId !== "kimi-for-coding") ?? moonshotDefaultModelId
-			const id = isKimiCodingEndpoint
-				? "kimi-for-coding"
-				: configuredId === "kimi-for-coding"
+			const id =
+				configuredId === "kimi-for-coding" && !isKimiCodingEndpoint
 					? firstNonCodingMoonshotModelId
 					: configuredId
 			// kilocode_change end
@@ -337,7 +336,8 @@ function getSelectedModel({
 		}
 		case "zai": {
 			// kilocode_change - china_api uses mainland model catalog too.
-			const isChina = apiConfiguration.zaiApiLine === "china_coding" || apiConfiguration.zaiApiLine === "china_api"
+			const isChina =
+				apiConfiguration.zaiApiLine === "china_coding" || apiConfiguration.zaiApiLine === "china_api"
 			const models = isChina ? mainlandZAiModels : internationalZAiModels
 			const defaultModelId = getProviderDefaultModelId(provider, { isChina })
 			const id = apiConfiguration.apiModelId ?? defaultModelId
@@ -588,18 +588,21 @@ function getSelectedModel({
 		// case "human-relay":
 		// case "fake-ai":
 		default: {
-			provider satisfies "anthropic" | "fake-ai" | "human-relay" | "kilocode"
+			provider satisfies "anthropic" | "fake-ai" | "human-relay" | "kilocode" | "apertis"
 			const id = apiConfiguration.apiModelId ?? defaultModelId
 			const baseInfo = anthropicModels[id as keyof typeof anthropicModels]
 
 			// Apply 1M context beta tier pricing for Claude Sonnet 4
 			if (
 				provider === "anthropic" &&
-				(id === "claude-sonnet-4-20250514" || id === "claude-sonnet-4-5") &&
+				(id === "claude-sonnet-4-20250514" ||
+					id === "claude-sonnet-4-5" ||
+					id === "claude-sonnet-4-6" ||
+					id === "claude-opus-4-6") &&
 				apiConfiguration.anthropicBeta1MContext &&
 				baseInfo
 			) {
-				// Type assertion since we know claude-sonnet-4-20250514 and claude-sonnet-4-5 have tiers
+				// Type assertion since supported Claude 4 models include 1M context pricing tiers.
 				const modelWithTiers = baseInfo as typeof baseInfo & {
 					tiers?: Array<{
 						contextWindow: number

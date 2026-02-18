@@ -41,10 +41,34 @@ export const GettingStartedNav: NavSection[] = [
 	{
 		title: "Help",
 		links: [
-			{ href: "/getting-started/faq", children: "FAQ" },
+			{
+				href: "/getting-started/faq",
+				children: "FAQ",
+				subLinks: [
+					{ href: "/getting-started/faq/general", children: "General" },
+					{ href: "/getting-started/faq/setup-and-installation", children: "Setup and Installation" },
+					{ href: "/getting-started/faq/credits-and-billing", children: "Credits and Billing" },
+					{ href: "/getting-started/faq/account-and-integration", children: "Account and Integration" },
+					{ href: "/getting-started/faq/known-issues", children: "Known Issues" },
+				],
+			},
 			{
 				href: "/getting-started/migrating",
 				children: "Migrating from Cursor",
+			},
+			{
+				href: "/getting-started/troubleshooting",
+				children: "Troubleshooting",
+				subLinks: [
+					{
+						href: "/getting-started/troubleshooting/troubleshooting-extension",
+						children: "Extension Troubleshooting",
+					},
+				],
+			},
+			{
+				href: "/getting-started/using-docs-with-agents",
+				children: "Using Docs with Agents",
 			},
 		],
 	},

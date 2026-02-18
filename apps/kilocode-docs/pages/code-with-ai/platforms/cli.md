@@ -13,6 +13,8 @@ Orchestrate agents from your terminal. Plan, debug, and code fast with keyboard-
 
 The Kilo Code CLI uses the same underlying technology that powers the IDE extensions, so you can expect the same workflow to handle agentic coding tasks from start to finish.
 
+**Source code & issues (Kilo CLI 1.0):** [Kilo-Org/kilo](https://github.com/Kilo-Org/kilo) · [Report an issue](https://github.com/Kilo-Org/kilo/issues)
+
 ## Getting Started
 
 ### Install
@@ -165,8 +167,16 @@ Review your code locally before pushing — catch issues early without waiting f
 Configuration is managed through:
 
 - `/connect` command for provider setup (interactive)
-- Config files directly at `~/.config/kilo/config.json`
+- Config files in **`~/.config/kilo/`**: the CLI (Kilo CLI 1.0 from [Kilo-Org/kilo](https://github.com/Kilo-Org/kilo)) merges `config.json`, `opencode.json`, and `opencode.jsonc`. Use **`opencode.json`** (or `opencode.jsonc`) for provider, model, permission, and **MCP** settings. Restart the CLI after editing. See [Using MCP in the CLI](/automate/mcp/using-in-cli) for MCP config format.
 - `kilo auth` for credential management
+
+## Slash Commands
+
+The CLI's interactive mode supports slash commands for common operations. The main commands are documented above in the [Interactive Slash Commands](#interactive-slash-commands) section.
+
+{% callout type="tip" %}
+**Confused about /newtask vs /smol in the IDE?** See the [Using Modes](/docs/code-with-ai/agents/using-modes#understanding-newtask-vs-smol) documentation for details.
+{% /callout %}
 
 ## Permissions
 
@@ -276,105 +286,77 @@ Any directory allowed here inherits the same defaults as the current workspace. 
 }
 ```
 
-### Available Permissions
+**Aliases:** `/t` and `/history` can be used as shorthand for `/tasks`
 
-Permissions are keyed by tool name, plus a couple of safety guards:
+## Configuration
 
-- `read` — reading a file (matches the file path)
-- `edit` — all file modifications (covers edit, write, patch, multiedit)
-- `glob` — file globbing (matches the glob pattern)
-- `grep` — content search (matches the regex pattern)
-- `list` — listing files in a directory (matches the directory path)
-- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
-- `task` — launching subagents (matches the subagent type)
-- `skill` — loading a skill (matches the skill name)
-- `lsp` — running LSP queries (currently non-granular)
-- `todoread`, `todowrite` — reading/updating the todo list
-- `webfetch` — fetching a URL (matches the URL)
-- `websearch`, `codesearch` — web/code search (matches the query)
-- `external_directory` — triggered when a tool touches paths outside the project working directory
-- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
+The Kilo CLI is a fork of [OpenCode](https://opencode.ai) and supports the same configuration options. The CLI you install with `npm install -g @kilocode/cli` (Kilo CLI 1.0) is built from [Kilo-Org/kilo](https://github.com/Kilo-Org/kilo). For comprehensive configuration documentation, see the [OpenCode Config documentation](https://opencode.ai/docs/config).
 
-### Defaults
+### Config File Location (Kilo CLI 1.0)
 
-If you don't specify anything, Kilo starts from permissive defaults:
+| Scope       | Path                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------- |
+| **Global**  | `~/.config/kilo/opencode.json` or `opencode.jsonc` (Windows: config dir may vary; same filenames) |
+| **Project** | `./opencode.json` or `./.opencode/` in project root                                               |
 
-- Most permissions default to `"allow"`.
-- `doom_loop` and `external_directory` default to `"ask"`.
-- `read` is `"allow"`, but `.env` files are denied by default:
+Project-level configuration takes precedence over global settings.
+
+### Key Configuration Options
 
 ```json
 {
-	"permission": {
-		"read": {
-			"*": "allow",
-			"*.env": "deny",
-			"*.env.*": "deny",
-			"*.env.example": "allow"
-		}
-	}
-}
-```
-
-### What "Ask" Does
-
-When Kilo prompts for approval, the UI offers three outcomes:
-
-- **once** — approve just this request
-- **always** — approve future requests matching the suggested patterns (for the rest of the current session)
-- **reject** — deny the request
-
-The set of patterns that "always" would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
-
-### Agent Permissions
-
-You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence.
-
-```json
-{
-	"$schema": "https://kilo.ai/config.json",
-	"permission": {
-		"bash": {
-			"*": "ask",
-			"git *": "allow",
-			"git commit *": "deny",
-			"git push *": "deny",
-			"grep *": "allow"
-		}
-	},
-	"agent": {
-		"build": {
-			"permission": {
-				"bash": {
-					"*": "ask",
-					"git *": "allow",
-					"git commit *": "ask",
-					"git push *": "deny",
-					"grep *": "allow"
-				}
+	"$schema": "https://opencode.ai/config.json",
+	"model": "anthropic/claude-sonnet-4-20250514",
+	"provider": {
+		"anthropic": {
+			"options": {
+				"apiKey": "{env:ANTHROPIC_API_KEY}"
 			}
 		}
 	}
 }
 ```
 
-You can also configure agent permissions in Markdown:
+Common configuration options include:
 
-```markdown
----
-description: Code review without edits
-mode: subagent
-permission:
-    edit: deny
-    bash: ask
-    webfetch: deny
----
+- **`model`** - Default model to use
+- **`provider`** - Provider-specific settings (API keys, base URLs, custom models)
+- **`mcp`** - MCP server configuration
+- **`permission`** - Tool permission settings (`allow` or `ask`)
+- **`instructions`** - Paths to instruction files (e.g., `["CONTRIBUTING.md", ".cursor/rules/*.md"]`)
+- **`formatter`** - Code formatter configuration
+- **`disabled_providers`** / **`enabled_providers`** - Control which providers are available
 
-Only analyze code and suggest changes.
+### Environment Variables
+
+Use `{env:VARIABLE_NAME}` syntax in config files to reference environment variables:
+
+```json
+{
+	"provider": {
+		"openai": {
+			"options": {
+				"apiKey": "{env:OPENAI_API_KEY}"
+			}
+		}
+	}
+}
 ```
 
+For full details on all configuration options including compaction, file watchers, plugins, and experimental features, see the [OpenCode Config documentation](https://opencode.ai/docs/config).
+
+## Config reference for providers
+
+Kilo gives you the ability to bring your own keys for a number of model providers and AI gateways, like OpenRouter and Vercel AI Gateway. Each provider has unique configuration options and some let you set environment variables.
+
+You can reference the [Provider Configuration Guide](https://github.com/Kilo-Org/kilocode/blob/main/cli/docs/PROVIDER_CONFIGURATION.md) for examples (same config format; for Kilo CLI 1.0 the file is `~/.config/kilo/opencode.json`). You can also run:
+
+`kilo config`
+
+to complete configuration with an interactive workflow on the command line.
+
 {% callout type="tip" %}
-Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
+You can also use the `/config` slash command during an interactive session, which is equivalent to running `kilocode config`.
 {% /callout %}
 
 ## Interactive Mode
