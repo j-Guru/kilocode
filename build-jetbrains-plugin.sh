@@ -28,7 +28,9 @@
 #
 # Expected size: 300-400MB (includes VSCode extension host and dependencies)
 #
-# Note: This script uses 'pnpm jetbrains:bundle' which automatically:
+# Note: This script calls turbo directly with --log-order=stream which:
+#   - Streams all task output in real-time (no buffering)
+#   - Prevents buffered output from bleeding into the parent shell after exit
 #   - Builds the webview with all UI components (including LenientXmlParsingControl)
 #   - Packages the VSCode extension
 #   - Copies resources to JetBrains plugin directories
@@ -142,7 +144,7 @@ echo "📦 Stopping any existing Gradle daemons..."
 (cd jetbrains/plugin && ./gradlew --stop) || true
 
 # Build using official Kilo Code method
-echo "🛠️  Building JetBrains plugin using pnpm jetbrains:bundle..."
+echo "🛠️  Building JetBrains plugin using turbo jetbrains:bundle --log-order=stream..."
 echo "   This will:"
 echo "   - Build VSCode webview UI"
 echo "   - Build VSCode extension"
@@ -150,7 +152,27 @@ echo "   - Copy resources to JetBrains plugin"
 echo "   - Build JetBrains plugin with Gradle"
 echo ""
 
-pnpm jetbrains:bundle
+# Call turbo directly with --log-order=stream instead of going through
+# 'pnpm jetbrains:bundle' (which uses turbo's default grouped/buffered mode).
+#
+# WHY: In grouped mode, turbo buffers each task's output and flushes it when
+# the task finishes. Fast tasks (copy:resource-nodemodules, core-schemas DTS)
+# complete while Gradle's ~2min buildPlugin is still running. Their buffered
+# output sits in turbo until turbo exits — by which point the build script has
+# already printed the success summary and the shell has returned the prompt.
+# Zsh then reads the flushed bytes as keyboard input and tries to execute them
+# as commands, producing errors like "zsh: no such file or directory:
+# @kilo-code/jetbrains-plugin:copy:resource-nodemodules:".
+#
+# --log-order=stream: emit each task's output immediately as it is produced,
+#   eliminating the end-of-build flush that races with script exit.
+#
+# npm_config_loglevel=error: suppress "npm warn EBADENGINE" lines emitted by
+#   'npm install' inside copy:resource-nodemodules. @electron/get@4.0.2
+#   requires Node >=22 but the project targets Node 20; the warning is harmless
+#   (the package is a build-time-only dep, not shipped in the plugin), but it
+#   would otherwise still bleed through even with streaming output.
+npm_config_loglevel=error ./node_modules/.bin/turbo jetbrains:bundle --force --log-order=stream --ui=stream
 
 # Verify artifact was created
 echo ""
