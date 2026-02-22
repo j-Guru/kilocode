@@ -50,6 +50,7 @@ import {
 	deepInfraDefaultModelId,
 	minimaxDefaultModelId,
 	nanoGptDefaultModelId, //kilocode_change
+	poeDefaultModelId, // kilocode_change
 } from "@roo-code/types"
 
 import { vscode } from "@src/utils/vscode"
@@ -118,6 +119,7 @@ import {
 	OvhCloudAiEndpoints,
 	Inception,
 	SapAiCore,
+	Aihubmix,
 	// kilocode_change end
 	ZAi,
 	Fireworks,
@@ -125,6 +127,7 @@ import {
 	VercelAiGateway,
 	DeepInfra,
 	MiniMax,
+	Poe, // kilocode_change
 } from "./providers"
 
 import { MODELS_BY_PROVIDER, PROVIDERS } from "./constants"
@@ -301,6 +304,7 @@ const ApiOptions = ({
 				selectedProvider === "deepinfra" ||
 				selectedProvider === "chutes" || // kilocode_change
 				selectedProvider === "synthetic" || // kilocode_change
+				selectedProvider === "poe" || // kilocode_change
 				selectedProvider === "roo"
 			) {
 				vscode.postMessage({ type: "requestRouterModels" })
@@ -481,6 +485,7 @@ const ApiOptions = ({
 				synthetic: { field: "apiModelId", default: syntheticDefaultModelId },
 				ovhcloud: { field: "ovhCloudAiEndpointsModelId", default: ovhCloudAiEndpointsDefaultModelId },
 				inception: { field: "inceptionLabsModelId", default: inceptionDefaultModelId },
+				poe: { field: "poeModelId", default: poeDefaultModelId },
 				// kilocode_change end
 			}
 
@@ -667,6 +672,21 @@ const ApiOptions = ({
 				/* kilocode_change end */
 			}
 
+			{
+				/* kilocode_change start */
+				selectedProvider === "aihubmix" && (
+					<Aihubmix
+						apiConfiguration={apiConfiguration}
+						setApiConfigurationField={setApiConfigurationField}
+						routerModels={routerModels}
+						organizationAllowList={organizationAllowList}
+						modelValidationError={modelValidationError}
+						simplifySettings={fromWelcomeView}
+					/>
+				)
+				/* kilocode_change end */
+			}
+
 			{selectedProvider === "unbound" && (
 				<Unbound
 					apiConfiguration={apiConfiguration}
@@ -693,6 +713,19 @@ const ApiOptions = ({
 			{/* kilocode_change start */}
 			{selectedProvider === "inception" && (
 				<Inception
+					apiConfiguration={apiConfiguration}
+					setApiConfigurationField={setApiConfigurationField}
+					routerModels={routerModels}
+					refetchRouterModels={refetchRouterModels}
+					organizationAllowList={organizationAllowList}
+					modelValidationError={modelValidationError}
+				/>
+			)}
+			{/* kilocode_change end */}
+
+			{/* kilocode_change start */}
+			{selectedProvider === "poe" && (
+				<Poe
 					apiConfiguration={apiConfiguration}
 					setApiConfigurationField={setApiConfigurationField}
 					routerModels={routerModels}

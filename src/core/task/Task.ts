@@ -151,7 +151,9 @@ import { MessageQueueService } from "../message-queue/MessageQueueService"
 import {
 	isAnyRecognizedKiloCodeError,
 	isPaymentRequiredError,
-	isUnauthorizedError,
+	isUnauthorizedGenericError,
+	isUnauthorizedPaidModelError,
+	isUnauthorizedPromotionLimitError,
 } from "../../shared/kilocode/errorUtils"
 import { getAppUrl } from "@roo-code/types"
 import { getKilocodeDefaultModel } from "../../api/providers/kilocode/getKilocodeDefaultModel" // kilocode_change
@@ -3085,6 +3087,7 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 									id: chunk.id,
 									name: chunk.name,
 									arguments: chunk.arguments,
+									extra_content: chunk.extra_content,
 								})
 
 								for (const event of events) {
@@ -3102,7 +3105,11 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 										}
 
 										// Initialize streaming in NativeToolCallParser
-										NativeToolCallParser.startStreamingToolCall(event.id, event.name as ToolName)
+										NativeToolCallParser.startStreamingToolCall(
+											event.id,
+											event.name as ToolName,
+											event.extra_content,
+										)
 
 										// Before adding a new tool, finalize any preceding text block
 										// This prevents the text block from blocking tool presentation
@@ -3127,6 +3134,11 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 										// Store the ID for native protocol
 										;(partialToolUse as any).id = event.id
 
+										// Preserve extra_content for Gemini 3 thought_signature support
+										if (event.extra_content) {
+											partialToolUse.extra_content = event.extra_content
+										}
+
 										// Add to content and present
 										this.assistantMessageContent.push(partialToolUse)
 										this.userMessageContentReady = false
@@ -3145,6 +3157,14 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 												// Store the ID for native protocol
 												;(partialToolUse as any).id = event.id
 
+												// Preserve extra_content from the original tool use (Gemini 3 thought_signature)
+												const existingToolUse = this.assistantMessageContent[
+													toolUseIndex
+												] as any
+												if (existingToolUse?.extra_content && !partialToolUse.extra_content) {
+													partialToolUse.extra_content = existingToolUse.extra_content
+												}
+
 												// Update the existing tool use with new partial data
 												this.assistantMessageContent[toolUseIndex] = partialToolUse
 
@@ -3162,6 +3182,16 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 										if (finalToolUse) {
 											// Store the tool call ID
 											;(finalToolUse as any).id = event.id
+
+											// Preserve extra_content from the original tool use (Gemini 3 thought_signature)
+											if (toolUseIndex !== undefined) {
+												const existingToolUse = this.assistantMessageContent[
+													toolUseIndex
+												] as any
+												if (existingToolUse?.extra_content && !finalToolUse.extra_content) {
+													finalToolUse.extra_content = existingToolUse.extra_content
+												}
+											}
 
 											// Get the index and replace partial with final
 											if (toolUseIndex !== undefined) {
@@ -3761,12 +3791,17 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 									continue
 								}
 								seenToolUseIds.add(sanitizedId)
-								assistantContent.push({
+								const toolUseBlock: any = {
 									type: "tool_use" as const,
 									id: sanitizedId,
 									name: mcpBlock.name, // Original dynamic name
 									input: mcpBlock.arguments, // Direct tool arguments
-								})
+								}
+								// Preserve extra_content for Gemini 3 thought_signature support
+								if (mcpBlock.extra_content) {
+									toolUseBlock.extra_content = mcpBlock.extra_content
+								}
+								assistantContent.push(toolUseBlock)
 							}
 						} else {
 							// Regular ToolUse
@@ -3791,12 +3826,17 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 								// was told the tool was named, preventing confusion in multi-turn conversations.
 								const toolNameForHistory = toolUse.originalName ?? toolUse.name
 
-								assistantContent.push({
+								const toolUseBlock: any = {
 									type: "tool_use" as const,
 									id: sanitizedId,
 									name: toolNameForHistory,
 									input,
-								})
+								}
+								// Preserve extra_content for Gemini 3 thought_signature support
+								if (toolUse.extra_content) {
+									toolUseBlock.extra_content = toolUse.extra_content
+								}
+								assistantContent.push(toolUseBlock)
 							}
 						}
 					}
@@ -4736,6 +4776,8 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 					}
 				: {}),
 			projectId: (await kiloConfig)?.project?.id, // kilocode_change: pass projectId for backend tracking (ignored by other providers)
+			// kilocode_change: child tasks (spawned via new_task tool) are parallel agents
+			...(this.parentTaskId ? { feature: "parallel-agent" } : {}),
 		}
 
 		// Create an AbortController to allow cancelling the request mid-stream
@@ -4792,34 +4834,49 @@ export class Task extends EventEmitter<TaskEvents> implements TaskLike {
 						apiConfiguration.kilocodeOrganizationId,
 					)
 				).defaultFreeModel
-				const { response } = await (isPaymentRequiredError(error)
-					? this.ask(
-							"payment_required_prompt",
-							JSON.stringify({
-								title: error.error?.title ?? t("kilocode:lowCreditWarning.title"),
-								message: error.error?.message ?? t("kilocode:lowCreditWarning.message"),
-								balance: error.error?.balance ?? "0.00",
-								buyCreditsUrl: error.error?.buyCreditsUrl ?? getAppUrl("/profile"),
-								defaultFreeModel,
-							}),
-						)
-					: isUnauthorizedError(error)
-						? this.ask(
-								"unauthorized_prompt",
-								JSON.stringify({
-									modelId: apiConfiguration.kilocodeModel,
-								}),
-							)
-						: this.ask(
-								"invalid_model",
-								JSON.stringify({
-									modelId: apiConfiguration.kilocodeModel,
-									error: {
-										status: error.status,
-										message: error.message,
-									},
-								}),
-							))
+
+				let askResponse: { response: string }
+
+				if (isPaymentRequiredError(error)) {
+					askResponse = await this.ask(
+						"payment_required_prompt",
+						JSON.stringify({
+							title: error.error?.title ?? t("kilocode:lowCreditWarning.title"),
+							message: error.error?.message ?? t("kilocode:lowCreditWarning.message"),
+							balance: error.error?.balance ?? "0.00",
+							buyCreditsUrl: error.error?.buyCreditsUrl ?? getAppUrl("/profile"),
+							defaultFreeModel,
+						}),
+					)
+				} else if (isUnauthorizedPromotionLimitError(error)) {
+					askResponse = await this.ask(
+						"promotion_model_sign_up_required_prompt",
+						JSON.stringify({
+							modelId: apiConfiguration.kilocodeModel,
+						}),
+					)
+				} else if (isUnauthorizedPaidModelError(error) || isUnauthorizedGenericError(error)) {
+					askResponse = await this.ask(
+						"unauthorized_prompt",
+						JSON.stringify({
+							modelId: apiConfiguration.kilocodeModel,
+						}),
+					)
+				} else {
+					askResponse = await this.ask(
+						"invalid_model",
+						JSON.stringify({
+							modelId: apiConfiguration.kilocodeModel,
+							error: {
+								status: error.status,
+								message: error.message,
+							},
+						}),
+					)
+				}
+
+				const { response } = askResponse
+
 				this.currentRequestAbortController = undefined
 				const isContextWindowExceededError = checkContextWindowExceededError(error)
 
