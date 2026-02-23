@@ -1,11 +1,1 @@
-node_modules
-dist
-build
-out
-.next
-.venv
-pnpm-lock.yaml
-*.min.js
-*.min.css
-coverage
-.turbo
+packages/desktop/src/bindings.ts

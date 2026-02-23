@@ -1,0 +1,1292 @@
+🧹 Cleaning with standard project script...
+
+> kilo-code@ clean /home/jguru/projects/kilocode
+> turbo clean --log-order grouped --output-logs new-only && rimraf dist out bin .vite-port .turbo
+
+turbo 2.6.1
+
+• Packages in scope: @kilo-code/jetbrains-host, @kilo-code/jetbrains-plugin, @kilocode/agent-runtime, @kilocode/cli, @kilocode/core-schemas, @roo-code/build, @roo-code/cloud, @roo-code/config-eslint, @roo-code/config-typescript, @roo-code/core, @roo-code/evals, @roo-code/ipc, @roo-code/playwright-e2e, @roo-code/storybook, @roo-code/telemetry, @roo-code/types, @roo-code/vscode-e2e, @roo-code/vscode-nightly, @roo-code/vscode-webview, @roo-code/web-evals, @roo-code/web-roo-code, kilo-code, kilocode-docs
+• Running clean in 23 packages
+• Remote caching disabled
+@roo-code/core:clean: cache bypass, force executing e635c63b42626572
+@roo-code/core:clean: 
+@roo-code/core:clean: > @roo-code/core@0.0.0 clean /home/jguru/projects/kilocode/packages/core
+@roo-code/core:clean: > rimraf .turbo
+@roo-code/core:clean: 
+@kilocode/agent-runtime:clean: cache bypass, force executing bd6074601a4e42a6
+@kilocode/agent-runtime:clean: 
+@kilocode/agent-runtime:clean: > @kilocode/agent-runtime@0.0.1 clean /home/jguru/projects/kilocode/packages/agent-runtime
+@kilocode/agent-runtime:clean: > rimraf dist .turbo
+@kilocode/agent-runtime:clean: 
+@roo-code/cloud:clean: cache bypass, force executing 486b141501d9e8b1
+@roo-code/cloud:clean: 
+@roo-code/cloud:clean: > @roo-code/cloud@0.0.0 clean /home/jguru/projects/kilocode/packages/cloud
+@roo-code/cloud:clean: > rimraf .turbo
+@roo-code/cloud:clean: 
+@roo-code/types:clean: cache bypass, force executing 1ed47a6fd7332d14
+@roo-code/types:clean: 
+@roo-code/types:clean: > @roo-code/types@0.0.0 clean /home/jguru/projects/kilocode/packages/types
+@roo-code/types:clean: > rimraf dist .turbo
+@roo-code/types:clean: 
+@roo-code/build:clean: cache bypass, force executing 07e5501873400e2b
+@roo-code/build:clean: 
+@roo-code/build:clean: > @roo-code/build@ clean /home/jguru/projects/kilocode/packages/build
+@roo-code/build:clean: > rimraf dist .turbo
+@roo-code/build:clean: 
+@roo-code/ipc:clean: cache bypass, force executing 45e8d96df7d524a9
+@roo-code/ipc:clean: 
+@roo-code/ipc:clean: > @roo-code/ipc@0.0.0 clean /home/jguru/projects/kilocode/packages/ipc
+@roo-code/ipc:clean: > rimraf .turbo
+@roo-code/ipc:clean: 
+@roo-code/vscode-e2e:clean: cache bypass, force executing ebbb47e944390452
+@roo-code/vscode-e2e:clean: 
+@roo-code/vscode-e2e:clean: > @roo-code/vscode-e2e@ clean /home/jguru/projects/kilocode/apps/vscode-e2e
+@roo-code/vscode-e2e:clean: > rimraf out .turbo
+@roo-code/vscode-e2e:clean: 
+@roo-code/vscode-nightly:clean: cache bypass, force executing 5e8c756a4cd9f2a4
+@roo-code/vscode-nightly:clean: 
+@roo-code/vscode-nightly:clean: > @roo-code/vscode-nightly@ clean /home/jguru/projects/kilocode/apps/vscode-nightly
+@roo-code/vscode-nightly:clean: > rimraf build .turbo
+@roo-code/vscode-nightly:clean: 
+kilo-code:clean: cache bypass, force executing 9123559f131c564e
+kilo-code:clean: 
+kilo-code:clean: > kilo-code@4.153.0 clean /home/jguru/projects/kilocode/src
+kilo-code:clean: > rimraf README.md CHANGELOG.md LICENSE dist logs mock .turbo
+kilo-code:clean: 
+@roo-code/web-evals:clean: cache bypass, force executing 87dc68ad1e9d9fff
+@roo-code/web-evals:clean: 
+@roo-code/web-evals:clean: > @roo-code/web-evals@0.0.0 clean /home/jguru/projects/kilocode/apps/web-evals
+@roo-code/web-evals:clean: > rimraf tsconfig.tsbuildinfo .next .turbo
+@roo-code/web-evals:clean: 
+@kilocode/core-schemas:clean: cache bypass, force executing 2f1a98864a197016
+@kilocode/core-schemas:clean: 
+@kilocode/core-schemas:clean: > @kilocode/core-schemas@0.0.2 clean /home/jguru/projects/kilocode/packages/core-schemas
+@kilocode/core-schemas:clean: > rimraf dist .turbo
+@kilocode/core-schemas:clean: 
+@roo-code/playwright-e2e:clean: cache bypass, force executing 11bcebe8ed4c72c3
+@roo-code/playwright-e2e:clean: 
+@roo-code/playwright-e2e:clean: > @roo-code/playwright-e2e@ clean /home/jguru/projects/kilocode/apps/playwright-e2e
+@roo-code/playwright-e2e:clean: > rimraf test-results playwright-report .turbo
+@roo-code/playwright-e2e:clean: 
+@roo-code/web-roo-code:clean: cache bypass, force executing cd0e34991dcdfe9a
+@roo-code/web-roo-code:clean: 
+@roo-code/web-roo-code:clean: > @roo-code/web-roo-code@0.0.0 clean /home/jguru/projects/kilocode/apps/web-roo-code
+@roo-code/web-roo-code:clean: > rimraf .next .turbo
+@roo-code/web-roo-code:clean: 
+@roo-code/vscode-webview:clean: cache bypass, force executing 17742eee427c0b2a
+@roo-code/vscode-webview:clean: 
+@roo-code/vscode-webview:clean: > @roo-code/vscode-webview@ clean /home/jguru/projects/kilocode/webview-ui
+@roo-code/vscode-webview:clean: > rimraf ../src/webview-ui ../apps/vscode-nightly/build/webview-ui tsconfig.tsbuildinfo .turbo
+@roo-code/vscode-webview:clean: 
+@kilocode/cli:clean: cache bypass, force executing 6ec37dec4f235380
+@kilocode/cli:clean: 
+@kilocode/cli:clean: > @kilocode/cli@0.26.0 clean /home/jguru/projects/kilocode/cli
+@kilocode/cli:clean: > rimraf dist
+@kilocode/cli:clean: 
+@roo-code/storybook:clean: cache bypass, force executing 96c5d21fb662b9b3
+@roo-code/storybook:clean: 
+@roo-code/storybook:clean: > @roo-code/storybook@ clean /home/jguru/projects/kilocode/apps/storybook
+@roo-code/storybook:clean: > rimraf storybook-static .turbo stories/generated public/screenshots
+@roo-code/storybook:clean: 
+@roo-code/telemetry:clean: cache bypass, force executing f9e4dc2109fddf7d
+@roo-code/telemetry:clean: 
+@roo-code/telemetry:clean: > @roo-code/telemetry@0.0.0 clean /home/jguru/projects/kilocode/packages/telemetry
+@roo-code/telemetry:clean: > rimraf .turbo
+@roo-code/telemetry:clean: 
+@roo-code/evals:clean: cache bypass, force executing 7ce1940d2c03f966
+@roo-code/evals:clean: 
+@roo-code/evals:clean: > @roo-code/evals@0.0.0 clean /home/jguru/projects/kilocode/packages/evals
+@roo-code/evals:clean: > rimraf dist .turbo
+@roo-code/evals:clean: 
+@kilo-code/jetbrains-host:clean: cache bypass, force executing 06d6da2ec14554ef
+@kilo-code/jetbrains-host:clean: 
+@kilo-code/jetbrains-host:clean: > @kilo-code/jetbrains-host@ clean /home/jguru/projects/kilocode/jetbrains/host
+@kilo-code/jetbrains-host:clean: > del-cli ./dist
+@kilo-code/jetbrains-host:clean: 
+@kilo-code/jetbrains-plugin:clean: cache bypass, force executing 2fbf91513548ee70
+@kilo-code/jetbrains-plugin:clean: 
+@kilo-code/jetbrains-plugin:clean: > @kilo-code/jetbrains-plugin@ clean /home/jguru/projects/kilocode/jetbrains/plugin
+@kilo-code/jetbrains-plugin:clean: > ./gradlew clean
+@kilo-code/jetbrains-plugin:clean: 
+@kilo-code/jetbrains-plugin:clean: Starting a Gradle Daemon, 1 stopped Daemon could not be reused, use --status for details
+@kilo-code/jetbrains-plugin:clean: > Task :clean
+@kilo-code/jetbrains-plugin:clean: 
+@kilo-code/jetbrains-plugin:clean: BUILD SUCCESSFUL in 4s
+@kilo-code/jetbrains-plugin:clean: 1 actionable task: 1 executed
+
+ Tasks:    20 successful, 20 total
+Cached:    0 cached, 20 total
+  Time:    6.174s 
+
+📦 Building VSIX using pnpm vsix...
+
+> kilo-code@ vsix /home/jguru/projects/kilocode
+> turbo vsix --log-order grouped --output-logs new-only
+
+turbo 2.6.1
+
+• Packages in scope: @kilo-code/jetbrains-host, @kilo-code/jetbrains-plugin, @kilocode/agent-runtime, @kilocode/cli, @kilocode/core-schemas, @roo-code/build, @roo-code/cloud, @roo-code/config-eslint, @roo-code/config-typescript, @roo-code/core, @roo-code/evals, @roo-code/ipc, @roo-code/playwright-e2e, @roo-code/storybook, @roo-code/telemetry, @roo-code/types, @roo-code/vscode-e2e, @roo-code/vscode-nightly, @roo-code/vscode-webview, @roo-code/web-evals, @roo-code/web-roo-code, kilo-code, kilocode-docs
+• Running vsix in 23 packages
+• Remote caching disabled
+@roo-code/build:build: cache miss, executing 00f42c5103e438ec
+@roo-code/build:build: 
+@roo-code/build:build: > @roo-code/build@ build /home/jguru/projects/kilocode/packages/build
+@roo-code/build:build: > tsc
+@roo-code/build:build: 
+@roo-code/types:build: cache miss, executing 1258cd1dfc500f64
+@roo-code/types:build: 
+@roo-code/types:build: > @roo-code/types@0.0.0 build /home/jguru/projects/kilocode/packages/types
+@roo-code/types:build: > tsup
+@roo-code/types:build: 
+@roo-code/types:build: CLI Building entry: src/index.ts
+@roo-code/types:build: CLI Using tsconfig: tsconfig.json
+@roo-code/types:build: CLI tsup v8.5.0
+@roo-code/types:build: CLI Using tsup config: /home/jguru/projects/kilocode/packages/types/tsup.config.ts
+@roo-code/types:build: CLI Target: es2022
+@roo-code/types:build: CLI Cleaning output folder
+@roo-code/types:build: CJS Build start
+@roo-code/types:build: ESM Build start
+@roo-code/types:build: CJS dist/index.cjs     315.89 KB
+@roo-code/types:build: CJS dist/index.cjs.map 513.79 KB
+@roo-code/types:build: CJS ⚡️ Build success in 80ms
+@roo-code/types:build: ESM dist/index.js     282.20 KB
+@roo-code/types:build: ESM dist/index.js.map 511.85 KB
+@roo-code/types:build: ESM ⚡️ Build success in 92ms
+@roo-code/types:build: DTS Build start
+@roo-code/types:build: DTS ⚡️ Build success in 6251ms
+@roo-code/types:build: DTS dist/index.d.cts 3.24 MB
+@roo-code/types:build: DTS dist/index.d.ts  3.24 MB
+@kilocode/core-schemas:build: cache miss, executing 2f97928e4b1c6542
+@kilocode/core-schemas:build: 
+@kilocode/core-schemas:build: > @kilocode/core-schemas@0.0.2 build /home/jguru/projects/kilocode/packages/core-schemas
+@kilocode/core-schemas:build: > tsup
+@kilocode/core-schemas:build: 
+@kilocode/core-schemas:build: CLI Building entry: src/index.ts
+@kilocode/core-schemas:build: CLI Using tsconfig: tsconfig.json
+@kilocode/core-schemas:build: CLI tsup v8.5.0
+@kilocode/core-schemas:build: CLI Using tsup config: /home/jguru/projects/kilocode/packages/core-schemas/tsup.config.ts
+@kilocode/core-schemas:build: CLI Target: es2022
+@kilocode/core-schemas:build: CLI Cleaning output folder
+@kilocode/core-schemas:build: CJS Build start
+@kilocode/core-schemas:build: ESM Build start
+@kilocode/core-schemas:build: ESM dist/index.js     31.74 KB
+@kilocode/core-schemas:build: ESM dist/index.js.map 66.82 KB
+@kilocode/core-schemas:build: ESM ⚡️ Build success in 68ms
+@kilocode/core-schemas:build: CJS dist/index.cjs     44.56 KB
+@kilocode/core-schemas:build: CJS dist/index.cjs.map 67.66 KB
+@kilocode/core-schemas:build: CJS ⚡️ Build success in 68ms
+@kilocode/core-schemas:build: DTS Build start
+@kilocode/core-schemas:build: DTS ⚡️ Build success in 4766ms
+@kilocode/core-schemas:build: DTS dist/index.d.cts 104.41 KB
+@kilocode/core-schemas:build: DTS dist/index.d.ts  104.41 KB
+@roo-code/vscode-webview:build: cache miss, executing f79324e292eaee0c
+@roo-code/vscode-webview:build: 
+@roo-code/vscode-webview:build: > @roo-code/vscode-webview@ build /home/jguru/projects/kilocode/webview-ui
+@roo-code/vscode-webview:build: > tsc -b && vite build
+@roo-code/vscode-webview:build: 
+@roo-code/vscode-webview:build: vite v6.3.6 building for production...
+@roo-code/vscode-webview:build: transforming...
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/core/prompts/sections/custom-instructions.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/core/prompts/sections/custom-instructions.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/node_modules/.pnpm/isbinaryfile@5.0.4/node_modules/isbinaryfile/lib/index.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/core/prompts/sections/kilo.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/core/prompts/sections/kilo.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "os" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/core/prompts/sections/kilo.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/roo-config/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "os" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/roo-config/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/roo-config/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/roo-config/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/search/file-search.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/search/file-search.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "child_process" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/search/file-search.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "readline" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/search/file-search.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/utils/path.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "os" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/utils/path.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "child_process" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/ripgrep/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/ripgrep/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "readline" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/ripgrep/index.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/services/ripgrep/index.kilocode.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "fs/promises" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/utils/fs.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: [plugin vite:resolve] Module "path" has been externalized for browser compatibility, imported by "/home/jguru/projects/kilocode/src/utils/fs.ts". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (28:20): "homedir" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (29:13): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (63:22): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (64:21): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (182:26): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (189:24): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (308:25): "dirname" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (377:29): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/services/roo-config/index.ts (378:30): "join" is not exported by "__vite-browser-external", imported by "../src/services/roo-config/index.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (13:33): "normalize" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (14:28): "dirname" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (22:21): "dirname" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (88:45): "resolve" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (96:35): "sep" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (96:68): "sep" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/fs.ts (96:80): "sep" is not exported by "__vite-browser-external", imported by "../src/utils/fs.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (73:23): "normalize" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (85:27): "resolve" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (86:29): "join" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (90:24): "normalize" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (90:54): "normalize" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (91:14): "basename" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (94:33): "relative" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/utils/path.ts (105:27): "relative" is not exported by "__vite-browser-external", imported by "../src/utils/path.ts".
+@roo-code/vscode-webview:build: ../src/services/ripgrep/index.ts (89:24): "join" is not exported by "__vite-browser-external", imported by "../src/services/ripgrep/index.ts".
+@roo-code/vscode-webview:build: ../src/services/ripgrep/index.ts (104:33): "spawn" is not exported by "__vite-browser-external", imported by "../src/services/ripgrep/index.ts".
+@roo-code/vscode-webview:build: ../src/services/ripgrep/index.ts (106:22): "createInterface" is not exported by "__vite-browser-external", imported by "../src/services/ripgrep/index.ts".
+@roo-code/vscode-webview:build: ../src/services/ripgrep/index.ts (247:32): "relative" is not exported by "__vite-browser-external", imported by "../src/services/ripgrep/index.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (29:33): "spawn" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (30:22): "createInterface" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (39:31): "relative" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (42:70): "basename" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (45:24): "dirname" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (49:21): "dirname" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (76:17): "basename" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (175:26): "join" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (177:11): "existsSync" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ../src/services/search/file-search.ts (178:28): "lstatSync" is not exported by "__vite-browser-external", imported by "../src/services/search/file-search.ts".
+@roo-code/vscode-webview:build: ✓ 6239 modules transformed.
+@roo-code/vscode-webview:build: rendering chunks...
+@roo-code/vscode-webview:build: ../src/webview-ui/build/browser-panel.html                                0.60 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/agent-manager.html                                0.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/index.html                                        0.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size3-Regular.woff             4.42 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size4-Regular.woff2            4.93 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size2-Regular.woff2            5.21 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size1-Regular.woff2            5.47 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size4-Regular.woff             5.98 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size2-Regular.woff             6.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size1-Regular.woff             6.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Regular.woff2      6.91 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Bold.woff2         6.91 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size3-Regular.ttf              7.59 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Regular.woff       7.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Bold.woff          7.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Script-Regular.woff2           9.64 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Regular.woff2       10.34 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size4-Regular.ttf             10.36 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Script-Regular.woff           10.59 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Regular.woff2         11.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Bold.woff2            11.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size2-Regular.ttf             11.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Italic.woff2        12.03 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Bold.woff2          12.22 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Size1-Regular.ttf             12.23 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Regular.woff        12.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Regular.ttf       12.34 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Caligraphic-Bold.ttf          12.37 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Regular.woff          13.21 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Bold.woff             13.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Typewriter-Regular.woff2      13.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Italic.woff         14.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Bold.woff           14.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Typewriter-Regular.woff       16.03 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-BoldItalic.woff2         16.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-Italic.woff2             16.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Script-Regular.ttf            16.65 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-BoldItalic.woff2         16.78 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Italic.woff2             16.99 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-BoldItalic.woff          18.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-Italic.woff              18.75 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-BoldItalic.woff          19.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Regular.ttf         19.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Regular.ttf           19.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Fraktur-Bold.ttf              19.58 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Italic.woff              19.68 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Italic.ttf          22.36 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_SansSerif-Bold.ttf            24.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Bold.woff2               25.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Regular.woff2            26.27 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Typewriter-Regular.ttf        27.56 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_AMS-Regular.woff2             28.08 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Bold.woff                29.91 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Regular.woff             30.77 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-BoldItalic.ttf           31.20 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Math-Italic.ttf               31.31 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-BoldItalic.ttf           32.97 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_AMS-Regular.woff              33.52 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Italic.ttf               33.58 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Bold.ttf                 51.34 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_Main-Regular.ttf              53.58 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/KaTeX_AMS-Regular.ttf               63.63 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/fonts/codicon.ttf                         80.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/agent-manager.css                         18.83 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/index.css                                161.10 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bp6g37R7.js                          0.59 kB │ map:      1.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D9kx8fwg.js                          0.75 kB │ map:      1.34 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B_m7g4N7.js                          0.78 kB │ map:      1.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C3rowuyE.js                          0.94 kB │ map:      1.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DjjNbUIW.js                          1.02 kB │ map:      1.70 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C8lEn-DE.js                          1.05 kB │ map:      1.76 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CSPye00a.js                          1.13 kB │ map:      1.96 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-fuZLfV_i.js                          1.19 kB │ map:      2.02 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CdTSL8YE.js                          1.27 kB │ map:      2.05 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CJOTNe-S.js                          1.43 kB │ map:      2.21 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Da5cRb03.js                          1.47 kB │ map:      2.36 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CrJ-YhoI.js                          1.52 kB │ map:      2.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BEwlwnbL.js                          1.57 kB │ map:      2.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BcOcwvcX.js                          1.78 kB │ map:      2.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C9tDr53Z.js                          1.79 kB │ map:      2.49 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BmXAJ9_W.js                          1.88 kB │ map:      2.79 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BV7otONQ.js                          2.20 kB │ map:      3.21 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C2t-YnRu.js                          2.28 kB │ map:      3.42 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C-SQnVFl.js                          2.39 kB │ map:      3.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DNNlxIVo.js                          2.39 kB │ map:      3.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D08WgyRC.js                          2.41 kB │ map:      3.85 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D97Zzqfu.js                          2.61 kB │ map:      3.89 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BspZqrRM.js                          2.62 kB │ map:      4.02 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DouSy6O5.js                          2.66 kB │ map:      3.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DFXneXwc.js                          2.69 kB │ map:      3.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cp-IABpG.js                          2.87 kB │ map:      4.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BFvZA1X9.js                          2.89 kB │ map:      4.37 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DP8w0yq8.js                          2.98 kB │ map:      4.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DcaNXYhu.js                          3.05 kB │ map:      4.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Des-eS-w.js                          3.15 kB │ map:      4.63 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BtOb2qkB.js                          3.17 kB │ map:      3.84 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BTJTHyun.js                          3.28 kB │ map:      5.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C9tS-k6U.js                          3.30 kB │ map:      4.98 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CKIfxQSi.js                          3.30 kB │ map:      4.70 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-QIJgUcNo.js                          3.33 kB │ map:      5.16 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D0YGMca9.js                          3.40 kB │ map:      4.90 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C3B-1QV4.js                          3.41 kB │ map:      4.90 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CsfeWuGM.js                          3.41 kB │ map:      4.92 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BtCnVYZw.js                          3.48 kB │ map:      4.47 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C4IJs8-o.js                          3.65 kB │ map:      5.23 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-_ykCGR6B.js                          3.66 kB │ map:      4.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DFQXde-d.js                          3.66 kB │ map:      5.45 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DXETW7eA.js                          3.68 kB │ map:      4.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DRg8JJMk.js                          3.72 kB │ map:      5.45 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BsS91CYL.js                          3.74 kB │ map:      5.52 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DVFEvuxE.js                          3.96 kB │ map:      5.78 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BU0udk1K.js                          3.98 kB │ map:      5.96 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-c1G5yEKj.js                          4.14 kB │ map:      6.09 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D93ZcfNL.js                          4.19 kB │ map:      5.56 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bl2oy6fF.js                          4.22 kB │ map:      5.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-6nHXG8SA.js                          4.35 kB │ map:      6.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-dwOrl1Do.js                          4.47 kB │ map:      6.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CUBwRw-F.js                          4.58 kB │ map:      6.71 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C0HS_06l.js                          4.71 kB │ map:      7.28 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DVxCFoDh.js                          4.75 kB │ map:      5.92 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BYunw83y.js                          4.81 kB │ map:      6.45 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CHM0blh-.js                          4.84 kB │ map:      7.05 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D32k8WzR.js                          5.06 kB │ map:      6.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Dx-B1_4e.js                          5.19 kB │ map:      7.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DEd0xgAf.js                          5.30 kB │ map:      7.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DXHVBXt-.js                          5.37 kB │ map:      8.15 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CEL-wOlO.js                          5.41 kB │ map:      6.80 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CK-KhNJq.js                          5.41 kB │ map:      7.93 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B_vNuMnf.js                          5.43 kB │ map:      7.87 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DMzUqQB5.js                          5.50 kB │ map:      8.02 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CMdgaOU9.js                          5.54 kB │ map:      7.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-25uR9ifH.js                          5.73 kB │ map:      8.52 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CEu0bR-o.js                          5.95 kB │ map:      8.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C3IMAYVA.js                          5.97 kB │ map:      7.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BQ8w6xss.js                          5.97 kB │ map:      8.05 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-COkxafJQ.js                          6.00 kB │ map:      8.47 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D17OF-Vu.js                          6.14 kB │ map:      8.07 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-bN70gL4F.js                          6.31 kB │ map:      8.90 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CafNBF8u.js                          6.33 kB │ map:      8.63 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DkwncUOv.js                          6.37 kB │ map:      9.22 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Dd19v3D-.js                          6.37 kB │ map:      9.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BRHolxvo.js                          6.41 kB │ map:      9.28 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-P80f7IUj.js                          6.46 kB │ map:      9.31 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CXtECtnM.js                          6.46 kB │ map:      9.14 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-vGWfd6FD.js                          6.47 kB │ map:      9.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-L9t79GZl.js                          6.52 kB │ map:      9.25 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DyJlTyXw.js                          6.56 kB │ map:      9.89 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BERRCDM3.js                          6.63 kB │ map:      9.28 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CkByrt1z.js                          6.80 kB │ map:     10.10 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DXbdFlpD.js                          6.89 kB │ map:      9.70 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BM1_JUlF.js                          6.96 kB │ map:      9.63 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CTRr51gU.js                          7.01 kB │ map:      9.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-3ipgsugG.js                          7.02 kB │ map:     10.73 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C98Dy4si.js                          7.21 kB │ map:      9.82 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D3lLCCz7.js                          7.31 kB │ map:      9.27 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-IeuSbFQv.js                          7.52 kB │ map:      9.43 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CF10PKvl.js                          7.86 kB │ map:     11.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-4A_iFExJ.js                          7.91 kB │ map:     10.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D4h5O-jR.js                          7.93 kB │ map:     11.12 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CDVJQ6XC.js                          8.03 kB │ map:     11.22 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cne5dW8M.js                          8.30 kB │ map:     12.39 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DHCkPAjA.js                          8.43 kB │ map:     12.33 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-ChMvpjG-.js                          8.56 kB │ map:     10.92 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D1_LrSGp.js                          8.70 kB │ map:     12.07 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BdnUsdx6.js                          8.83 kB │ map:     12.81 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C3khCPGq.js                          8.90 kB │ map:     11.77 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DIHx2sdZ.js                          8.99 kB │ map:     14.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CHLpvVh8.js                          9.00 kB │ map:     12.89 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D1K3uGbs.js                          9.11 kB │ map:     11.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C3mMm8J8.js                          9.14 kB │ map:     12.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BthQWCQV.js                          9.16 kB │ map:     12.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cj5Yp3dK.js                          9.33 kB │ map:     13.45 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-3e1v2bzS.js                          9.34 kB │ map:     12.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DqwNpetd.js                          9.47 kB │ map:     13.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-jQY0bNUL.js                          9.57 kB │ map:     12.23 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B5tOyCc9.js                          9.73 kB │ map:     14.12 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D1j8_8rp.js                          9.90 kB │ map:     11.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B7mTdjB0.js                          9.98 kB │ map:     13.44 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BWvSN4gD.js                         10.10 kB │ map:     14.82 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BoKiGodi.js                         10.17 kB │ map:     14.74 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BtqSS_iP.js                         10.51 kB │ map:     15.14 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DXvB9xmW.js                         10.52 kB │ map:     12.94 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D2CYqzqI.js                         10.55 kB │ map:     15.20 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Buea-lGh.js                         10.55 kB │ map:     14.93 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BAAX8Kh4.js                         10.71 kB │ map:     15.59 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-sVvOI5da.js                         11.02 kB │ map:     16.06 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DAi9KRSo.js                         11.23 kB │ map:     15.43 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CbFg5uaA.js                         11.40 kB │ map:     13.33 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BETggiCN.js                         11.43 kB │ map:     16.25 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DHJKELXO.js                         11.45 kB │ map:     15.70 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BMWR74SV.js                         11.48 kB │ map:     16.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DUszq2jm.js                         11.54 kB │ map:     14.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DyxjwDmM.js                         11.99 kB │ map:     13.15 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-MzD3tlZU.js                         12.05 kB │ map:     16.87 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D5-asLiD.js                         12.10 kB │ map:     17.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C9dXKwCe.js                         12.19 kB │ map:     17.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Pmp26Uib.js                         12.50 kB │ map:     15.98 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-irsrSlf-.js                         12.73 kB │ map:     17.89 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DU1UobuO.js                         12.74 kB │ map:     16.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BkioyH1T.js                         12.93 kB │ map:     17.43 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DljmTZ5-.js                         13.27 kB │ map:     19.32 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CVO1_9PV.js                         13.66 kB │ map:     18.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D-2ljcwZ.js                         13.70 kB │ map:     17.59 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bkuqu6BP.js                         13.72 kB │ map:     18.65 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D0r3Knsf.js                         13.80 kB │ map:     18.73 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Jcf2cZT6.js                         13.88 kB │ map:     20.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CbfX1IO0.js                         14.08 kB │ map:     19.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CfeIJUat.js                         14.09 kB │ map:     19.86 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CHh-QcGE.js                         14.14 kB │ map:     19.78 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D7oLnXFd.js                         14.20 kB │ map:     19.29 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BfjtVDDH.js                         14.32 kB │ map:     19.46 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DH5Ifo-i.js                         14.48 kB │ map:     19.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cuk6v7N8.js                         14.48 kB │ map:     19.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-E3gJ1_iC.js                         14.64 kB │ map:     19.89 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BepWV7mh.js                         14.79 kB │ map:     21.56 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DdkO51Og.js                         14.83 kB │ map:     20.85 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cv9koXgw.js                         14.99 kB │ map:     20.29 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B1yitclQ.js                         15.11 kB │ map:     21.49 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BvAqAH-y.js                         15.21 kB │ map:     19.64 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Colysff4.js                         15.25 kB │ map:     21.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BdImnpbu.js                         15.90 kB │ map:     18.87 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D7o27uSR.js                         16.13 kB │ map:     23.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D82EKSYY.js                         16.25 kB │ map:     23.82 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BbcW6ACK.js                         16.28 kB │ map:     23.70 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DRBVVfo7.js                         16.36 kB │ map:     23.16 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DO0LZyKx.js                         16.77 kB │ map:     24.05 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CMUws-av.js                         17.00 kB │ map:     23.92 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BkPM1oy1.js                         17.11 kB │ map:     25.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DWedfzmr.js                         17.17 kB │ map:     22.29 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CfQXZHmo.js                         17.17 kB │ map:     22.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CkXjmgJE.js                         17.17 kB │ map:     22.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BgEskmCb.js                         17.76 kB │ map:     24.78 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C-HMFfM3.js                         18.04 kB │ map:     25.48 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D5KoaKCx.js                         18.66 kB │ map:     24.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BfHTSMKl.js                         18.67 kB │ map:     24.17 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CyktbL80.js                         18.67 kB │ map:     24.16 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B0m2ddpp.js                         18.68 kB │ map:     24.18 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Csfq5Kiy.js                         18.68 kB │ map:     24.18 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bty6elJm.js                         18.88 kB │ map:     26.12 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-gcz8RCvz.js                         19.22 kB │ map:     27.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B0YXbBSa.js                         19.66 kB │ map:     23.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-I3RK9BU8.js                         19.85 kB │ map:     27.05 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BaML1QMV.js                         20.11 kB │ map:     28.62 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bc2xwClX.js                         20.11 kB │ map:     28.62 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Dpen1YoG.js                         20.19 kB │ map:     26.62 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CJc9bBzg.js                         20.41 kB │ map:     23.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/browser-panel.js                          20.55 kB │ map:     75.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Bw305WKR.js                         20.82 kB │ map:     28.03 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BzJJZx-M.js                         21.11 kB │ map:     27.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BXkSAIEj.js                         21.12 kB │ map:     27.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DQ46CBc_.js                         21.13 kB │ map:     31.77 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-T7J2jLj3.js                         21.42 kB │ map:     29.24 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-5i3qLPDT.js                         21.51 kB │ map:     30.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BHrmToEH.js                         21.79 kB │ map:     28.78 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-NleAzG8P.js                         21.80 kB │ map:     28.81 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CnK8MTSM.js                         21.80 kB │ map:     28.81 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Hhtzho9R.js                         21.90 kB │ map:     29.52 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BFVdkX1U.js                         21.90 kB │ map:     29.52 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-7i6GEmcB.js                         21.90 kB │ map:     29.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-leinZj1a.js                         21.90 kB │ map:     29.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DFR6f4Jn.js                         21.90 kB │ map:     29.53 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Dcsh5twl.js                         21.91 kB │ map:     29.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DWkon8Hs.js                         22.51 kB │ map:     32.77 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cg-RD9OK.js                         22.62 kB │ map:     26.71 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B9xm8XSJ.js                         23.46 kB │ map:     27.96 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CtrldY6v.js                         23.61 kB │ map:     33.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Df68jz8_.js                         23.70 kB │ map:     33.09 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BrYkhBEK.js                         24.00 kB │ map:     29.10 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B47ASqzZ.js                         24.04 kB │ map:     30.83 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DbjXokdF.js                         24.08 kB │ map:     33.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CeAyd5Ju.js                         24.31 kB │ map:     33.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-sYKpKAhk.js                         24.33 kB │ map:     35.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk--Ycre7K_.js                         25.33 kB │ map:     35.88 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-PoHY5YXO.js                         25.34 kB │ map:     33.81 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BSCcYQo-.js                         25.60 kB │ map:     35.74 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CnnmHF94.js                         26.25 kB │ map:     36.29 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Ddv68eIx.js                         26.77 kB │ map:     35.36 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DsOJ9woJ.js                         26.93 kB │ map:     36.04 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-vbB5lEOJ.js                         27.25 kB │ map:     38.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CylS5w8V.js                         27.26 kB │ map:     38.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C-C_nZcE.js                         27.46 kB │ map:     36.10 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DfEE3Bzs.js                         28.33 kB │ map:     42.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C151Ov-r.js                         28.93 kB │ map:     40.14 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C39BiMTA.js                         28.96 kB │ map:     39.06 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BnD7D7ah.js                         29.43 kB │ map:     41.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Co6uUVPk.js                         29.61 kB │ map:     39.37 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BEDo0Tqx.js                         31.12 kB │ map:     38.90 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DSnTR2wu.js                         31.12 kB │ map:     40.57 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CS3Unz2-.js                         33.54 kB │ map:     43.07 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DVMEJ2y_.js                         33.83 kB │ map:     44.51 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CDuzWNpe.js                         33.91 kB │ map:     37.62 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BP3HzMA6.js                         35.20 kB │ map:     49.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cu1ofpgu.js                         35.42 kB │ map:     48.49 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DnULxvSX.js                         35.47 kB │ map:     46.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-hegEt444.js                         35.71 kB │ map:     45.35 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BYCUR9qn.js                         36.96 kB │ map:    156.31 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DpOm0zC4.js                         37.47 kB │ map:     51.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-OpcvBqEo.js                         39.18 kB │ map:     47.38 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C2tOF0e5.js                         39.47 kB │ map:     48.58 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D_Q5rh1f.js                         40.76 kB │ map:     53.02 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Yzrsuije.js                         41.52 kB │ map:     56.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Df6bDoY_.js                         41.53 kB │ map:     57.87 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BgfZh1f1.js                         43.20 kB │ map:     60.76 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-85-TOEBH.js                         43.84 kB │ map:     62.72 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-PEFJdsE-.js                         45.17 kB │ map:     64.22 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-3mfGJbgy.js                         45.96 kB │ map:     65.26 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-QX45V2Sx.js                         46.12 kB │ map:     64.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BR7mELCv.js                         46.89 kB │ map:     61.48 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-q-j0iyEw.js                         46.89 kB │ map:     61.48 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Btyk0a-E.js                         46.89 kB │ map:     61.48 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-brDaU2vB.js                         46.89 kB │ map:     61.50 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-bCR0ucgS.js                         48.13 kB │ map:     70.99 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DPfMkruS.js                         49.07 kB │ map:     60.65 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DGztddWO.js                         49.97 kB │ map:     68.11 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BgDCqdQA.js                         53.79 kB │ map:     68.27 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C8M2exoo.js                         53.79 kB │ map:     68.28 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BhOHFoWU.js                         55.93 kB │ map:     77.66 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-RrBGtqGR.js                         55.95 kB │ map:     77.63 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CiIkovmz.js                         57.04 kB │ map:     74.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CXhxxCfG.js                         57.29 kB │ map:     73.01 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BFfxhgS-.js                         58.74 kB │ map:     81.56 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C0hk2d4L.js                         62.49 kB │ map:     81.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-1DNp92w6.js                         69.33 kB │ map:     94.25 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Du0Ki9n9.js                         69.45 kB │ map:     96.16 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B6aJPvgy.js                         70.00 kB │ map:     95.26 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BIGW1oBm.js                         72.16 kB │ map:     95.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CDx5xZoG.js                         74.69 kB │ map:    100.73 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/agent-manager.js                          78.21 kB │ map:    340.79 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CUz34qUM.js                         80.28 kB │ map:     97.31 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CHadp7IV.js                         85.63 kB │ map:    120.19 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-fve9TYiY.js                         86.01 kB │ map:    113.15 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CdggvHu8.js                         87.11 kB │ map:    124.90 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-D22FLkUw.js                         87.19 kB │ map:    121.54 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BqYA7rlc.js                         92.43 kB │ map:    106.21 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-B1dDrJ26.js                         97.68 kB │ map:    131.88 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CLIx6TIR.js                        103.84 kB │ map:    129.27 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DXmwc3jG.js                        105.46 kB │ map:    129.67 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cf4Oy6XI.js                        111.05 kB │ map:    139.30 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cmh6b_Ma.js                        136.16 kB │ map:    176.75 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-75r8LPYm.js                        138.23 kB │ map:    887.45 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CLxacb5B.js                        172.02 kB │ map:    218.55 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-BMMyXqK5.js                        174.86 kB │ map:    236.06 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-COt5Ahok.js                        175.58 kB │ map:    236.76 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-g9-lgVsj.js                        177.84 kB │ map:    239.01 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-DlfHMoPT.js                        181.11 kB │ map:    244.40 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-Cno5XSCQ.js                        183.86 kB │ map:    249.41 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-IN8fJS5x.js                        190.97 kB │ map:    746.13 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-lXgVvXCa.js                        262.43 kB │ map:    279.68 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CG6Dc4jp.js                        622.38 kB │ map:    622.93 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CzjqYRUi.js                        626.13 kB │ map:    816.15 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-C9XAeP06.js                        779.90 kB │ map:    789.83 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/index.js                               1,463.33 kB │ map: 10,632.69 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/mermaid-bundle.js                      2,585.35 kB │ map:  9,706.79 kB
+@roo-code/vscode-webview:build: ../src/webview-ui/build/assets/chunk-CJjposE6.js                      4,466.47 kB │ map:  3,834.87 kB
+@roo-code/vscode-webview:build: 
+@roo-code/vscode-webview:build: (!) Some chunks are larger than 500 kB after minification. Consider:
+@roo-code/vscode-webview:build: - Using dynamic import() to code-split the application
+@roo-code/vscode-webview:build: - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+@roo-code/vscode-webview:build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+@roo-code/vscode-webview:build: ✓ built in 15.93s
+@roo-code/vscode-webview:build: Ensuring source maps are included in build...
+@roo-code/vscode-webview:build: Source map processing for production build in /home/jguru/projects/kilocode/src/webview-ui/build
+@roo-code/vscode-webview:build: Found 289 JS files in assets directory
+@roo-code/vscode-webview:build: Source map found for agent-manager.js
+@roo-code/vscode-webview:build: Updated source map for agent-manager.js
+@roo-code/vscode-webview:build: Source map found for browser-panel.js
+@roo-code/vscode-webview:build: Updated source map for browser-panel.js
+@roo-code/vscode-webview:build: Source map found for chunk--Ycre7K_.js
+@roo-code/vscode-webview:build: Updated source map for chunk--Ycre7K_.js
+@roo-code/vscode-webview:build: Source map found for chunk-1DNp92w6.js
+@roo-code/vscode-webview:build: Updated source map for chunk-1DNp92w6.js
+@roo-code/vscode-webview:build: Source map found for chunk-25uR9ifH.js
+@roo-code/vscode-webview:build: Updated source map for chunk-25uR9ifH.js
+@roo-code/vscode-webview:build: Source map found for chunk-3e1v2bzS.js
+@roo-code/vscode-webview:build: Updated source map for chunk-3e1v2bzS.js
+@roo-code/vscode-webview:build: Source map found for chunk-3ipgsugG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-3ipgsugG.js
+@roo-code/vscode-webview:build: Source map found for chunk-3mfGJbgy.js
+@roo-code/vscode-webview:build: Updated source map for chunk-3mfGJbgy.js
+@roo-code/vscode-webview:build: Source map found for chunk-4A_iFExJ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-4A_iFExJ.js
+@roo-code/vscode-webview:build: Source map found for chunk-5i3qLPDT.js
+@roo-code/vscode-webview:build: Updated source map for chunk-5i3qLPDT.js
+@roo-code/vscode-webview:build: Source map found for chunk-6nHXG8SA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-6nHXG8SA.js
+@roo-code/vscode-webview:build: Source map found for chunk-75r8LPYm.js
+@roo-code/vscode-webview:build: Updated source map for chunk-75r8LPYm.js
+@roo-code/vscode-webview:build: Source map found for chunk-7i6GEmcB.js
+@roo-code/vscode-webview:build: Updated source map for chunk-7i6GEmcB.js
+@roo-code/vscode-webview:build: Source map found for chunk-85-TOEBH.js
+@roo-code/vscode-webview:build: Updated source map for chunk-85-TOEBH.js
+@roo-code/vscode-webview:build: Source map found for chunk-B0YXbBSa.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B0YXbBSa.js
+@roo-code/vscode-webview:build: Source map found for chunk-B0m2ddpp.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B0m2ddpp.js
+@roo-code/vscode-webview:build: Source map found for chunk-B1dDrJ26.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B1dDrJ26.js
+@roo-code/vscode-webview:build: Source map found for chunk-B1yitclQ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B1yitclQ.js
+@roo-code/vscode-webview:build: Source map found for chunk-B47ASqzZ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B47ASqzZ.js
+@roo-code/vscode-webview:build: Source map found for chunk-B5tOyCc9.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B5tOyCc9.js
+@roo-code/vscode-webview:build: Source map found for chunk-B6aJPvgy.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B6aJPvgy.js
+@roo-code/vscode-webview:build: Source map found for chunk-B7mTdjB0.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B7mTdjB0.js
+@roo-code/vscode-webview:build: Source map found for chunk-B9xm8XSJ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B9xm8XSJ.js
+@roo-code/vscode-webview:build: Source map found for chunk-BAAX8Kh4.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BAAX8Kh4.js
+@roo-code/vscode-webview:build: Source map found for chunk-BEDo0Tqx.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BEDo0Tqx.js
+@roo-code/vscode-webview:build: Source map found for chunk-BERRCDM3.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BERRCDM3.js
+@roo-code/vscode-webview:build: Source map found for chunk-BETggiCN.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BETggiCN.js
+@roo-code/vscode-webview:build: Source map found for chunk-BEwlwnbL.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BEwlwnbL.js
+@roo-code/vscode-webview:build: Source map found for chunk-BFVdkX1U.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BFVdkX1U.js
+@roo-code/vscode-webview:build: Source map found for chunk-BFfxhgS-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BFfxhgS-.js
+@roo-code/vscode-webview:build: Source map found for chunk-BFvZA1X9.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BFvZA1X9.js
+@roo-code/vscode-webview:build: Source map found for chunk-BHrmToEH.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BHrmToEH.js
+@roo-code/vscode-webview:build: Source map found for chunk-BIGW1oBm.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BIGW1oBm.js
+@roo-code/vscode-webview:build: Source map found for chunk-BM1_JUlF.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BM1_JUlF.js
+@roo-code/vscode-webview:build: Source map found for chunk-BMMyXqK5.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BMMyXqK5.js
+@roo-code/vscode-webview:build: Source map found for chunk-BMWR74SV.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BMWR74SV.js
+@roo-code/vscode-webview:build: Source map found for chunk-BP3HzMA6.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BP3HzMA6.js
+@roo-code/vscode-webview:build: Source map found for chunk-BQ8w6xss.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BQ8w6xss.js
+@roo-code/vscode-webview:build: Source map found for chunk-BR7mELCv.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BR7mELCv.js
+@roo-code/vscode-webview:build: Source map found for chunk-BRHolxvo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BRHolxvo.js
+@roo-code/vscode-webview:build: Source map found for chunk-BSCcYQo-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BSCcYQo-.js
+@roo-code/vscode-webview:build: Source map found for chunk-BTJTHyun.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BTJTHyun.js
+@roo-code/vscode-webview:build: Source map found for chunk-BU0udk1K.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BU0udk1K.js
+@roo-code/vscode-webview:build: Source map found for chunk-BV7otONQ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BV7otONQ.js
+@roo-code/vscode-webview:build: Source map found for chunk-BWvSN4gD.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BWvSN4gD.js
+@roo-code/vscode-webview:build: Source map found for chunk-BXkSAIEj.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BXkSAIEj.js
+@roo-code/vscode-webview:build: Source map found for chunk-BYCUR9qn.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BYCUR9qn.js
+@roo-code/vscode-webview:build: Source map found for chunk-BYunw83y.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BYunw83y.js
+@roo-code/vscode-webview:build: Source map found for chunk-B_m7g4N7.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B_m7g4N7.js
+@roo-code/vscode-webview:build: Source map found for chunk-B_vNuMnf.js
+@roo-code/vscode-webview:build: Updated source map for chunk-B_vNuMnf.js
+@roo-code/vscode-webview:build: Source map found for chunk-BaML1QMV.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BaML1QMV.js
+@roo-code/vscode-webview:build: Source map found for chunk-BbcW6ACK.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BbcW6ACK.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bc2xwClX.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bc2xwClX.js
+@roo-code/vscode-webview:build: Source map found for chunk-BcOcwvcX.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BcOcwvcX.js
+@roo-code/vscode-webview:build: Source map found for chunk-BdImnpbu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BdImnpbu.js
+@roo-code/vscode-webview:build: Source map found for chunk-BdnUsdx6.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BdnUsdx6.js
+@roo-code/vscode-webview:build: Source map found for chunk-BepWV7mh.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BepWV7mh.js
+@roo-code/vscode-webview:build: Source map found for chunk-BfHTSMKl.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BfHTSMKl.js
+@roo-code/vscode-webview:build: Source map found for chunk-BfjtVDDH.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BfjtVDDH.js
+@roo-code/vscode-webview:build: Source map found for chunk-BgDCqdQA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BgDCqdQA.js
+@roo-code/vscode-webview:build: Source map found for chunk-BgEskmCb.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BgEskmCb.js
+@roo-code/vscode-webview:build: Source map found for chunk-BgfZh1f1.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BgfZh1f1.js
+@roo-code/vscode-webview:build: Source map found for chunk-BhOHFoWU.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BhOHFoWU.js
+@roo-code/vscode-webview:build: Source map found for chunk-BkPM1oy1.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BkPM1oy1.js
+@roo-code/vscode-webview:build: Source map found for chunk-BkioyH1T.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BkioyH1T.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bkuqu6BP.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bkuqu6BP.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bl2oy6fF.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bl2oy6fF.js
+@roo-code/vscode-webview:build: Source map found for chunk-BmXAJ9_W.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BmXAJ9_W.js
+@roo-code/vscode-webview:build: Source map found for chunk-BnD7D7ah.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BnD7D7ah.js
+@roo-code/vscode-webview:build: Source map found for chunk-BoKiGodi.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BoKiGodi.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bp6g37R7.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bp6g37R7.js
+@roo-code/vscode-webview:build: Source map found for chunk-BqYA7rlc.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BqYA7rlc.js
+@roo-code/vscode-webview:build: Source map found for chunk-BrYkhBEK.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BrYkhBEK.js
+@roo-code/vscode-webview:build: Source map found for chunk-BsS91CYL.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BsS91CYL.js
+@roo-code/vscode-webview:build: Source map found for chunk-BspZqrRM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BspZqrRM.js
+@roo-code/vscode-webview:build: Source map found for chunk-BtCnVYZw.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BtCnVYZw.js
+@roo-code/vscode-webview:build: Source map found for chunk-BtOb2qkB.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BtOb2qkB.js
+@roo-code/vscode-webview:build: Source map found for chunk-BthQWCQV.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BthQWCQV.js
+@roo-code/vscode-webview:build: Source map found for chunk-BtqSS_iP.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BtqSS_iP.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bty6elJm.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bty6elJm.js
+@roo-code/vscode-webview:build: Source map found for chunk-Btyk0a-E.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Btyk0a-E.js
+@roo-code/vscode-webview:build: Source map found for chunk-Buea-lGh.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Buea-lGh.js
+@roo-code/vscode-webview:build: Source map found for chunk-BvAqAH-y.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BvAqAH-y.js
+@roo-code/vscode-webview:build: Source map found for chunk-Bw305WKR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Bw305WKR.js
+@roo-code/vscode-webview:build: Source map found for chunk-BzJJZx-M.js
+@roo-code/vscode-webview:build: Updated source map for chunk-BzJJZx-M.js
+@roo-code/vscode-webview:build: Source map found for chunk-C-C_nZcE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C-C_nZcE.js
+@roo-code/vscode-webview:build: Source map found for chunk-C-HMFfM3.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C-HMFfM3.js
+@roo-code/vscode-webview:build: Source map found for chunk-C-SQnVFl.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C-SQnVFl.js
+@roo-code/vscode-webview:build: Source map found for chunk-C0HS_06l.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C0HS_06l.js
+@roo-code/vscode-webview:build: Source map found for chunk-C0hk2d4L.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C0hk2d4L.js
+@roo-code/vscode-webview:build: Source map found for chunk-C151Ov-r.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C151Ov-r.js
+@roo-code/vscode-webview:build: Source map found for chunk-C2t-YnRu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C2t-YnRu.js
+@roo-code/vscode-webview:build: Source map found for chunk-C2tOF0e5.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C2tOF0e5.js
+@roo-code/vscode-webview:build: Source map found for chunk-C39BiMTA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C39BiMTA.js
+@roo-code/vscode-webview:build: Source map found for chunk-C3B-1QV4.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C3B-1QV4.js
+@roo-code/vscode-webview:build: Source map found for chunk-C3IMAYVA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C3IMAYVA.js
+@roo-code/vscode-webview:build: Source map found for chunk-C3khCPGq.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C3khCPGq.js
+@roo-code/vscode-webview:build: Source map found for chunk-C3mMm8J8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C3mMm8J8.js
+@roo-code/vscode-webview:build: Source map found for chunk-C3rowuyE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C3rowuyE.js
+@roo-code/vscode-webview:build: Source map found for chunk-C4IJs8-o.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C4IJs8-o.js
+@roo-code/vscode-webview:build: Source map found for chunk-C8M2exoo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C8M2exoo.js
+@roo-code/vscode-webview:build: Source map found for chunk-C8lEn-DE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C8lEn-DE.js
+@roo-code/vscode-webview:build: Source map found for chunk-C98Dy4si.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C98Dy4si.js
+@roo-code/vscode-webview:build: Source map found for chunk-C9XAeP06.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C9XAeP06.js
+@roo-code/vscode-webview:build: Source map found for chunk-C9dXKwCe.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C9dXKwCe.js
+@roo-code/vscode-webview:build: Source map found for chunk-C9tDr53Z.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C9tDr53Z.js
+@roo-code/vscode-webview:build: Source map found for chunk-C9tS-k6U.js
+@roo-code/vscode-webview:build: Updated source map for chunk-C9tS-k6U.js
+@roo-code/vscode-webview:build: Source map found for chunk-CDVJQ6XC.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CDVJQ6XC.js
+@roo-code/vscode-webview:build: Source map found for chunk-CDuzWNpe.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CDuzWNpe.js
+@roo-code/vscode-webview:build: Source map found for chunk-CDx5xZoG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CDx5xZoG.js
+@roo-code/vscode-webview:build: Source map found for chunk-CEL-wOlO.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CEL-wOlO.js
+@roo-code/vscode-webview:build: Source map found for chunk-CEu0bR-o.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CEu0bR-o.js
+@roo-code/vscode-webview:build: Source map found for chunk-CF10PKvl.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CF10PKvl.js
+@roo-code/vscode-webview:build: Source map found for chunk-CG6Dc4jp.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CG6Dc4jp.js
+@roo-code/vscode-webview:build: Source map found for chunk-CHLpvVh8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CHLpvVh8.js
+@roo-code/vscode-webview:build: Source map found for chunk-CHM0blh-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CHM0blh-.js
+@roo-code/vscode-webview:build: Source map found for chunk-CHadp7IV.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CHadp7IV.js
+@roo-code/vscode-webview:build: Source map found for chunk-CHh-QcGE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CHh-QcGE.js
+@roo-code/vscode-webview:build: Source map found for chunk-CJOTNe-S.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CJOTNe-S.js
+@roo-code/vscode-webview:build: Source map found for chunk-CJc9bBzg.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CJc9bBzg.js
+@roo-code/vscode-webview:build: Source map found for chunk-CJjposE6.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CJjposE6.js
+@roo-code/vscode-webview:build: Source map found for chunk-CK-KhNJq.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CK-KhNJq.js
+@roo-code/vscode-webview:build: Source map found for chunk-CKIfxQSi.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CKIfxQSi.js
+@roo-code/vscode-webview:build: Source map found for chunk-CLIx6TIR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CLIx6TIR.js
+@roo-code/vscode-webview:build: Source map found for chunk-CLxacb5B.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CLxacb5B.js
+@roo-code/vscode-webview:build: Source map found for chunk-CMUws-av.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CMUws-av.js
+@roo-code/vscode-webview:build: Source map found for chunk-CMdgaOU9.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CMdgaOU9.js
+@roo-code/vscode-webview:build: Source map found for chunk-COkxafJQ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-COkxafJQ.js
+@roo-code/vscode-webview:build: Source map found for chunk-COt5Ahok.js
+@roo-code/vscode-webview:build: Updated source map for chunk-COt5Ahok.js
+@roo-code/vscode-webview:build: Source map found for chunk-CS3Unz2-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CS3Unz2-.js
+@roo-code/vscode-webview:build: Source map found for chunk-CSPye00a.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CSPye00a.js
+@roo-code/vscode-webview:build: Source map found for chunk-CTRr51gU.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CTRr51gU.js
+@roo-code/vscode-webview:build: Source map found for chunk-CUBwRw-F.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CUBwRw-F.js
+@roo-code/vscode-webview:build: Source map found for chunk-CUz34qUM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CUz34qUM.js
+@roo-code/vscode-webview:build: Source map found for chunk-CVO1_9PV.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CVO1_9PV.js
+@roo-code/vscode-webview:build: Source map found for chunk-CXhxxCfG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CXhxxCfG.js
+@roo-code/vscode-webview:build: Source map found for chunk-CXtECtnM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CXtECtnM.js
+@roo-code/vscode-webview:build: Source map found for chunk-CafNBF8u.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CafNBF8u.js
+@roo-code/vscode-webview:build: Source map found for chunk-CbFg5uaA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CbFg5uaA.js
+@roo-code/vscode-webview:build: Source map found for chunk-CbfX1IO0.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CbfX1IO0.js
+@roo-code/vscode-webview:build: Source map found for chunk-CdTSL8YE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CdTSL8YE.js
+@roo-code/vscode-webview:build: Source map found for chunk-CdggvHu8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CdggvHu8.js
+@roo-code/vscode-webview:build: Source map found for chunk-CeAyd5Ju.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CeAyd5Ju.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cf4Oy6XI.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cf4Oy6XI.js
+@roo-code/vscode-webview:build: Source map found for chunk-CfQXZHmo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CfQXZHmo.js
+@roo-code/vscode-webview:build: Source map found for chunk-CfeIJUat.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CfeIJUat.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cg-RD9OK.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cg-RD9OK.js
+@roo-code/vscode-webview:build: Source map found for chunk-ChMvpjG-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-ChMvpjG-.js
+@roo-code/vscode-webview:build: Source map found for chunk-CiIkovmz.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CiIkovmz.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cj5Yp3dK.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cj5Yp3dK.js
+@roo-code/vscode-webview:build: Source map found for chunk-CkByrt1z.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CkByrt1z.js
+@roo-code/vscode-webview:build: Source map found for chunk-CkXjmgJE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CkXjmgJE.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cmh6b_Ma.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cmh6b_Ma.js
+@roo-code/vscode-webview:build: Source map found for chunk-CnK8MTSM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CnK8MTSM.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cne5dW8M.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cne5dW8M.js
+@roo-code/vscode-webview:build: Source map found for chunk-CnnmHF94.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CnnmHF94.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cno5XSCQ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cno5XSCQ.js
+@roo-code/vscode-webview:build: Source map found for chunk-Co6uUVPk.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Co6uUVPk.js
+@roo-code/vscode-webview:build: Source map found for chunk-Colysff4.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Colysff4.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cp-IABpG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cp-IABpG.js
+@roo-code/vscode-webview:build: Source map found for chunk-CrJ-YhoI.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CrJ-YhoI.js
+@roo-code/vscode-webview:build: Source map found for chunk-CsfeWuGM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CsfeWuGM.js
+@roo-code/vscode-webview:build: Source map found for chunk-Csfq5Kiy.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Csfq5Kiy.js
+@roo-code/vscode-webview:build: Source map found for chunk-CtrldY6v.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CtrldY6v.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cu1ofpgu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cu1ofpgu.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cuk6v7N8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cuk6v7N8.js
+@roo-code/vscode-webview:build: Source map found for chunk-Cv9koXgw.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Cv9koXgw.js
+@roo-code/vscode-webview:build: Source map found for chunk-CyktbL80.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CyktbL80.js
+@roo-code/vscode-webview:build: Source map found for chunk-CylS5w8V.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CylS5w8V.js
+@roo-code/vscode-webview:build: Source map found for chunk-CzjqYRUi.js
+@roo-code/vscode-webview:build: Updated source map for chunk-CzjqYRUi.js
+@roo-code/vscode-webview:build: Source map found for chunk-D-2ljcwZ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D-2ljcwZ.js
+@roo-code/vscode-webview:build: Source map found for chunk-D08WgyRC.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D08WgyRC.js
+@roo-code/vscode-webview:build: Source map found for chunk-D0YGMca9.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D0YGMca9.js
+@roo-code/vscode-webview:build: Source map found for chunk-D0r3Knsf.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D0r3Knsf.js
+@roo-code/vscode-webview:build: Source map found for chunk-D17OF-Vu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D17OF-Vu.js
+@roo-code/vscode-webview:build: Source map found for chunk-D1K3uGbs.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D1K3uGbs.js
+@roo-code/vscode-webview:build: Source map found for chunk-D1_LrSGp.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D1_LrSGp.js
+@roo-code/vscode-webview:build: Source map found for chunk-D1j8_8rp.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D1j8_8rp.js
+@roo-code/vscode-webview:build: Source map found for chunk-D22FLkUw.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D22FLkUw.js
+@roo-code/vscode-webview:build: Source map found for chunk-D2CYqzqI.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D2CYqzqI.js
+@roo-code/vscode-webview:build: Source map found for chunk-D32k8WzR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D32k8WzR.js
+@roo-code/vscode-webview:build: Source map found for chunk-D3lLCCz7.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D3lLCCz7.js
+@roo-code/vscode-webview:build: Source map found for chunk-D4h5O-jR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D4h5O-jR.js
+@roo-code/vscode-webview:build: Source map found for chunk-D5-asLiD.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D5-asLiD.js
+@roo-code/vscode-webview:build: Source map found for chunk-D5KoaKCx.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D5KoaKCx.js
+@roo-code/vscode-webview:build: Source map found for chunk-D7o27uSR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D7o27uSR.js
+@roo-code/vscode-webview:build: Source map found for chunk-D7oLnXFd.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D7oLnXFd.js
+@roo-code/vscode-webview:build: Source map found for chunk-D82EKSYY.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D82EKSYY.js
+@roo-code/vscode-webview:build: Source map found for chunk-D93ZcfNL.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D93ZcfNL.js
+@roo-code/vscode-webview:build: Source map found for chunk-D97Zzqfu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D97Zzqfu.js
+@roo-code/vscode-webview:build: Source map found for chunk-D9kx8fwg.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D9kx8fwg.js
+@roo-code/vscode-webview:build: Source map found for chunk-DAi9KRSo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DAi9KRSo.js
+@roo-code/vscode-webview:build: Source map found for chunk-DEd0xgAf.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DEd0xgAf.js
+@roo-code/vscode-webview:build: Source map found for chunk-DFQXde-d.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DFQXde-d.js
+@roo-code/vscode-webview:build: Source map found for chunk-DFR6f4Jn.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DFR6f4Jn.js
+@roo-code/vscode-webview:build: Source map found for chunk-DFXneXwc.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DFXneXwc.js
+@roo-code/vscode-webview:build: Source map found for chunk-DGztddWO.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DGztddWO.js
+@roo-code/vscode-webview:build: Source map found for chunk-DH5Ifo-i.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DH5Ifo-i.js
+@roo-code/vscode-webview:build: Source map found for chunk-DHCkPAjA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DHCkPAjA.js
+@roo-code/vscode-webview:build: Source map found for chunk-DHJKELXO.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DHJKELXO.js
+@roo-code/vscode-webview:build: Source map found for chunk-DIHx2sdZ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DIHx2sdZ.js
+@roo-code/vscode-webview:build: Source map found for chunk-DMzUqQB5.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DMzUqQB5.js
+@roo-code/vscode-webview:build: Source map found for chunk-DNNlxIVo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DNNlxIVo.js
+@roo-code/vscode-webview:build: Source map found for chunk-DO0LZyKx.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DO0LZyKx.js
+@roo-code/vscode-webview:build: Source map found for chunk-DP8w0yq8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DP8w0yq8.js
+@roo-code/vscode-webview:build: Source map found for chunk-DPfMkruS.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DPfMkruS.js
+@roo-code/vscode-webview:build: Source map found for chunk-DQ46CBc_.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DQ46CBc_.js
+@roo-code/vscode-webview:build: Source map found for chunk-DRBVVfo7.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DRBVVfo7.js
+@roo-code/vscode-webview:build: Source map found for chunk-DRg8JJMk.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DRg8JJMk.js
+@roo-code/vscode-webview:build: Source map found for chunk-DSnTR2wu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DSnTR2wu.js
+@roo-code/vscode-webview:build: Source map found for chunk-DU1UobuO.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DU1UobuO.js
+@roo-code/vscode-webview:build: Source map found for chunk-DUszq2jm.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DUszq2jm.js
+@roo-code/vscode-webview:build: Source map found for chunk-DVFEvuxE.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DVFEvuxE.js
+@roo-code/vscode-webview:build: Source map found for chunk-DVMEJ2y_.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DVMEJ2y_.js
+@roo-code/vscode-webview:build: Source map found for chunk-DVxCFoDh.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DVxCFoDh.js
+@roo-code/vscode-webview:build: Source map found for chunk-DWedfzmr.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DWedfzmr.js
+@roo-code/vscode-webview:build: Source map found for chunk-DWkon8Hs.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DWkon8Hs.js
+@roo-code/vscode-webview:build: Source map found for chunk-DXETW7eA.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DXETW7eA.js
+@roo-code/vscode-webview:build: Source map found for chunk-DXHVBXt-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DXHVBXt-.js
+@roo-code/vscode-webview:build: Source map found for chunk-DXbdFlpD.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DXbdFlpD.js
+@roo-code/vscode-webview:build: Source map found for chunk-DXmwc3jG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DXmwc3jG.js
+@roo-code/vscode-webview:build: Source map found for chunk-DXvB9xmW.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DXvB9xmW.js
+@roo-code/vscode-webview:build: Source map found for chunk-D_Q5rh1f.js
+@roo-code/vscode-webview:build: Updated source map for chunk-D_Q5rh1f.js
+@roo-code/vscode-webview:build: Source map found for chunk-Da5cRb03.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Da5cRb03.js
+@roo-code/vscode-webview:build: Source map found for chunk-DbjXokdF.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DbjXokdF.js
+@roo-code/vscode-webview:build: Source map found for chunk-DcaNXYhu.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DcaNXYhu.js
+@roo-code/vscode-webview:build: Source map found for chunk-Dcsh5twl.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Dcsh5twl.js
+@roo-code/vscode-webview:build: Source map found for chunk-Dd19v3D-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Dd19v3D-.js
+@roo-code/vscode-webview:build: Source map found for chunk-DdkO51Og.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DdkO51Og.js
+@roo-code/vscode-webview:build: Source map found for chunk-Ddv68eIx.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Ddv68eIx.js
+@roo-code/vscode-webview:build: Source map found for chunk-Des-eS-w.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Des-eS-w.js
+@roo-code/vscode-webview:build: Source map found for chunk-Df68jz8_.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Df68jz8_.js
+@roo-code/vscode-webview:build: Source map found for chunk-Df6bDoY_.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Df6bDoY_.js
+@roo-code/vscode-webview:build: Source map found for chunk-DfEE3Bzs.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DfEE3Bzs.js
+@roo-code/vscode-webview:build: Source map found for chunk-DjjNbUIW.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DjjNbUIW.js
+@roo-code/vscode-webview:build: Source map found for chunk-DkwncUOv.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DkwncUOv.js
+@roo-code/vscode-webview:build: Source map found for chunk-DlfHMoPT.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DlfHMoPT.js
+@roo-code/vscode-webview:build: Source map found for chunk-DljmTZ5-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DljmTZ5-.js
+@roo-code/vscode-webview:build: Source map found for chunk-DnULxvSX.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DnULxvSX.js
+@roo-code/vscode-webview:build: Source map found for chunk-DouSy6O5.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DouSy6O5.js
+@roo-code/vscode-webview:build: Source map found for chunk-DpOm0zC4.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DpOm0zC4.js
+@roo-code/vscode-webview:build: Source map found for chunk-Dpen1YoG.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Dpen1YoG.js
+@roo-code/vscode-webview:build: Source map found for chunk-DqwNpetd.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DqwNpetd.js
+@roo-code/vscode-webview:build: Source map found for chunk-DsOJ9woJ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DsOJ9woJ.js
+@roo-code/vscode-webview:build: Source map found for chunk-Du0Ki9n9.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Du0Ki9n9.js
+@roo-code/vscode-webview:build: Source map found for chunk-Dx-B1_4e.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Dx-B1_4e.js
+@roo-code/vscode-webview:build: Source map found for chunk-DyJlTyXw.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DyJlTyXw.js
+@roo-code/vscode-webview:build: Source map found for chunk-DyxjwDmM.js
+@roo-code/vscode-webview:build: Updated source map for chunk-DyxjwDmM.js
+@roo-code/vscode-webview:build: Source map found for chunk-E3gJ1_iC.js
+@roo-code/vscode-webview:build: Updated source map for chunk-E3gJ1_iC.js
+@roo-code/vscode-webview:build: Source map found for chunk-Hhtzho9R.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Hhtzho9R.js
+@roo-code/vscode-webview:build: Source map found for chunk-I3RK9BU8.js
+@roo-code/vscode-webview:build: Updated source map for chunk-I3RK9BU8.js
+@roo-code/vscode-webview:build: Source map found for chunk-IN8fJS5x.js
+@roo-code/vscode-webview:build: Updated source map for chunk-IN8fJS5x.js
+@roo-code/vscode-webview:build: Source map found for chunk-IeuSbFQv.js
+@roo-code/vscode-webview:build: Updated source map for chunk-IeuSbFQv.js
+@roo-code/vscode-webview:build: Source map found for chunk-Jcf2cZT6.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Jcf2cZT6.js
+@roo-code/vscode-webview:build: Source map found for chunk-L9t79GZl.js
+@roo-code/vscode-webview:build: Updated source map for chunk-L9t79GZl.js
+@roo-code/vscode-webview:build: Source map found for chunk-MzD3tlZU.js
+@roo-code/vscode-webview:build: Updated source map for chunk-MzD3tlZU.js
+@roo-code/vscode-webview:build: Source map found for chunk-NleAzG8P.js
+@roo-code/vscode-webview:build: Updated source map for chunk-NleAzG8P.js
+@roo-code/vscode-webview:build: Source map found for chunk-OpcvBqEo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-OpcvBqEo.js
+@roo-code/vscode-webview:build: Source map found for chunk-P80f7IUj.js
+@roo-code/vscode-webview:build: Updated source map for chunk-P80f7IUj.js
+@roo-code/vscode-webview:build: Source map found for chunk-PEFJdsE-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-PEFJdsE-.js
+@roo-code/vscode-webview:build: Source map found for chunk-Pmp26Uib.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Pmp26Uib.js
+@roo-code/vscode-webview:build: Source map found for chunk-PoHY5YXO.js
+@roo-code/vscode-webview:build: Updated source map for chunk-PoHY5YXO.js
+@roo-code/vscode-webview:build: Source map found for chunk-QIJgUcNo.js
+@roo-code/vscode-webview:build: Updated source map for chunk-QIJgUcNo.js
+@roo-code/vscode-webview:build: Source map found for chunk-QX45V2Sx.js
+@roo-code/vscode-webview:build: Updated source map for chunk-QX45V2Sx.js
+@roo-code/vscode-webview:build: Source map found for chunk-RrBGtqGR.js
+@roo-code/vscode-webview:build: Updated source map for chunk-RrBGtqGR.js
+@roo-code/vscode-webview:build: Source map found for chunk-T7J2jLj3.js
+@roo-code/vscode-webview:build: Updated source map for chunk-T7J2jLj3.js
+@roo-code/vscode-webview:build: Source map found for chunk-Yzrsuije.js
+@roo-code/vscode-webview:build: Updated source map for chunk-Yzrsuije.js
+@roo-code/vscode-webview:build: Source map found for chunk-_ykCGR6B.js
+@roo-code/vscode-webview:build: Updated source map for chunk-_ykCGR6B.js
+@roo-code/vscode-webview:build: Source map found for chunk-bCR0ucgS.js
+@roo-code/vscode-webview:build: Updated source map for chunk-bCR0ucgS.js
+@roo-code/vscode-webview:build: Source map found for chunk-bN70gL4F.js
+@roo-code/vscode-webview:build: Updated source map for chunk-bN70gL4F.js
+@roo-code/vscode-webview:build: Source map found for chunk-brDaU2vB.js
+@roo-code/vscode-webview:build: Updated source map for chunk-brDaU2vB.js
+@roo-code/vscode-webview:build: Source map found for chunk-c1G5yEKj.js
+@roo-code/vscode-webview:build: Updated source map for chunk-c1G5yEKj.js
+@roo-code/vscode-webview:build: Source map found for chunk-dwOrl1Do.js
+@roo-code/vscode-webview:build: Updated source map for chunk-dwOrl1Do.js
+@roo-code/vscode-webview:build: Source map found for chunk-fuZLfV_i.js
+@roo-code/vscode-webview:build: Updated source map for chunk-fuZLfV_i.js
+@roo-code/vscode-webview:build: Source map found for chunk-fve9TYiY.js
+@roo-code/vscode-webview:build: Updated source map for chunk-fve9TYiY.js
+@roo-code/vscode-webview:build: Source map found for chunk-g9-lgVsj.js
+@roo-code/vscode-webview:build: Updated source map for chunk-g9-lgVsj.js
+@roo-code/vscode-webview:build: Source map found for chunk-gcz8RCvz.js
+@roo-code/vscode-webview:build: Updated source map for chunk-gcz8RCvz.js
+@roo-code/vscode-webview:build: Source map found for chunk-hegEt444.js
+@roo-code/vscode-webview:build: Updated source map for chunk-hegEt444.js
+@roo-code/vscode-webview:build: Source map found for chunk-irsrSlf-.js
+@roo-code/vscode-webview:build: Updated source map for chunk-irsrSlf-.js
+@roo-code/vscode-webview:build: Source map found for chunk-jQY0bNUL.js
+@roo-code/vscode-webview:build: Updated source map for chunk-jQY0bNUL.js
+@roo-code/vscode-webview:build: Source map found for chunk-lXgVvXCa.js
+@roo-code/vscode-webview:build: Updated source map for chunk-lXgVvXCa.js
+@roo-code/vscode-webview:build: Source map found for chunk-leinZj1a.js
+@roo-code/vscode-webview:build: Updated source map for chunk-leinZj1a.js
+@roo-code/vscode-webview:build: Source map found for chunk-q-j0iyEw.js
+@roo-code/vscode-webview:build: Updated source map for chunk-q-j0iyEw.js
+@roo-code/vscode-webview:build: Source map found for chunk-sVvOI5da.js
+@roo-code/vscode-webview:build: Updated source map for chunk-sVvOI5da.js
+@roo-code/vscode-webview:build: Source map found for chunk-sYKpKAhk.js
+@roo-code/vscode-webview:build: Updated source map for chunk-sYKpKAhk.js
+@roo-code/vscode-webview:build: Source map found for chunk-vGWfd6FD.js
+@roo-code/vscode-webview:build: Updated source map for chunk-vGWfd6FD.js
+@roo-code/vscode-webview:build: Source map found for chunk-vbB5lEOJ.js
+@roo-code/vscode-webview:build: Updated source map for chunk-vbB5lEOJ.js
+@roo-code/vscode-webview:build: Source map found for index.js
+@roo-code/vscode-webview:build: Updated source map for index.js
+@roo-code/vscode-webview:build: Source map found for mermaid-bundle.js
+@roo-code/vscode-webview:build: Updated source map for mermaid-bundle.js
+@roo-code/vscode-webview:build: Source map processing complete
+kilo-code:bundle: cache miss, executing 07e5c5c8fbc821ff
+kilo-code:bundle: 
+kilo-code:bundle: > kilo-code@4.153.0 bundle /home/jguru/projects/kilocode/src
+kilo-code:bundle: > node esbuild.mjs
+kilo-code:bundle: 
+kilo-code:bundle: [esbuild-problem-matcher#onStart]
+kilo-code:bundle: [copyPaths] Copied ../README.md to README.md
+kilo-code:bundle: [copyPaths] Copied ../CHANGELOG.md to CHANGELOG.md
+kilo-code:bundle: [copyPaths] Copied ../LICENSE to LICENSE
+kilo-code:bundle: [copyPaths] Optional file not found: ../.env
+kilo-code:bundle: [copyPaths] Copied 911 files from node_modules/vscode-material-icons/generated to assets/vscode-material-icons
+kilo-code:bundle: [copyPaths] Copied 3 files from ../webview-ui/audio to webview-ui/audio
+kilo-code:bundle: [copyPaths] Copied 13 files from walkthrough to walkthrough
+kilo-code:bundle: [copyPaths] Copied 52 files from services/continuedev/tree-sitter to tree-sitter
+kilo-code:bundle: [extension] Copied JSDOM xhr-sync-worker.js to dist from: /home/jguru/projects/kilocode/node_modules/.pnpm/jsdom@26.1.0/node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js
+kilo-code:bundle: [copyWasms] Copied tiktoken WASMs to /home/jguru/projects/kilocode/src/dist
+kilo-code:bundle: [copyWasms] Copied tiktoken WASMs to /home/jguru/projects/kilocode/src/dist/workers
+kilo-code:bundle: [copyWasms] Copied tree-sitter.wasm to /home/jguru/projects/kilocode/src/dist
+kilo-code:bundle: [copyWasms] Copied 35 tree-sitter language wasms to /home/jguru/projects/kilocode/src/dist
+kilo-code:bundle: [copyWasms] Copied 4 esbuild-wasm files to /home/jguru/projects/kilocode/src/dist
+kilo-code:bundle: [copyLocales] Copied 154 locale files to /home/jguru/projects/kilocode/src/dist/i18n/locales
+kilo-code:bundle: [esbuild-problem-matcher#onEnd]
+kilo-code:vsix: cache miss, executing de901cd13014c61e
+kilo-code:vsix: 
+kilo-code:vsix: > kilo-code@4.153.0 vsix /home/jguru/projects/kilocode/src
+kilo-code:vsix: > mkdirp ../bin && vsce package --no-dependencies --out ../bin
+kilo-code:vsix: 
+kilo-code:vsix: Executing prepublish script 'npm run vscode:prepublish'...
+kilo-code:vsix: 
+kilo-code:vsix: > kilo-code@4.153.0 vscode:prepublish
+kilo-code:vsix: > pnpm bundle --production
+kilo-code:vsix: 
+kilo-code:vsix: 
+kilo-code:vsix: > kilo-code@4.153.0 bundle /home/jguru/projects/kilocode/src
+kilo-code:vsix: > node esbuild.mjs --production
+kilo-code:vsix: 
+kilo-code:vsix: [extension] Cleaning dist directory: /home/jguru/projects/kilocode/src/dist
+kilo-code:vsix: [esbuild-problem-matcher#onStart]
+kilo-code:vsix: [copyPaths] Copied ../README.md to README.md
+kilo-code:vsix: [copyPaths] Copied ../CHANGELOG.md to CHANGELOG.md
+kilo-code:vsix: [copyPaths] Copied ../LICENSE to LICENSE
+kilo-code:vsix: [copyPaths] Optional file not found: ../.env
+kilo-code:vsix: [copyPaths] Copied 911 files from node_modules/vscode-material-icons/generated to assets/vscode-material-icons
+kilo-code:vsix: [copyPaths] Copied 3 files from ../webview-ui/audio to webview-ui/audio
+kilo-code:vsix: [copyPaths] Copied 13 files from walkthrough to walkthrough
+kilo-code:vsix: [copyPaths] Copied 52 files from services/continuedev/tree-sitter to tree-sitter
+kilo-code:vsix: [extension] Copied JSDOM xhr-sync-worker.js to dist from: /home/jguru/projects/kilocode/node_modules/.pnpm/jsdom@26.1.0/node_modules/jsdom/lib/jsdom/living/xhr/xhr-sync-worker.js
+kilo-code:vsix: [copyWasms] Copied tiktoken WASMs to /home/jguru/projects/kilocode/src/dist
+kilo-code:vsix: [copyWasms] Copied tiktoken WASMs to /home/jguru/projects/kilocode/src/dist/workers
+kilo-code:vsix: [copyWasms] Copied tree-sitter.wasm to /home/jguru/projects/kilocode/src/dist
+kilo-code:vsix: [copyWasms] Copied 35 tree-sitter language wasms to /home/jguru/projects/kilocode/src/dist
+kilo-code:vsix: [copyWasms] Copied 4 esbuild-wasm files to /home/jguru/projects/kilocode/src/dist
+kilo-code:vsix: [copyLocales] Copied 154 locale files to /home/jguru/projects/kilocode/src/dist/i18n/locales
+kilo-code:vsix: [esbuild-problem-matcher#onEnd]
+kilo-code:vsix:  WARNING  This extension consists of 1874 files, out of which 295 are JavaScript files. For performance reasons, you should bundle your extension: https://aka.ms/vscode-bundle-extension. You should also exclude unnecessary files by adding them to your .vscodeignore: https://aka.ms/vscode-vscodeignore.
+kilo-code:vsix: 
+kilo-code:vsix:  INFO  Files included in the VSIX:
+kilo-code:vsix: kilo-code-4.153.0.vsix
+kilo-code:vsix: ├─ [Content_Types].xml 
+kilo-code:vsix: ├─ extension.vsixmanifest 
+kilo-code:vsix: └─ extension/
+kilo-code:vsix:    ├─ LICENSE.txt [9.93 KB]
+kilo-code:vsix:    ├─ changelog.md 
+kilo-code:vsix:    ├─ package.json [20.88 KB]
+kilo-code:vsix:    ├─ package.nls.ar.json [7.55 KB]
+kilo-code:vsix:    ├─ package.nls.ca.json [6.42 KB]
+kilo-code:vsix:    ├─ package.nls.cs.json [6.24 KB]
+kilo-code:vsix:    ├─ package.nls.de.json [6.37 KB]
+kilo-code:vsix:    ├─ package.nls.es.json [6.45 KB]
+kilo-code:vsix:    ├─ package.nls.fr.json [6.67 KB]
+kilo-code:vsix:    ├─ package.nls.hi.json [10.85 KB]
+kilo-code:vsix:    ├─ package.nls.id.json [6.02 KB]
+kilo-code:vsix:    ├─ package.nls.it.json [6.37 KB]
+kilo-code:vsix:    ├─ package.nls.ja.json [6.98 KB]
+kilo-code:vsix:    ├─ package.nls.json [5.62 KB]
+kilo-code:vsix:    ├─ package.nls.ko.json [6.22 KB]
+kilo-code:vsix:    ├─ package.nls.nl.json [6.12 KB]
+kilo-code:vsix:    ├─ package.nls.pl.json [6.3 KB]
+kilo-code:vsix:    ├─ package.nls.pt-BR.json [6.38 KB]
+kilo-code:vsix:    ├─ package.nls.ru.json [9.19 KB]
+kilo-code:vsix:    ├─ package.nls.th.json [10.64 KB]
+kilo-code:vsix:    ├─ package.nls.tr.json [6.24 KB]
+kilo-code:vsix:    ├─ package.nls.uk.json [8.96 KB]
+kilo-code:vsix:    ├─ package.nls.vi.json [6.93 KB]
+kilo-code:vsix:    ├─ package.nls.zh-CN.json [5.37 KB]
+kilo-code:vsix:    ├─ package.nls.zh-TW.json [5.41 KB]
+kilo-code:vsix:    ├─ readme.md 
+kilo-code:vsix:    ├─ assets/ (924 files) [1.38 MB]
+kilo-code:vsix:    ├─ dist/ (268 files) [114.12 MB]
+kilo-code:vsix:    ├─ integrations/ (11 files) [164.11 KB]
+kilo-code:vsix:    └─ webview-ui/ (643 files) [54.69 MB]
+kilo-code:vsix: 
+kilo-code:vsix: => Run vsce ls --tree to see all included files.
+kilo-code:vsix: 
+kilo-code:vsix:  DONE  Packaged: ../bin/kilo-code-4.153.0.vsix (1874 files, 39.8 MB)
+
+ Tasks:    6 successful, 6 total
+Cached:    0 cached, 6 total
+  Time:    47.578s 
+

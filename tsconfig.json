@@ -1,8 +1,5 @@
 {
-	"extends": "@roo-code/config-typescript/base.json",
-	"compilerOptions": {
-		"types": ["node"]
-	},
-	"exclude": ["node_modules"],
-	"include": ["scripts/*.ts"]
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/bun/tsconfig.json",
+  "compilerOptions": {}
 }

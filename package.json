@@ -1,86 +1,110 @@
 {
-	"name": "kilo-code",
-	"packageManager": "pnpm@10.8.1",
-	"engines": {
-		"node": "20.20.0"
-	},
-	"scripts": {
-		"preinstall": "node scripts/bootstrap.mjs",
-		"prepare": "husky",
-		"install": "node scripts/bootstrap.mjs",
-		"install:all": "node scripts/bootstrap.mjs",
-		"lint": "turbo lint --log-order grouped --output-logs new-only",
-		"check-types": "turbo check-types --log-order grouped --output-logs new-only",
-		"test": "turbo test --log-order grouped --output-logs new-only",
-		"format": "turbo format --log-order grouped --output-logs new-only",
-		"build": "pnpm vsix",
-		"bundle": "turbo bundle --log-order grouped --output-logs new-only",
-		"bundle:nightly": "turbo bundle:nightly --log-order grouped --output-logs new-only",
-		"vsix:production": "turbo vsix --log-order grouped --output-logs new-only --force",
-		"vsix": "turbo vsix --log-order grouped --output-logs new-only",
-		"vsix:nightly": "turbo vsix:nightly --log-order grouped --output-logs new-only",
-		"clean": "turbo clean --log-order grouped --output-logs new-only && rimraf dist out bin .vite-port .turbo",
-		"install:vsix": "pnpm install --frozen-lockfile && pnpm clean && pnpm vsix && node scripts/install-vsix.js",
-		"changeset:version": "cp CHANGELOG.md src/CHANGELOG.md && changeset version && cp -vf src/CHANGELOG.md .",
-		"knip": "knip --include files",
-		"evals": "dotenvx run -f packages/evals/.env.development packages/evals/.env.local -- docker compose -f packages/evals/docker-compose.yml --profile server --profile runner up --build --scale runner=0",
-		"playwright": "turbo playwright",
-		"npm:publish:types": "pnpm --filter @roo-code/types npm:publish",
-		"link-workspace-packages": "tsx scripts/link-packages.ts",
-		"unlink-workspace-packages": "tsx scripts/link-packages.ts --unlink",
-		"jetbrains:bundle": "turbo jetbrains:bundle --force",
-		"jetbrains:run-bundle": "turbo jetbrains:run-bundle",
-		"jetbrains:build": "turbo jetbrains:build",
-		"jetbrains:run": "turbo jetbrains:run",
-		"jetbrains-host:build": "turbo jetbrains-host:build"
-	},
-	"devDependencies": {
-		"@changesets/changelog-github": "^0.5.1",
-		"@changesets/cli": "^2.27.10",
-		"@dotenvx/dotenvx": "^1.34.0",
-		"@roo-code/config-typescript": "workspace:^",
-		"@types/glob": "^9.0.0",
-		"@types/node": "20.x",
-		"@vscode/vsce": "3.3.2",
-		"esbuild": "^0.25.0",
-		"eslint": "^9.27.0",
-		"glob": "^11.1.0",
-		"husky": "^9.1.7",
-		"knip": "^5.44.4",
-		"lint-staged": "^16.0.0",
-		"mkdirp": "^3.0.1",
-		"only-allow": "^1.2.1",
-		"ovsx": "0.10.4",
-		"prettier": "^3.4.2",
-		"rimraf": "^6.0.1",
-		"tsx": "^4.19.3",
-		"turbo": "^2.6.0",
-		"typescript": "5.8.3"
-	},
-	"lint-staged": {
-		"*.{js,jsx,ts,tsx,json,css,md}": [
-			"prettier --write"
-		]
-	},
-	"pnpm": {
-		"onlyBuiltDependencies": [
-			"@vscode/ripgrep"
-		],
-		"overrides": {
-			"tar-fs": ">=3.1.1",
-			"esbuild": ">=0.25.0",
-			"undici": ">=5.29.0",
-			"brace-expansion": "^2.0.2",
-			"form-data": ">=4.0.4",
-			"bluebird": ">=3.7.2",
-			"glob": ">=11.1.0",
-			"@types/react": "^18.3.23",
-			"@types/react-dom": "^18.3.5",
-			"qs": "^6.14.1",
-			"body-parser": "^2.2.2",
-			"preact": "^10.28.2",
-			"zod": "3.25.76",
-			"@sap-ai-sdk/prompt-registry>zod": "^4.0.0"
-		}
-	}
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@kilocode/kilo",
+  "description": "AI-powered development tool",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.3.9",
+  "scripts": {
+    "dev": "bun run --cwd packages/opencode --conditions=browser src/index.ts",
+    "dev:desktop": "bun --cwd packages/desktop tauri dev",
+    "dev:web": "bun --cwd packages/app dev",
+    "typecheck": "bun turbo typecheck",
+    "prepare": "husky",
+    "random": "echo 'Random script'",
+    "hello": "echo 'Hello World!'",
+    "test": "echo 'do not run tests from root' && exit 1"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "packages/sdk/js"
+    ],
+    "catalog": {
+      "@types/bun": "1.3.9",
+      "@octokit/rest": "22.0.0",
+      "@hono/zod-validator": "0.4.2",
+      "ulid": "3.0.1",
+      "@kobalte/core": "0.13.11",
+      "@types/luxon": "3.7.1",
+      "@types/node": "22.13.9",
+      "@types/semver": "7.7.1",
+      "@tsconfig/node22": "22.0.2",
+      "@tsconfig/bun": "1.0.9",
+      "@cloudflare/workers-types": "4.20251008.0",
+      "@openauthjs/openauth": "0.0.0-20250322224806",
+      "@pierre/diffs": "1.1.0-beta.13",
+      "@solid-primitives/storage": "4.3.3",
+      "@tailwindcss/vite": "4.1.11",
+      "diff": "8.0.2",
+      "dompurify": "3.3.1",
+      "drizzle-kit": "1.0.0-beta.12-a5629fb",
+      "drizzle-orm": "1.0.0-beta.12-a5629fb",
+      "ai": "5.0.124",
+      "hono": "4.10.7",
+      "hono-openapi": "1.1.2",
+      "fuzzysort": "3.1.0",
+      "luxon": "3.6.1",
+      "marked": "17.0.1",
+      "marked-shiki": "1.2.1",
+      "@playwright/test": "1.51.0",
+      "typescript": "5.8.2",
+      "@typescript/native-preview": "7.0.0-dev.20251207.1",
+      "zod": "4.1.8",
+      "remeda": "2.26.0",
+      "shiki": "3.20.0",
+      "solid-list": "0.3.0",
+      "tailwindcss": "4.1.11",
+      "virtua": "0.42.3",
+      "vite": "7.1.4",
+      "@solidjs/meta": "0.29.4",
+      "@solidjs/router": "0.15.4",
+      "@solidjs/start": "https://pkg.pr.new/@solidjs/start@dfb2020",
+      "solid-js": "1.9.10",
+      "vite-plugin-solid": "2.11.10"
+    }
+  },
+  "devDependencies": {
+    "@actions/artifact": "5.0.1",
+    "@tsconfig/bun": "catalog:",
+    "husky": "9.1.7",
+    "prettier": "3.6.2",
+    "semver": "^7.6.0",
+    "sst": "3.17.23",
+    "turbo": "2.5.6"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.933.0",
+    "@kilocode/plugin": "workspace:*",
+    "@opencode-ai/script": "workspace:*",
+    "@kilocode/sdk": "workspace:*",
+    "typescript": "catalog:"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kilo-Org/kilocode"
+  },
+  "license": "MIT",
+  "prettier": {
+    "semi": false,
+    "printWidth": 120
+  },
+  "trustedDependencies": [
+    "esbuild",
+    "protobufjs",
+    "tree-sitter",
+    "tree-sitter-bash",
+    "web-tree-sitter"
+  ],
+  "overrides": {
+    "@types/bun": "catalog:",
+    "@types/node": "catalog:"
+  },
+  "patchedDependencies": {
+    "@standard-community/standard-openapi@0.2.9": "patches/@standard-community%2Fstandard-openapi@0.2.9.patch",
+    "@openrouter/ai-sdk-provider@1.5.4": "patches/@openrouter%2Fai-sdk-provider@1.5.4.patch",
+    "ghostty-web@0.3.0": "patches/ghostty-web@0.3.0.patch"
+  },
+  "version": "7.0.27",
+  "peerDependencies": {}
 }

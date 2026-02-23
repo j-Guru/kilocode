@@ -1,142 +1,92 @@
-# Contributing to Kilo Code
+# Contributing to Kilo CLI
 
-> **Note**: New versions of the VS Code extension and CLI are being developed in [Kilo-Org/Kilo](https://github.com/Kilo-Org/Kilo) (extension at `packages/kilo-vscode`, CLI at `packages/opencode`). If you're looking to contribute to the extension or CLI, please head over to that repository.
+See [the Documentation for details on contributing](https://kilo.ai/docs/contributing).
 
-First off, thanks for taking the time to contribute! ❤️
+## TL;DR
 
-All types of contributions are encouraged and valued. See the [Table of Contents](#table-of-contents) for different ways to help and details about how this project handles them. Please make sure to read the relevant section before making your contribution. It will make it a lot easier for the team and smooth out the experience for all involved. The community looks forward to your contributions. 🎉
+There are lots of ways to contribute to the project:
 
-If you don't have time to contribute, that's fine. There are other easy ways to support the project and show your appreciation, which we would also be very happy about:
+- **Code Contributions:** Implement new features or fix bugs
+- **Documentation:** Improve existing docs or create new guides
+- **Bug Reports:** Report issues you encounter
+- **Feature Requests:** Suggest new features or improvements
+- **Community Support:** Help other users in the community
 
-- Star the project
-- Post on X or Linkedin about Kilo Code `#kilocode
-- Mention the project at local meetups and tell your friends/colleagues
+The Kilo Community is [on Discord](https://kilo.ai/discord).
 
-## Table of Contents
+## Developing Kilo CLI
 
-- [Code of Conduct](#code-of-conduct)
-- [I Have a Question](#i-have-a-question)
-- [I Want To Contribute](#i-want-to-contribute)
-    - [Code Contributors](#code-contributors)
-    - [Reporting Bugs](#reporting-bugs)
-    - [Custom Modes](#custom-modes)
-    - [Feature Requests](#feature-requests)
-    - [Improving The Documentation](#improving-the-documentation)
-    - [Improving The Design](#improving-the-design)
-    - [Publish a Blog Post or Case Study](#publish-a-blog-post-or-case-study)
-    - [Commit Messages](#commit-messages)
-- [Pull requests](#pull-requests)
+- **Requirements:** Bun 1.3+
+- Install dependencies and start the dev server from the repo root:
 
-## Code of Conduct
+  ```bash
+  bun install
+  bun dev
+  ```
 
-This project and everyone participating in it is governed by the [Code of Conduct](https://github.com/Kilo-Org/kilocode/blob/main/CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior
-to [hi@kilocode.ai](mailto:hi@kilocode.ai).
+### Running against a different directory
 
-## I Have a Question
+By default, `bun dev` runs Kilo CLI in the `packages/kilo-cli` directory. To run it against a different directory or repository:
 
-If you need clarification after reading this document, we encourage you to join our [discord](https://kilo.ai/discord) workspace and join channels [kilo-dev-contributors](https://discord.com/channels/1349288496988160052/1391109167275577464) and [extensions-support channel](https://discord.com/channels/1349288496988160052/1349358641295265864).
+```bash
+bun dev <directory>
+```
 
-## I Want To Contribute
+To run Kilo CLI in the root of the repo itself:
 
-### Code Contributors
+```bash
+bun dev .
+```
 
-We’re excited that you’re interested in contributing code to Kilo Code! Before you start, please take a look at our [Development Guide](https://github.com/Kilo-Org/kilocode/blob/main/DEVELOPMENT.md), it includes setup instructions, build steps, and details on running tests locally.
+### Building a "local" binary
 
-#### What to Expect
+To compile a standalone executable:
 
-- A GUI-based change with settings may involve 12–13 files, plus about 18 more for internationalization (i18n).
+```bash
+./packages/kilo-cli/script/build.ts --single
+```
 
-- A new feature or major update might also require corresponding tests, translations, and settings configuration updates.
+Then run it with:
 
-Don’t let that scare you off, we just want you to have a realistic idea of what’s involved before diving in. You’ll learn a lot, and we’re here to help if you get stuck.
+```bash
+./packages/kilo-cli/dist/kilo-cli-<platform>/bin/kilo
+```
 
-#### Tips Before You Start
+Replace `<platform>` with your platform (e.g., `darwin-arm64`, `linux-x64`).
 
-- If your change affects any UI elements or Settings, expect it to touch multiple files and translations.
+### Understanding bun dev vs kilo
 
-- You can use our translation workflow to automate adding i18n strings instead of editing each language manually.
+During development, `bun dev` is the local equivalent of the built `kilo` command. Both run the same CLI interface:
 
-Unsure if your contribution is “small” or “large”? Start a quick discussion in [kilo-dev-contributors](https://discord.com/channels/1349288496988160052/1391109167275577464) channel on discord or open an issue with good context, follow the commit and pull request guidelines below once you’re ready to open a PR.
+```bash
+# Development (from project root)
+bun dev --help           # Show all available commands
+bun dev serve            # Start headless API server
+bun dev web              # Start server + open web interface
 
-### Reporting Bugs
+# Production
+kilo --help          # Show all available commands
+kilo serve           # Start headless API server
+kilo web             # Start server + open web interface
+```
 
-Please use our issues templates that provide hints on what information we need to help you.
+### Pull Request Expectations
 
-> You must never report security related issues, vulnerabilities or bugs including sensitive information to the issue tracker, or elsewhere in public. Instead sensitive bugs must be sent by email to [hi@kilocode.ai](mailto:hi@kilocode.ai).
+- **Issue First Policy:** All PRs must reference an existing issue.
+- **UI Changes:** Include screenshots or videos (before/after).
+- **Logic Changes:** Explain how you verified it works.
+- **PR Titles:** Follow conventional commit standards (`feat:`, `fix:`, `docs:`, etc.).
 
-### Custom Modes
+### Issue and PR Lifecycle
 
-Custom modes are a powerful way to extend Kilo Code's capabilities. To create and share a custom mode:
+To keep our backlog manageable, we automatically close inactive issues and PRs after a period of inactivity. This isn't a judgment on quality — older items tend to lose context over time and we'd rather start fresh if they're still relevant. Feel free to reopen or create a new issue/PR if you're still working on something!
 
-- Follow the [Custom Modes documentation](https://kilo.ai/docs/customize/custom-modes) to create your mode.
+### Style Preferences
 
-- Test your mode thoroughly
-
-- Share your mode with the community on [Reddit](https://www.reddit.com/r/kilocode/) or you can show off / start a discussion on [show-off-your-builds](https://discord.com/channels/1349288496988160052/1375399779760214037) or [workflows-and-integration](https://discord.com/channels/1349288496988160052/1420236932780130418) on discord.
-
-### Feature Requests
-
-Suggest feature requests in [Discussion](https://github.com/Kilo-Org/kilocode/discussions), only open an [Issue](https://github.com/Kilo-Org/kilocode/issues/new/choose) for reporting a bug or actual contributions. Don't open issues for questions or support, instead join our [Discord workspace](https://kilo.ai/discord) and ask there.
-
-- Provide as much context as you can about what you're running into.
-
-### Improving The Documentation
-
-If you notice outdated information or areas that could be clarified, kindly start a discussion in the [general](https://discord.com/channels/1349288496988160052/1349288496988160055) channel on discord.
-Please note that the main [documentation](https://github.com/Kilo-Org/docs) repository has been archived, you can still view it for reference.
-
-### Improving The Design
-
-Design contributions are welcome! To ensure smooth collaboration, please use the Design Improvement Template when opening a design-related issue.
-This helps us gather the right context (such as wireframes, mockups, or visual references) and maintain a consistent design language across the project. Feedback and iterations are highly encouraged, design is always a shared process.
-
-### Publish a Blog Post or Case Study
-
-We love hearing how people use or extend Kilo Code in their own projects. If you’ve written about your experience, we’re happy to review it!
-Our blog and case study repository has been archived, you can still access it [here](https://github.com/Kilo-Org/docs/tree/main/blog-posts) for reference. To share your work, please start a discussion in the [general](https://discord.com/channels/1349288496988160052/1349288496988160055) channel on discord, summarizing your post or case study, with a link to the full content.
-
-### Commit Messages
-
-Writing clear and consistent commit messages helps maintainers understand the purpose of your changes. A good commit message should:
-
-- Be written in the present tense (e.g., Add new feature, not Added new feature)
-
-- Be short (50 characters or less for the summary line)
-
-- Include additional context in the body if needed
-
-- Reference related issue numbers (e.g., Fixes `#123)
-
-- Keep each commit focused on one logical change
-
-## Pull Requests
-
-When you’re ready to contribute your changes, follow these steps to create a clear and reviewable pull request:
-
-- Push your changes to your fork:
-
-    ```bash
-    git push origin your-branch-name
-    ```
-
-- Open a Pull Request against the main Kilo Code repository.
-
-- Select "Compare across forks" and choose your fork and branch.
-
-- Fill out the PR template with:
-
-- A clear description of your changes
-
-    - Any related issues (e.g., “Fixes `#123”)
-
-    - Testing steps or screenshots (if applicable)
-
-    - Notes for reviewers, if special attention is needed
-
-For more context, kindly read the official [contributing docs](https://kilo.ai/docs/contributing).
-
-Your contributions, big or small help make Kilo Code better for everyone!🫶
-
-## References
-
-This document was adapted from [https://contributing.md](https://contributing.md/)!
+- **Functions:** Keep logic within a single function unless breaking it out adds clear reuse.
+- **Destructuring:** Avoid unnecessary destructuring.
+- **Control flow:** Avoid `else` statements; prefer early returns.
+- **Types:** Avoid `any`.
+- **Variables:** Prefer `const`.
+- **Naming:** Concise single-word identifiers when descriptive.
+- **Runtime APIs:** Use Bun helpers (e.g., `Bun.file()`).

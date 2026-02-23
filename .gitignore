@@ -1,81 +1,39 @@
-.pnpm-store
-dist
-out
-out-*
-node_modules
-package-lock.json
-coverage/
-mock/
 .DS_Store
-*.orig
-
-# Builds
-bin/
-bin-unpacked/
-*.vsix
-
-# Local prompts and rules
-/local-prompts
-
-# Test environment
-.test_env
-.vscode-test/
-
-# Docs
-docs/_site/
-
-# Dotenv
+node_modules
+.worktrees
+.sst
 .env
-.env.*
-!.env.*.sample
-
-# Logging
-logs
-*.log
-
-# Vite development
-.vite-port
-
-# kilocode_change
-.history/
-.aider*
-.docker-cache/
-
-# Turborepo
-.turbo
-
-# IntelliJ and Qodo plugin folders
-.idea/
-.qodo/
-.vercel
-.roo/mcp.json
-.codex
-.claude
-
-# Nix / Direnv
-.direnv
-
-# Mise
-mise.toml
-mise.local.toml
-
-# Exclude Conport Directory (MCP server)
-context_portal/
-
-# Submodules
-deps/vscode/*
-!deps/vscode/.git
-
-# Qdrant
-qdrant_storage/
-
-# allow multiple local clones with different workspaces with different colors
-# to make it easier to work on features in parallel
+.idea
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+# use vscode workspaces with peacock to have many vscodes with the same repo:
 *.code-workspace
+.codex
+*~
+playground
+tmp
+dist
+ts-dist
+storybook-static
+.turbo
+**/.serena
+.serena/
+/result
+refs
+Session.vim
+opencode.json
+a.out
+target
+.scripts
+.direnv/
 
-# Act Secret Files
-.secrets
-# Architect plans
-./plans/
+# Local dev files
+opencode-dev
+logs/
+*.bun-build
 
-roo-cli-*.tar.gz*
+# Telemetry ID
+telemetry-id
