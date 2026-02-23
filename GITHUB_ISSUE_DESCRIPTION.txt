@@ -1,0 +1,138 @@
+Vertex AI support in Kilocode is currently incomplete and broken for Model-as-a-Service (MaaS) models from third-party providers (Meta Llama, DeepSeek, Qwen, Moonshot AI, etc.). While the codebase has stubs for these models, they fail at runtime due to incorrect API endpoint construction and missing provider routing logic.
+
+## Background
+
+Google Cloud Vertex AI offers two categories of models:
+
+1. **Google native models** (Gemini family) - Currently working
+2. **Model-as-a-Service (MaaS)** from third-party providers - Currently broken:
+   - Meta Llama 4 (Maverick, Scout)
+   - DeepSeek (V3.2, R1)
+   - Qwen (Coder, Next, etc.)
+   - Moonshot AI (Kimi K2)
+   - MiniMax M2
+   - OpenAI GPT-OSS
+   - ZAI.org (GLM-4.7)
+
+## Current Issues
+
+### 1. Incorrect URL Construction
+
+The existing Vertex AI implementation assumes all models use the Gemini API format:
+```
+https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/publishers/google/models/{model}:streamGenerateContent
+```
+
+However, MaaS models require **OpenAI-compatible Chat Completions endpoints**:
+```
+https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/endpoints/openapi/chat/completions
+```
+
+### 2. Missing Provider Routing
+
+The codebase defines `vertexPublisher` fields (meta, deepseek-ai, qwen, moonshotai, etc.) but never uses them to route requests to the correct API surface.
+
+### 3. Request Format Mismatch
+
+MaaS models expect OpenAI-compatible request payloads with the model specified as `{publisher}/{model-id}`:
+```json
+{
+  "model": "deepseek-ai/deepseek-v3.2-maas",
+  "messages": [...],
+  "stream": true
+}
+```
+
+Current implementation sends Gemini-formatted requests which are rejected by the MaaS endpoints.
+
+### 4. Authentication Scope
+
+MaaS models **only support OAuth2/Service Account authentication** (keyFile or JSON credentials). Unlike some other providers, there is no API key option for Vertex AI MaaS.
+
+## Impact
+
+**Developers cannot use any third-party models through Vertex AI**, despite these models being:
+- Listed in the model configuration (`packages/types/src/providers/vertex.ts`)
+- Documented in Google Cloud
+- Cost-effective alternatives to Gemini/Claude
+- Valuable for specialized tasks (coding with Qwen Coder, reasoning with DeepSeek R1, multilingual with Kimi K2)
+
+This significantly limits Kilocode's value proposition for enterprise users with Google Cloud commitments.
+
+## Proposed Solution
+
+A complete fix requires:
+
+### 1. New Handler for MaaS Models
+
+Create `VertexMaaSHandler` (separate from `VertexHandler`) that:
+- Constructs OpenAI-compatible URLs: `/endpoints/openapi/chat/completions`
+- Formats requests using OpenAI message structure with `{publisher}/{model}` format
+- Handles streaming responses in SSE format
+- Supports native tool calling for compatible models
+- Uses OAuth2 authentication (GoogleAuth with keyFile or JSON credentials)
+
+### 2. Provider Routing Logic
+
+Update `src/api/index.ts` to route based on `vertexPublisher`:
+```typescript
+if (provider === "vertex") {
+  const model = vertexModels[modelId]
+  if (model.vertexPublisher && model.vertexPublisher !== "google") {
+    return new VertexMaaSHandler(options)
+  }
+  return new VertexHandler(options) // Gemini/Claude models
+}
+```
+
+### 3. Model Metadata Enhancement
+
+Ensure all MaaS models in type definitions have the `vertexPublisher` field set correctly:
+- `meta` - Llama 4 models
+- `deepseek-ai` - DeepSeek V3.2, R1
+- `qwen` - Qwen Coder, Qwen3 models
+- `moonshotai` - Kimi K2
+- `minimaxai` - MiniMax M2
+- `openai` - GPT-OSS
+- `zai` - GLM-4.7 models
+
+### 4. Documentation
+
+Create clear documentation explaining:
+- How Vertex AI MaaS differs from native Gemini
+- Regional availability of different models
+- Authentication setup (OAuth2 only - keyFile or JSON credentials)
+- Example configuration for each provider
+- That API key authentication is NOT supported for MaaS models
+
+## Additional Context
+
+### Regional Availability
+Many MaaS models are region-restricted:
+- Llama 4: `us-east5`
+- DeepSeek R1: `us-central1`
+- Qwen models: `us-south1`
+- Global: Kimi K2, MiniMax M2, DeepSeek V3.2, Qwen3 Next
+
+### Tool Calling Support
+MaaS models support native tool calling via OpenAI-compatible function calling:
+- ✅ Qwen Coder 480B, Qwen3 235B, Qwen3 Next 80B
+- ✅ DeepSeek V3.2, DeepSeek R1
+- ✅ Kimi K2 Thinking
+- ✅ MiniMax M2
+- ✅ ZAI.org GLM-4.7
+- ❌ Llama 4 models (no native tool support)
+- ❌ OpenAI GPT-OSS (no native tool support)
+
+### Authentication Requirements
+Unlike Gemini models which can use API keys via Google AI Studio, **MaaS models require Google Cloud authentication**:
+- Service Account Key File (JSON file path via `vertexKeyFile`)
+- Service Account JSON credentials (inline JSON string via `vertexJsonCredentials`)
+
+No API key option is available for MaaS endpoints.
+
+## References
+
+- [Vertex AI Partner Models Documentation](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models)
+- [Partners model Pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing#partner-models)
+- [Partner Models Deprecations](https://docs.cloud.google.com/vertex-ai/generative-ai/docs/deprecations/partner-models)

@@ -1,6 +1,22 @@
 # AGENTS.md
 
-Kilo Code is an open source AI coding agent for VS Code that generates code from natural language, automates tasks, and supports 500+ AI models.
+Kilo Code is an open source AI coding plugin for VS Code and JetBrains tools that generates code from natural language, automates tasks, and supports 500+ AI models.
+
+## Branch Structure
+
+**IMPORTANT**: This project uses a dual-branch development strategy:
+
+- **`main`**: Fork of Kilo Code GitHub `main` branch - tracks upstream repository
+- **`main-vertex`**: **Current project MAIN branch** - contains project-specific development
+
+**All development work should be based on `main-vertex`, not `main`.**
+
+This branching strategy allows for upstream synchronization while maintaining project-specific development.
+
+## Fork Information
+
+- **Merge Strategy**: We periodically merge upstream changes using scripts in `scripts/kilocode/`
+- **Conflict Resolution**: Use `kilocode_change` markers to minimize merge conflicts when syncing with upstream
 
 ## Project Structure
 
@@ -8,6 +24,7 @@ This is a pnpm monorepo using Turbo for task orchestration:
 
 - **`src/`** - VSCode extension (core logic, API providers, tools)
 - **`webview-ui/`** - React frontend (chat UI, settings)
+- **`cli/`** - Standalone CLI package
 - **`packages/`** - Shared packages (`types`, `ipc`, `telemetry`, `cloud`)
 - **`jetbrains/`** - JetBrains plugin (Kotlin + Node.js host)
 - **`apps/`** - E2E tests, Storybook, docs
@@ -27,7 +44,7 @@ The `@kilocode/agent-runtime` package enables running Kilo Code agents as isolat
 
 ```
 ┌─────────────────────┐     fork()      ┌─────────────────────┐
-│  Agent Manager      │ ───────────────▶│  Agent Process      │
+│  CLI / Manager      │ ───────────────▶│  Agent Process      │
 │                     │◀───── IPC ─────▶│  (extension host)   │
 └─────────────────────┘                 └─────────────────────┘
 ```
@@ -107,6 +124,40 @@ pnpm lint             # Run ESLint
 pnpm check-types      # TypeScript type checking
 ```
 
+## Development Workflow
+
+### Setting Up Your Environment
+
+1. Clone the repository and checkout `main-vertex` branch
+2. Run `pnpm install` to install dependencies
+3. Make your changes
+4. Run tests: `pnpm test` (from appropriate workspace)
+5. Run linting: `pnpm lint`
+6. Create a changeset: `pnpm changeset` (if needed)
+
+### Testing
+
+- The vitest framework is used for testing
+- `vi`, `describe`, `test`, `it` functions are defined by default in `tsconfig.json` (no need to import from `vitest`)
+- Tests must be run from the same directory as the `package.json` file that specifies `vitest` in `devDependencies`
+
+**Running Tests:**
+
+```bash
+# Backend tests - run from src/ directory
+cd src && pnpm test path/to/test-file
+
+# UI tests - run from webview-ui/ directory
+cd webview-ui && pnpm test src/path/to/test-file
+
+# Do NOT run from project root - causes "vitest: command not found" error
+```
+
+**Test File Naming:**
+
+- Monorepo default: `.spec.ts` / `.spec.tsx`
+- CLI package exception: `.test.ts` / `.test.tsx` (match existing CLI convention)
+
 ## Skills
 
 - **Translation**: `.kilocode/skills/translation/SKILL.md` - Translation and localization guidelines
@@ -114,6 +165,21 @@ pnpm check-types      # TypeScript type checking
 ## Workflows
 
 - **Add Missing Translations**: `.kilocode/workflows/add-missing-translations.md` - Run `/add-missing-translations` to find and fix missing translations
+
+### Release Sync Trigger (Important)
+
+When the user says phrases like "new version was released", "we have new version", or similar, interpret this as the following required workflow:
+
+1. Update branch `main` from upstream latest (`Kilo-Org/kilocode` `main`).
+2. Merge latest `main` into `main-vertex`.
+3. Resolve merge conflicts with priority to project-specific fixes:
+    - Vertex AI fix
+    - Lenient XML processing fix
+4. If any conflict is unclear, stop and ask the user explicitly how to resolve it before continuing.
+5. After merge/conflict resolution, run a local VS Code plugin build.
+6. If build succeeds, send this exact confirmation format:
+   `New VS Code plugin (version x.y.z) is READY TO TEST!`
+   Replace `x.y.z` with the actual built version.
 
 ## Changesets
 
@@ -134,16 +200,13 @@ Brief description of the change
 ```
 
 - Use `patch` for fixes, `minor` for features, `major` for breaking changes
+- For CLI changes, use `"@kilocode/cli": patch` instead
 
 Keep changesets concise and feature-oriented as they appear directly in release notes.
 
 - **Only for actual changes**: Documentation-only or internal tooling changes do not need a changeset.
 - **User-focused**: Avoid technical descriptions, code references, or PR numbers. Readers may not know the codebase.
 - **Concise**: Use a one-liner for small fixes. For larger features, a few words or a short sentence is sufficient.
-
-## Fork Merge Process
-
-Kilo Code is a fork of [Roo Code](https://github.com/RooVetGit/Roo-Code). We periodically merge upstream changes using scripts in `scripts/kilocode/`.
 
 ## kilocode_change Markers
 
@@ -174,6 +237,7 @@ const bar = 2
 
 Code in these directories is Kilo Code-specific and doesn't need markers:
 
+- `cli/` - CLI package
 - `jetbrains/` - JetBrains plugin
 - `agent-manager/` directories
 - Any path containing `kilocode` in filename or directory name
@@ -191,33 +255,64 @@ Keep changes to core extension code minimal to reduce merge conflicts during ups
 
 ## Code Quality Rules
 
-1. Test Coverage:
+### 1. Test Coverage
 
-    - Before attempting completion, always make sure that any code changes have test coverage
-    - Ensure all tests pass before submitting changes
-    - The vitest framework is used for testing; the `vi`, `describe`, `test`, `it`, etc functions are defined by default in `tsconfig.json` and therefore don't need to be imported from `vitest`
-    - Tests must be run from the same directory as the `package.json` file that specifies `vitest` in `devDependencies`
-    - Run tests with: `pnpm test <relative-path-from-workspace-root>`
-    - Do NOT run tests from project root - this causes "vitest: command not found" error
-    - Tests must be run from inside the correct workspace:
-        - Backend tests: `cd src && pnpm test path/to/test-file` (don't include `src/` in path)
-        - UI tests: `cd webview-ui && pnpm test src/path/to/test-file`
-    - Example: For `src/tests/user.spec.ts`, run `cd src && pnpm test tests/user.spec.ts` NOT `pnpm test src/tests/user.spec.ts`
-    - **Test File Naming Convention**:
-        - Monorepo default: `.spec.ts` / `.spec.tsx`
+- Before attempting completion, always make sure that any code changes have test coverage
+- Ensure all tests pass before submitting changes
+- Run tests with: `pnpm test <relative-path-from-workspace-root>`
+- Do NOT run tests from project root - this causes "vitest: command not found" error
+- Tests must be run from inside the correct workspace:
+    - Backend tests: `cd src && pnpm test path/to/test-file` (don't include `src/` in path)
+    - UI tests: `cd webview-ui && pnpm test src/path/to/test-file`
+- Example: For `src/tests/user.spec.ts`, run `cd src && pnpm test tests/user.spec.ts` NOT `pnpm test src/tests/user.spec.ts`
 
-2. Lint Rules:
+### 2. Lint Rules
 
-    - Never disable any lint rules without explicit user approval
+- Never disable any lint rules without explicit user approval
+- Run `pnpm lint` before committing
+- Fix all linting errors and warnings
 
-3. Error Handling:
+### 3. Error Handling
 
-    - Never use empty catch blocks - always log or handle the error
-    - Handle expected errors explicitly, or omit try-catch if the error should propagate
-    - Consider user impact when deciding whether to throw or log errors
+- Never use empty catch blocks - always log or handle the error
+- Handle expected errors explicitly, or omit try-catch if the error should propagate
+- Consider user impact when deciding whether to throw or log errors
+- Provide meaningful error messages
 
-4. Styling Guidelines:
+### 4. Styling Guidelines
 
-    - Use Tailwind CSS classes instead of inline style objects for new markup
-    - VSCode CSS variables must be added to webview-ui/src/index.css before using them in Tailwind classes
-    - Example: `<div className="text-md text-vscode-descriptionForeground mb-2" />` instead of style objects
+- Use Tailwind CSS classes instead of inline style objects for new markup
+- VSCode CSS variables must be added to webview-ui/src/index.css before using them in Tailwind classes
+- Example: `<div className="text-md text-vscode-descriptionForeground mb-2" />` instead of style objects
+- Follow consistent formatting and naming conventions
+
+## JetBrains Plugin Rules
+
+### Production Build
+
+- Always use the `build-jetbrains-plugin.sh` script in the root directory for production-ready builds
+- The final plugin artifact must be approximately 300MB - 400MB in size
+- A significantly smaller size (e.g., ~5MB) indicates a failed bundle that is missing the Extension Host or VSCode dependencies
+- Ensure `platform.zip` is generated before building if it's missing or if dependencies changed
+
+## Common Pitfalls
+
+1. **Branch Confusion**: Always work on `main-vertex`, not `main`
+2. **Test Execution**: Don't run tests from project root
+3. **Missing Changesets**: Remember to create changesets for user-facing changes
+4. **Missing kilocode_change Markers**: Mark changes in shared code properly
+5. **Lint Errors**: Run linting before committing
+6. **Empty Catch Blocks**: Always handle or log errors
+
+## Quick Reference
+
+| Task                   | Command                             |
+| ---------------------- | ----------------------------------- |
+| Install dependencies   | `pnpm install`                      |
+| Build extension        | `pnpm build`                        |
+| Run linting            | `pnpm lint`                         |
+| Type checking          | `pnpm check-types`                  |
+| Create changeset       | `pnpm changeset`                    |
+| Run backend tests      | `cd src && pnpm test <path>`        |
+| Run UI tests           | `cd webview-ui && pnpm test <path>` |
+| Build JetBrains plugin | `./build-jetbrains-plugin.sh`       |

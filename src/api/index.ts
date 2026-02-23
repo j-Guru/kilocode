@@ -1,7 +1,8 @@
 import { Anthropic } from "@anthropic-ai/sdk"
 import OpenAI from "openai"
 
-import type { ProviderSettings, ModelInfo, ToolProtocol } from "@roo-code/types"
+import type { ProviderSettings, ModelInfo, ToolProtocol, VertexModelId } from "@roo-code/types"
+import { vertexDefaultModelId, vertexModels } from "@roo-code/types"
 
 import { ApiStream } from "./transform/stream"
 
@@ -14,6 +15,7 @@ import {
 	PoeHandler, // kilocode_change
 	ZenMuxHandler, // kilocode_change
 	VertexHandler,
+	VertexMaaSHandler,
 	AnthropicVertexHandler,
 	OpenAiHandler,
 	OpenAiCodexHandler,
@@ -200,10 +202,19 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			return new ZenMuxHandler(options) // kilocode_change
 		case "bedrock":
 			return new AwsBedrockHandler(options)
-		case "vertex":
-			return options.apiModelId?.startsWith("claude")
-				? new AnthropicVertexHandler(options)
-				: new VertexHandler(options)
+		case "vertex": {
+			if (options.apiModelId?.startsWith("claude")) {
+				return new AnthropicVertexHandler(options)
+			}
+			// kilocode_change start
+			const modelId = (options.apiModelId as VertexModelId) ?? vertexDefaultModelId
+			const info = vertexModels[modelId] as ModelInfo | undefined
+			if (info?.vertexPublisher && info.vertexPublisher !== "google") {
+				return new VertexMaaSHandler(options)
+			}
+			return new VertexHandler(options)
+			// kilocode_change end
+		}
 		case "openai":
 			return new OpenAiHandler(options)
 		case "ollama":

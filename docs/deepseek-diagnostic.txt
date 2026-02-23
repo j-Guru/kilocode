@@ -1,0 +1,76 @@
+// Please share this file with Kilo Code Support (support@kilo.ai) to diagnose the issue faster
+// Just make sure you're OK sharing the contents of the conversation below.
+
+{
+  "error": {
+    "timestamp": "2026-01-31T12:33:02.185Z",
+    "version": "5.2.2",
+    "provider": "vertex",
+    "model": "deepseek-v3.2-maas",
+    "details": "MODEL_NO_TOOLS_USED"
+  },
+  "history": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "<task>\nWhat's your model name, date of release, cutoff date and price? Output: use bulleted list\n</task>"
+        },
+        {
+          "type": "text",
+          "text": "<environment_details>\n# VSCode Visible Files\n\n\n# VSCode Open Tabs\n\n\n# Current Time\nCurrent time in ISO 8601 UTC format: 2026-01-31T12:32:44.067Z\nUser time zone: Europe/Bratislava, UTC+1:00\n\n# Current Cost\n$0.00\n\n# Current Mode\n<slug>code</slug>\n<name>Code</name>\n<model>deepseek-v3.2-maas</model>\n<tool_format>native</tool_format>\n\n\n# Current Workspace Directory (C:/java/projects/ai/claude-space/claude-skrape) Files\n.gitignore\n.mcp.json\nAGENTS.md\nclaude-skrape.cmd\nIMPLEMENTATION_SUMMARY.md\nMANIFEST.in\nREADME.md\nrequirements.txt\nrun.py\nsetup.py\ntest_one_url.py\nTEST_RESULTS.md\ntest_two_stage_processing.py\n.ai/\n.claude/\nconfig/\nconfig/ddos-urls-test.txt\nconfig/ddos-urls.txt\nconfig/ruben-code-test.txt\nconfig/ruben-urls-test.txt\nconfig/ruben-urls.txt\nconfig/test_url.txt\nconfig/test-python-only.txt\ndocs/\ndocs/research/\nlogs/\nplans/\nresearch/\nresearch/python-only-migration.md\nsrc/\nsrc/claude_skrape/\nsrc/claude_skrape/__init__.py\nsrc/claude_skrape/archiver.py\nsrc/claude_skrape/cdp_connector.py\nsrc/claude_skrape/config_manager.py\nsrc/claude_skrape/content_extractor.py\nsrc/claude_skrape/main.py\nsrc/claude_skrape/media_processor.py\nsrc/claude_skrape/pdf_renderer.py\nsrc/claude_skrape/assets/\ntests/\ntests/debug_extraction.py\ntests/test_first_url.py\ntests/test_prompts.py\ntests/test_single_pdf.py\nYou have not created a todo list yet. Create one with `update_todo_list` if your task is complicated or involves multiple steps.\n</environment_details>"
+        }
+      ],
+      "ts": 1769862764111
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "I'll provide information about my model based on the current system details.\n\n<function_calls>\n<invoke name=\"update_todo_list\">{\n  \"todos\": \"[-] Gather model information from system details\\n[ ] Format response as bulleted list\\n[ ] Provide accurate model specifications\"\ninvfunction_calls>"
+        }
+      ],
+      "ts": 1769862771042
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "[ERROR] You did not use a tool in your previous response! Please retry with a tool use.\n\n# Reminder: Instructions for Tool Use\n\nTools are invoked using the platform's native tool calling mechanism. Each tool requires specific parameters as defined in the tool descriptions. Refer to the tool definitions provided in your system instructions for the correct parameter structure and usage examples.\n\nAlways ensure you provide all required parameters for the tool you wish to use.\n\n# Next Steps\n\nIf you have completed the user's task, use the attempt_completion tool.\nIf you require additional information from the user, use the ask_followup_question tool.\nOtherwise, if you have not completed the task and do not need additional information, then proceed with the next step of the task.\n(This is an automated message, so do not respond to it conversationally.)"
+        },
+        {
+          "type": "text",
+          "text": "<environment_details>\n# VSCode Visible Files\n\n\n# VSCode Open Tabs\n\n\n# Current Time\nCurrent time in ISO 8601 UTC format: 2026-01-31T12:32:51.417Z\nUser time zone: Europe/Bratislava, UTC+1:00\n\n# Current Cost\n$0.01\n\n# Current Mode\n<slug>code</slug>\n<name>Code</name>\n<model>deepseek-v3.2-maas</model>\n<tool_format>native</tool_format>\nYou have not created a todo list yet. Create one with `update_todo_list` if your task is complicated or involves multiple steps.\n</environment_details>"
+        }
+      ],
+      "ts": 1769862771419
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "type": "text",
+          "text": "\n\n<function_calls>\n<invoke name=\"update_todo_list\">{\n  \"todos\": \"[-] Gather model information from system details\\n[ ] Format response as bulleted list\\n[ ] Provide accurate modelinvfunction_calls>"
+        }
+      ],
+      "ts": 1769862777535
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "[ERROR] You did not use a tool in your previous response! Please retry with a tool use.\n\n# Reminder: Instructions for Tool Use\n\nTools are invoked using the platform's native tool calling mechanism. Each tool requires specific parameters as defined in the tool descriptions. Refer to the tool definitions provided in your system instructions for the correct parameter structure and usage examples.\n\nAlways ensure you provide all required parameters for the tool you wish to use.\n\n# Next Steps\n\nIf you have completed the user's task, use the attempt_completion tool.\nIf you require additional information from the user, use the ask_followup_question tool.\nOtherwise, if you have not completed the task and do not need additional information, then proceed with the next step of the task.\n(This is an automated message, so do not respond to it conversationally.)"
+        },
+        {
+          "type": "text",
+          "text": "<environment_details>\n# VSCode Visible Files\n\n\n# VSCode Open Tabs\n\n\n# Current Time\nCurrent time in ISO 8601 UTC format: 2026-01-31T12:32:57.652Z\nUser time zone: Europe/Bratislava, UTC+1:00\n\n# Current Cost\n$0.03\n\n# Current Mode\n<slug>code</slug>\n<name>Code</name>\n<model>deepseek-v3.2-maas</model>\n<tool_format>native</tool_format>\nYou have not created a todo list yet. Create one with `update_todo_list` if your task is complicated or involves multiple steps.\n</environment_details>"
+        }
+      ],
+      "ts": 1769862777654
+    }
+  ]
+}

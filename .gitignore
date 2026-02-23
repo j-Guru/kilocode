@@ -49,6 +49,8 @@ logs
 .qodo/
 .vercel
 .roo/mcp.json
+.codex
+.claude
 
 # Nix / Direnv
 .direnv

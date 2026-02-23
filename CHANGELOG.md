@@ -267,6 +267,8 @@
 
 - [#5420](https://github.com/Kilo-Org/kilocode/pull/5420) [`ebcfca8`](https://github.com/Kilo-Org/kilocode/commit/ebcfca8ea1dd3aad87e3a2598370208a1daaddc6) Thanks [@pedroheyerdahl](https://github.com/pedroheyerdahl)! - Improved Portuguese (Brazil) translation
 
+> > > > > > > main
+
 ## 5.0.0
 
 ### Major Changes

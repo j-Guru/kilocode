@@ -273,17 +273,16 @@ tasks {
 
             val pluginName = properties("pluginGroup").get().split(".").last()
 
-            // Copy host runtime files
-            from("../host/dist") { into("$pluginName/runtime/") }
-            from("../host/package.json") { into("$pluginName/runtime/") }
+            // Copy host runtime files from prepared resources.
+            // This keeps runtime/extension.js deterministic for release builds.
+            from("../resources/runtime") { into("$pluginName/runtime/") }
 
             // Copy host node_modules based on prodDep.txt
             from("../resources/node_modules") {
                 into("$pluginName/node_modules/")
                 doFirst {
-                    list.forEach {
-                        include(it)
-                    }
+                    // Set includes to only production dependencies from prodDep.txt
+                    setIncludes(list)
                 }
             }
 

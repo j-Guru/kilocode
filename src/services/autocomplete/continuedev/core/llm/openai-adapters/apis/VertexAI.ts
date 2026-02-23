@@ -1,4 +1,5 @@
 import { streamSse } from "../../../fetch/stream.js"
+import { vertexModels } from "@roo-code/types"
 import { AuthClient, GoogleAuth, JWT, auth } from "google-auth-library"
 import {
 	ChatCompletion,
@@ -90,11 +91,11 @@ export class VertexAIApi implements BaseLlmApi {
 			}
 			this.clientPromise = new GoogleAuth({
 				scopes: VertexAIApi.AUTH_SCOPES,
-				keyFile,
+				keyFile: keyFile?.replace(/\\/g, "/"),
 			})
 				.getClient()
 				.catch((e: Error) => {
-					console.warn(`Failed to load credentials for Vertex AI: ${e.message}`)
+					throw new Error(`VertexAI authentication failed: ${e.message}`)
 				})
 		} else if (!apiKey) {
 			// Application Default Credentials
@@ -103,12 +104,13 @@ export class VertexAIApi implements BaseLlmApi {
 			})
 				.getClient()
 				.catch((e: Error) => {
-					console.warn(`Failed to load credentials for Vertex AI: ${e.message}`)
+					throw new Error(`VertexAI authentication failed: ${e.message}`)
 				})
 		}
 	}
 
-	private getApiBase(): string {
+	private getApiBase(provider?: string): string {
+		console.debug("VertexAI.getApiBase", { provider, apiKey: !!this.config.apiKey, env: this.config.env })
 		const { apiKey, env } = this.config
 
 		if (this.config.apiBase) {
@@ -120,12 +122,33 @@ export class VertexAIApi implements BaseLlmApi {
 			return "https://aiplatform.googleapis.com/v1/"
 		} else {
 			// Standard mode
-			const { region, projectId } = env!
+			let { region, projectId } = env!
+			if (region === "global") {
+				return `https://aiplatform.googleapis.com/v1/projects/${projectId}/locations/global/`
+			}
+
+			// Standard regional endpoint format
 			return `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/`
 		}
 	}
 
-	private determineVertexProvider(model: string): "mistral" | "anthropic" | "gemini" | "unknown" {
+	private getVertexModelPublisher(model: string): string | undefined {
+		const modelInfo = (vertexModels as Record<string, { vertexPublisher?: string | null }>)[model]
+		return modelInfo?.vertexPublisher ?? undefined
+	}
+
+	private determineVertexProvider(model: string): "mistral" | "anthropic" | "gemini" | "openai" | "unknown" {
+		const publisher = this.getVertexModelPublisher(model)
+		if (publisher === "google") {
+			return "gemini"
+		}
+		if (publisher === "anthropic") {
+			return "anthropic"
+		}
+		if (publisher === "mistralai") {
+			return "mistral"
+		}
+
 		if (model.includes("mistral") || model.includes("codestral") || model.includes("mixtral")) {
 			return "mistral"
 		} else if (model.includes("claude")) {
@@ -133,7 +156,47 @@ export class VertexAIApi implements BaseLlmApi {
 		} else if (model.includes("gemini")) {
 			return "gemini"
 		}
+		if (publisher) {
+			return "openai"
+		}
 		return "unknown"
+	}
+
+	private getPublisherForProvider(provider: "mistral" | "anthropic" | "gemini", model: string): string {
+		const publisher = this.getVertexModelPublisher(model)
+		if (publisher) {
+			return publisher
+		}
+		switch (provider) {
+			case "mistral":
+				return "mistralai"
+			case "anthropic":
+				return "anthropic"
+			case "gemini":
+				return "google"
+		}
+	}
+
+	private buildOpenAiChatCompletionUrl(): URL {
+		const { env } = this.config
+		const { region, projectId } = env || {}
+		if (!region || !projectId) {
+			throw new Error("region and projectId are required for VertexAI OpenAI-compatible endpoints")
+		}
+
+		if (this.config.apiBase) {
+			const basePath = new URL(this.config.apiBase).pathname
+			const hasProjectPath = basePath.includes("/projects/")
+			const endpoint = hasProjectPath
+				? "endpoints/openapi/chat/completions"
+				: `projects/${projectId}/locations/${region}/endpoints/openapi/chat/completions`
+			return this.buildUrl(endpoint)
+		}
+
+		const host = region === "global" ? "aiplatform.googleapis.com" : `${region}-aiplatform.googleapis.com`
+		return new URL(
+			`https://${host}/v1/projects/${projectId}/locations/${region}/endpoints/openapi/chat/completions`,
+		)
 	}
 
 	private async getAuthHeaders(): Promise<Record<string, string>> {
@@ -159,8 +222,8 @@ export class VertexAIApi implements BaseLlmApi {
 		}
 	}
 
-	private buildUrl(endpoint: string): URL {
-		const apiBase = this.getApiBase()
+	private buildUrl(endpoint: string, provider?: string): URL {
+		const apiBase = this.getApiBase(provider)
 		const url = new URL(endpoint, apiBase)
 
 		if (this.config.apiKey) {
@@ -199,20 +262,37 @@ export class VertexAIApi implements BaseLlmApi {
 
 		switch (vertexProvider) {
 			case "anthropic":
-				url = this.buildUrl(`publishers/anthropic/models/${body.model}:rawPredict`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("anthropic", body.model)}/models/${body.model}:rawPredict`,
+					vertexProvider,
+				)
 				requestBody = this.convertAnthropicBody(body)
 				break
 			case "gemini":
-				url = this.buildUrl(`publishers/google/models/${body.model}:generateContent`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("gemini", body.model)}/models/${body.model}:generateContent`,
+					vertexProvider,
+				)
 				requestBody = this.convertGeminiBody(body, url)
 				break
 			case "mistral":
-				url = this.buildUrl(`publishers/mistralai/models/${body.model}:rawPredict`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("mistral", body.model)}/models/${body.model}:rawPredict`,
+					vertexProvider,
+				)
+				requestBody = body
+				break
+			case "openai":
+				url = this.buildOpenAiChatCompletionUrl()
 				requestBody = body
 				break
 			default:
 				throw new Error(`Unsupported model: ${body.model}`)
 		}
+
+		// kilocode_change start
+		console.error(`[VertexAI Debug] Non-Stream URL: ${url.toString()}`)
+		// kilocode_change end
 
 		const response = await fetch(url.toString(), {
 			method: "POST",
@@ -224,7 +304,13 @@ export class VertexAIApi implements BaseLlmApi {
 		const data = await response.json()
 
 		if (!response.ok) {
-			throw new Error(`VertexAI API error: ${response.status} ${response.statusText}\n${JSON.stringify(data)}`)
+			console.error("VertexAI API Error", {
+				status: response.status,
+				statusText: response.statusText,
+				data,
+				url: url.toString(),
+			})
+			throw new Error(`${response.status} VertexAI API error: ${response.statusText}\n${JSON.stringify(data)}`)
 		}
 
 		// Convert response to OpenAI format
@@ -240,6 +326,7 @@ export class VertexAIApi implements BaseLlmApi {
 					model: body.model,
 				})
 			case "mistral":
+			case "openai":
 				return chatCompletion({
 					content: data.choices?.[0]?.message?.content || "",
 					model: body.model,
@@ -265,37 +352,39 @@ export class VertexAIApi implements BaseLlmApi {
 
 		switch (vertexProvider) {
 			case "anthropic":
-				url = this.buildUrl(`publishers/anthropic/models/${body.model}:streamRawPredict`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("anthropic", body.model)}/models/${body.model}:streamRawPredict`,
+					vertexProvider,
+				)
 				requestBody = this.convertAnthropicBody(body)
 				break
 			case "gemini":
-				url = this.buildUrl(`publishers/google/models/${body.model}:streamGenerateContent`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("gemini", body.model)}/models/${body.model}:streamGenerateContent`,
+					vertexProvider,
+				)
 				requestBody = this.convertGeminiBody(body, url)
 				break
 			case "mistral":
-				url = this.buildUrl(`publishers/mistralai/models/${body.model}:streamRawPredict`)
+				url = this.buildUrl(
+					`publishers/${this.getPublisherForProvider("mistral", body.model)}/models/${body.model}:streamRawPredict`,
+					vertexProvider,
+				)
 				requestBody = body
+				break
+			case "openai":
+				url = this.buildOpenAiChatCompletionUrl()
+				requestBody = this.mistralInstance.modifyChatBody({ ...body })
 				break
 			default:
 				throw new Error(`Unsupported model: ${body.model}`)
 		}
 
 		switch (vertexProvider) {
-			case "mistral": {
-				const mistralResponse = await this.mistralInstance.openai.chat.completions.create(
-					this.mistralInstance.modifyChatBody(body),
-					{
-						signal,
-						headers,
-					},
-				)
-				for await (const result of mistralResponse) {
-					yield result
-				}
-				break
-			}
 			case "anthropic":
-			case "gemini": {
+			case "gemini":
+			case "mistral":
+			case "openai": {
 				const response = await fetch(url.toString(), {
 					method: "POST",
 					headers,
@@ -315,8 +404,12 @@ export class VertexAIApi implements BaseLlmApi {
 				}
 				if (vertexProvider === "gemini") {
 					yield* this.geminiInstance.handleStreamResponse(response, body.model)
-				} else {
+				} else if (vertexProvider === "anthropic") {
 					yield* this.anthropicInstance.handleStreamResponse(response, body.model)
+				} else {
+					for await (const chunk of streamSse(response)) {
+						yield chunk
+					}
 				}
 				break
 			}
@@ -397,7 +490,7 @@ export class VertexAIApi implements BaseLlmApi {
 		}
 
 		const headers = await this.getAuthHeaders()
-		const url = this.buildUrl(`publishers/mistralai/models/${body.model}:streamRawPredict`)
+		const url = this.buildUrl(`publishers/mistralai/models/${body.model}:streamRawPredict`, "mistral")
 
 		const requestBody = {
 			model: body.model,
@@ -410,6 +503,10 @@ export class VertexAIApi implements BaseLlmApi {
 			suffix: body.suffix,
 		}
 
+		// kilocode_change start
+		console.error(`[VertexAI Debug] FIM URL: ${url.toString()}`)
+		// kilocode_change end
+
 		const response = await fetch(url.toString(), {
 			method: "POST",
 			headers,
@@ -418,7 +515,7 @@ export class VertexAIApi implements BaseLlmApi {
 		})
 
 		if (!response.ok) {
-			throw new Error(`VertexAI API error: ${response.status} ${response.statusText}`)
+			throw new Error(`${response.status} VertexAI API error: ${response.statusText}`)
 		}
 
 		for await (const chunk of streamSse(response)) {
