@@ -1,9 +1,8 @@
-name: beta
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: "0 * * * *"
+# This workflow has been disabled
+# on:
+#   workflow_dispatch:
+#   schedule:
+#     - cron: "0 * * * *"
 
 jobs:
   sync:
