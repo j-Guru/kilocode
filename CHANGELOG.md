@@ -1,5 +1,24 @@
 # kilo-code
 
+## 5.9.0
+
+### Minor Changes
+
+- Native Poe.com API provider support
+- Azure Cognitive Services support
+- Merge kilocode-legacy changes into main-vertex
+
+### Patch Changes
+
+- Fix: Mode-specific rules in `.kilocode/rules-code/` directory are now included in Rules pop-over UI
+- Fix: Prevent terminal focus stealing in Agent Manager
+- Fix: Normalize Vertex Claude Opus 4.6 model id aliases
+- Fix: MiniMax/Kimi context window size
+- Fix: Azure/OpenAI endpoints and reject Azure AI Inference URLs
+- Fix: OpenAI Codex OAuth in Agent Manager so ChatGPT Plus/Pro work
+- Fix: avoid duplicate /v1 in OpenAI Responses fallback URL
+- Fix: Bedrock network error handling
+
 ## 5.8.1
 
 ### Patch Changes
