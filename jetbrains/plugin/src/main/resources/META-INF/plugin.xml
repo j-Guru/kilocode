@@ -30,19 +30,10 @@ SPDX-License-Identifier: Apache-2.0
    
    <!-- Change notes for the plugin -->
    <change-notes><![CDATA[
-        <h3>Version 5.9.0</h3>
+        <h3>Version 5.10.0</h3>
         <ul>
-            <li>Native Poe.com API provider support</li>
-            <li>Azure Cognitive Services support</li>
-            <li>Merge kilocode-legacy changes into main-vertex</li>
-            <li>Fix: Mode-specific rules in `.kilocode/rules-code/` directory are now included in Rules pop-over UI</li>
-            <li>Fix: Prevent terminal focus stealing in Agent Manager</li>
-            <li>Fix: Normalize Vertex Claude Opus 4.6 model id aliases</li>
-            <li>Fix: MiniMax/Kimi context window size</li>
-            <li>Fix: Azure/OpenAI endpoints and reject Azure AI Inference URLs</li>
-            <li>Fix: OpenAI Codex OAuth in Agent Manager so ChatGPT Plus/Pro work</li>
-            <li>Fix: avoid duplicate /v1 in OpenAI Responses fallback URL</li>
-            <li>Fix: Bedrock network error handling</li>
+            <li>Add Oracle Code Assist provider</li>
+            <li>Rename leftover `roo-preview` and `roo-debug` temp filenames to `kilo-preview` and `kilo-debug`</li>
         </ul>
     ]]></change-notes>
 
