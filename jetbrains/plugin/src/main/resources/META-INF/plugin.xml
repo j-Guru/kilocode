@@ -32,12 +32,17 @@ SPDX-License-Identifier: Apache-2.0
    <change-notes><![CDATA[
         <h3>Version 5.9.0</h3>
         <ul>
-            <li>Show post-completion suggestions after `code` and `orchestrator` tasks to start `review` mode, including an option that clears context and starts a fresh review of uncommitted changes.</li>
-            <li>Add X-KiloCode-Feature header for microdollar usage tracking</li>
-            <li>Update Gemini default model metadata for Gemini 3.1 Pro and keep tool calling behavior consistent.</li>
-            <li>Fix: JetBrains editor initialization when ExtensionHostManager is missing from SystemObjectProvider</li>
-            <li>Add promotion sign-up prompt when anonymous users hit the promotional model usage limit</li>
-            <li>Updated promotion warning text and translations across all 22 languages</li>
+            <li>Native Poe.com API provider support</li>
+            <li>Azure Cognitive Services support</li>
+            <li>Merge kilocode-legacy changes into main-vertex</li>
+            <li>Fix: Mode-specific rules in `.kilocode/rules-code/` directory are now included in Rules pop-over UI</li>
+            <li>Fix: Prevent terminal focus stealing in Agent Manager</li>
+            <li>Fix: Normalize Vertex Claude Opus 4.6 model id aliases</li>
+            <li>Fix: MiniMax/Kimi context window size</li>
+            <li>Fix: Azure/OpenAI endpoints and reject Azure AI Inference URLs</li>
+            <li>Fix: OpenAI Codex OAuth in Agent Manager so ChatGPT Plus/Pro work</li>
+            <li>Fix: avoid duplicate /v1 in OpenAI Responses fallback URL</li>
+            <li>Fix: Bedrock network error handling</li>
         </ul>
     ]]></change-notes>
 
