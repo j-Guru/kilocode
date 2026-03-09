@@ -126,6 +126,7 @@ import {
 	Featherless,
 	VercelAiGateway,
 	DeepInfra,
+	OCA, // kilocode_change
 	MiniMax,
 	Poe, // kilocode_change
 } from "./providers"
@@ -516,7 +517,7 @@ const ApiOptions = ({
 
 		// kilocode_change start
 		// Providers that don't have documentation pages yet
-		const excludedProviders = ["moonshot", "chutes", "cerebras", "litellm", "zai", "qwen-code", "minimax"]
+		const excludedProviders = ["moonshot", "chutes", "cerebras", "litellm", "zai", "qwen-code", "minimax", "oca"]
 
 		// Skip documentation link when the provider is excluded because documentation is not available
 		if (excludedProviders.includes(selectedProvider)) {
@@ -637,6 +638,17 @@ const ApiOptions = ({
 					selectedModelId={selectedModelId}
 					uriScheme={uriScheme}
 					simplifySettings={fromWelcomeView}
+					organizationAllowList={organizationAllowList}
+					modelValidationError={modelValidationError}
+				/>
+			)}
+			{/* kilocode_change end */}
+
+			{/* kilocode_change start */}
+			{selectedProvider === "oca" && (
+				<OCA
+					apiConfiguration={apiConfiguration}
+					setApiConfigurationField={setApiConfigurationField}
 					organizationAllowList={organizationAllowList}
 					modelValidationError={modelValidationError}
 				/>

@@ -101,6 +101,7 @@ export const modelInfoSchema = z.object({
 	cacheWritesPrice: z.number().optional(),
 	cacheReadsPrice: z.number().optional(),
 	description: z.string().optional(),
+	banner: z.string().optional(), // kilocode_change
 	// Default effort value for models that support reasoning effort
 	reasoningEffort: reasoningEffortExtendedSchema.optional(),
 	minTokensPerCachePoint: z.number().optional(),
@@ -129,8 +130,19 @@ export const modelInfoSchema = z.object({
 	// These tools will be added if they belong to an allowed group in the current mode
 	// Cannot force-add tools from groups the mode doesn't allow
 	includedTools: z.array(z.string()).optional(),
-	//3rd party Vertex AI publisher prefix
+	//3rd party Vertex AI publisher prefix // kilocode_change
 	vertexPublisher: z.string().nullish(),
+
+	// kilocode_change start
+	/**
+	 * List of supported API types for this model, e.g. ['chat-completions', 'responses']
+	 */
+	supportedApiTypes: z.array(z.string()).optional(),
+	/**
+	 * Preferred API type for this model, e.g. 'responses' or 'chat-completions'.
+	 */
+	apiType: z.string().optional(),
+	// kilocode_change end
 	/**
 	 * Service tiers with pricing information.
 	 * Each tier can have a name (for OpenAI service tiers) and pricing overrides.

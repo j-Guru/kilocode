@@ -43,6 +43,7 @@ export { Fireworks } from "./Fireworks"
 export { Featherless } from "./Featherless"
 export { VercelAiGateway } from "./VercelAiGateway"
 export { DeepInfra } from "./DeepInfra"
+export { OCA } from "./Oca" // kilocode_change
 export { MiniMax } from "./MiniMax"
 export { Baseten } from "./Baseten"
 export { Poe } from "./Poe" // kilocode_change

@@ -1,8 +1,4 @@
 <p align="center">
-  <strong>⚠️ This repository is no longer actively maintained. Development has moved to <a href="https://github.com/Kilo-Org/kilocode">github.com/Kilo-Org/kilocode</a>.</strong>
-</p>
-
-<p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=kilocode.Kilo-Code"><img src="https://img.shields.io/badge/VS_Code_Marketplace-007ACC?style=flat&logo=visualstudiocode&logoColor=white" alt="VS Code Marketplace"></a>
   <a href="https://x.com/kilocode"><img src="https://img.shields.io/badge/kilocode-000000?style=flat&logo=x&logoColor=white" alt="X (Twitter)"></a>
   <a href="https://blog.kilo.ai"><img src="https://img.shields.io/badge/Blog-555?style=flat&logo=substack&logoColor=white" alt="Substack Blog"></a>
@@ -62,7 +58,7 @@ Our community is built on respect, inclusivity, and collaboration. Please review
 ## License
 
 This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
-You’re free to use, modify, and distribute this code, including for commercial purposes as long as you include proper attribution and license notices. See [License](/LICENSE).
+You're free to use, modify, and distribute this code, including for commercial purposes as long as you include proper attribution and license notices. See [License](/LICENSE).
 
 ## Contributing
 

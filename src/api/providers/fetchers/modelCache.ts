@@ -20,6 +20,7 @@ import { getOpenRouterModels } from "./openrouter"
 import { getVercelAiGatewayModels } from "./vercel-ai-gateway"
 import { getRequestyModels } from "./requesty"
 import { getGlamaModels } from "./glama" // kilocode_change
+import { getOCAModels } from "./oca" // kilocode_change
 import { getUnboundModels } from "./unbound"
 import { getLiteLLMModels } from "./litellm"
 import { GetModelsOptions } from "../../../shared/api"
@@ -37,6 +38,7 @@ import { getAihubmixModels } from "./aihubmix"
 import { getApertisModels } from "./apertis"
 // kilocode_change end
 
+import { DEFAULT_OCA_BASE_URL } from "../oca/utils/constants" // kilocode_change
 import { getDeepInfraModels } from "./deepinfra"
 import { getHuggingFaceModels } from "./huggingface"
 import { getRooModels } from "./roo"
@@ -151,6 +153,11 @@ async function fetchModelsFromProvider(options: GetModelsOptions): Promise<Model
 		case "huggingface":
 			models = await getHuggingFaceModels()
 			break
+		// kilocode_change start
+		case "oca":
+			models = await getOCAModels(options.baseUrl ?? DEFAULT_OCA_BASE_URL, options.apiKey)
+			break
+		// kilocode_change end
 		// kilocode_change start
 		case "sap-ai-core":
 			models = await getSapAiCoreModels(

@@ -2844,6 +2844,7 @@ describe("ClineProvider - Router Models", () => {
 				kilocode: mockModels,
 				"nano-gpt": mockModels, // kilocode_change
 				aihubmix: mockModels, // kilocode_change
+				oca: {}, // kilocode_change
 				ollama: mockModels, // kilocode_change
 				lmstudio: {},
 				"vercel-ai-gateway": mockModels,
@@ -2932,6 +2933,7 @@ describe("ClineProvider - Router Models", () => {
 				kilocode: {},
 				"nano-gpt": mockModels, // kilocode_change
 				aihubmix: mockModels, // kilocode_change
+				oca: {}, // kilocode_change
 				"vercel-ai-gateway": mockModels,
 				ovhcloud: mockModels, // kilocode_change
 				inception: mockModels, // kilocode_change
@@ -3090,6 +3092,7 @@ describe("ClineProvider - Router Models", () => {
 				kilocode: mockModels,
 				"nano-gpt": mockModels, // kilocode_change
 				aihubmix: mockModels, // kilocode_change
+				oca: {}, // kilocode_change
 				ollama: mockModels, // kilocode_change
 				lmstudio: {},
 				"vercel-ai-gateway": mockModels,

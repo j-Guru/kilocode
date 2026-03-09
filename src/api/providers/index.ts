@@ -50,6 +50,7 @@ export { RooHandler } from "./roo"
 export { FeatherlessHandler } from "./featherless"
 export { VercelAiGatewayHandler } from "./vercel-ai-gateway"
 export { DeepInfraHandler } from "./deepinfra"
+export { OcaHandler } from "./oca-handler" // kilocode_change
 export { MiniMaxHandler } from "./minimax"
 export { BasetenHandler } from "./baseten"
 export { CorethinkHandler } from "./corethink"

@@ -82,6 +82,10 @@ import { getModels, flushModels } from "../../api/providers/fetchers/modelCache"
 import { GetModelsOptions } from "../../shared/api"
 import { generateSystemPrompt } from "./generateSystemPrompt"
 import { getCommand } from "../../utils/commands"
+// kilocode_change start
+import { OcaTokenManager } from "../../api/providers/oca/OcaTokenManager"
+import { DEFAULT_OCA_BASE_URL } from "../../api/providers/oca/utils/constants"
+// kilocode_change end
 import { toggleWorkflow, toggleRule, createRuleFile, deleteRuleFile } from "./kilorules"
 import { mermaidFixPrompt } from "../prompts/utilities/mermaid" // kilocode_change
 // kilocode_change start
@@ -920,6 +924,7 @@ export const webviewMessageHandler = async (
 						glama: {}, // kilocode_change
 						ollama: {},
 						lmstudio: {},
+						oca: {}, // kilocode_change
 						roo: {},
 						synthetic: {}, // kilocode_change
 						"sap-ai-core": {}, // kilocode_change
@@ -1052,6 +1057,26 @@ export const webviewMessageHandler = async (
 					},
 				},
 			]
+			// kilocode_change end
+
+			// kilocode_change start
+			try {
+				const valid = await OcaTokenManager.getValid()
+				if (valid?.access_token) {
+					candidates.push({
+						key: "oca",
+						options: {
+							provider: "oca",
+							apiKey: valid.access_token,
+							baseUrl: process.env.OCA_API_BASE ?? DEFAULT_OCA_BASE_URL,
+						} as GetModelsOptions,
+					})
+				} else {
+					console.debug("OCA model fetch skipped: user must Sign in.")
+				}
+			} catch (e) {
+				console.debug("OCA model fetch skipped: error occurred while validating IDCS token..", e)
+			}
 			// kilocode_change end
 
 			// IO Intelligence is conditional on api key
@@ -1334,6 +1359,53 @@ export const webviewMessageHandler = async (
 				vscode.env.openExternal(vscode.Uri.parse(message.url))
 			}
 			break
+		// kilocode_change start
+		case "oca/login": {
+			OcaTokenManager.loginWithoutAutoOpen((url: string) => {
+				provider.postMessageToWebview({ type: "oca/show-auth-url", url })
+			})
+				.then(async () => {
+					await provider.postMessageToWebview({ type: "oca/login-success" })
+				})
+				.catch(async (error: unknown) => {
+					await provider.postMessageToWebview({
+						type: "oca/login-error",
+						error: error instanceof Error ? error.message : String(error),
+					})
+				})
+			break
+		}
+		case "oca/logout": {
+			try {
+				await OcaTokenManager.logout()
+				try {
+					await provider.context.secrets.delete("ocaTokenSet")
+				} catch {}
+				await provider.postMessageToWebview({ type: "oca/logout-success" })
+			} catch (error) {
+				await provider.postMessageToWebview({
+					type: "oca/login-error",
+					error: error instanceof Error ? error.message : String(error),
+				})
+			}
+			break
+		}
+		case "oca/status": {
+			try {
+				const valid = await OcaTokenManager.getValid()
+				await provider.postMessageToWebview({
+					type: "oca/status",
+					authenticated: !!valid?.access_token,
+				})
+			} catch {
+				await provider.postMessageToWebview({
+					type: "oca/status",
+					authenticated: false,
+				})
+			}
+			break
+		}
+		// kilocode_change end
 		case "checkpointDiff":
 			const result = checkoutDiffPayloadSchema.safeParse(message.payload)
 
@@ -4502,7 +4574,7 @@ export const webviewMessageHandler = async (
 				try {
 					const tmpDir = os.tmpdir()
 					const timestamp = Date.now()
-					const tempFileName = `roo-preview-${timestamp}.md`
+					const tempFileName = `kilo-preview-${timestamp}.md`
 					const tempFilePath = path.join(tmpDir, tempFileName)
 
 					await fs.writeFile(tempFilePath, message.text, "utf8")
@@ -4621,7 +4693,7 @@ export const webviewMessageHandler = async (
 				// Create a temporary file
 				const tmpDir = os.tmpdir()
 				const timestamp = Date.now()
-				const tempFileName = `roo-debug-${message.type === "openDebugApiHistory" ? "api" : "ui"}-${currentTask.taskId.slice(0, 8)}-${timestamp}.json`
+				const tempFileName = `kilo-debug-${message.type === "openDebugApiHistory" ? "api" : "ui"}-${currentTask.taskId.slice(0, 8)}-${timestamp}.json`
 				const tempFilePath = path.join(tmpDir, tempFileName)
 
 				await fs.writeFile(tempFilePath, prettifiedContent, "utf8")
