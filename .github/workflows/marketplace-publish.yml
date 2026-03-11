@@ -7,7 +7,7 @@ on:
     workflow_dispatch:
 
 env:
-    NODE_VERSION: 20.20.0
+    NODE_VERSION: 24
     PNPM_VERSION: 10.8.1
 
 jobs:
@@ -113,7 +113,7 @@ jobs:
                     "jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}#JetBrains plugin (${{ steps.get_version.outputs.version }})"
 
             - name: Upload VSIX artifact
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: VS Code plugin (${{ steps.get_version.outputs.version }})
                   path: bin/kilo-code-${{ steps.get_version.outputs.version }}.vsix
@@ -121,7 +121,7 @@ jobs:
                   retention-days: 14
 
             - name: Upload JetBrains plugin artifact
-              uses: actions/upload-artifact@v6
+              uses: actions/upload-artifact@v7
               with:
                   name: JetBrains plugin (${{ steps.get_version.outputs.version }})
                   path: jetbrains/plugin/build/distributions/${{ steps.get_bundle_name.outputs.bundle_name }}
