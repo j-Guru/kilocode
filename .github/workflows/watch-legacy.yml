@@ -1,0 +1,96 @@
+name: Watch kilocode-legacy
+
+on:
+    schedule:
+        - cron: "0 12 * * *"
+    workflow_dispatch:
+
+jobs:
+    check-legacy:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
+        steps:
+            - name: Get latest commit on kilocode-legacy/main
+              id: legacy
+              run: |
+                  sha=$(curl -s https://api.github.com/repos/Kilo-Org/kilocode-legacy/commits/main | jq -r '.sha')
+                  echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+                  echo "Latest legacy/main SHA: ${sha}"
+
+            - name: Get our main SHA
+              id: ours
+              run: |
+                  sha=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    https://api.github.com/repos/${{ github.repository }}/commits/main | jq -r '.sha')
+                  echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+                  echo "Our main SHA: ${sha}"
+
+            - name: Compare commits
+              id: compare
+              run: |
+                  legacy_sha="${{ steps.legacy.outputs.sha }}"
+                  our_sha="${{ steps.ours.outputs.sha }}"
+
+                  if [ "$legacy_sha" = "$our_sha" ]; then
+                    echo "in_sync=true" >> "$GITHUB_OUTPUT"
+                    echo "✅ main is in sync with kilocode-legacy/main"
+                  else
+                    echo "in_sync=false" >> "$GITHUB_OUTPUT"
+                    echo "⚠️ kilocode-legacy/main has new commits!"
+                  fi
+
+            - name: Get new commits info
+              id: commits
+              if: steps.compare.outputs.in_sync == 'false'
+              run: |
+                  compare_url="https://api.github.com/repos/Kilo-Org/kilocode-legacy/compare/${{ steps.ours.outputs.sha }}...${{ steps.legacy.outputs.sha }}"
+                  response=$(curl -s "$compare_url")
+                  ahead=$(echo "$response" | jq -r '.ahead_by')
+                  commits=$(echo "$response" | jq -r '.commits[] | "- \(.commit.message | split("\n")[0]) ([\(.sha[0:7])](https://github.com/Kilo-Org/kilocode-legacy/commit/\(.sha)))"' | head -20)
+                  echo "ahead_by=${ahead}" >> "$GITHUB_OUTPUT"
+                  {
+                    echo "commits<<EOF"
+                    echo "$commits"
+                    echo "EOF"
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Check for existing open issue
+              id: existing_issue
+              if: steps.compare.outputs.in_sync == 'false'
+              run: |
+                  issue=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    "https://api.github.com/repos/${{ github.repository }}/issues?state=open&labels=legacy-sync&per_page=1" \
+                    | jq -r '.[0].number // empty')
+                  echo "number=${issue}" >> "$GITHUB_OUTPUT"
+                  echo "Existing open issue: ${issue:-none}"
+
+            - name: Create issue if not exists
+              if: steps.compare.outputs.in_sync == 'false' && steps.existing_issue.outputs.number == ''
+              run: |
+                  curl -s -X POST \
+                    -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    https://api.github.com/repos/${{ github.repository }}/issues \
+                    -d @- <<EOF
+                  {
+                    "title": "⚠️ kilocode-legacy/main has ${{ steps.commits.outputs.ahead_by }} new commit(s) — sync needed",
+                    "body": "## kilocode-legacy/main is ahead of our main branch\n\n**Commits ahead:** ${{ steps.commits.outputs.ahead_by }}\n\n**New commits:**\n${{ steps.commits.outputs.commits }}\n\n**Compare:** [View diff](https://github.com/Kilo-Org/kilocode-legacy/compare/${{ steps.ours.outputs.sha }}...${{ steps.legacy.outputs.sha }})\n\n---\n_This issue was created automatically by the [Watch kilocode-legacy](https://github.com/${{ github.repository }}/actions/workflows/watch-legacy.yml) workflow. Say **\"we have new version\"** to trigger the sync workflow._",
+                    "labels": ["legacy-sync"]
+                  }
+                  EOF
+
+            - name: Update existing issue
+              if: steps.compare.outputs.in_sync == 'false' && steps.existing_issue.outputs.number != ''
+              run: |
+                  curl -s -X PATCH \
+                    -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                    -H "Content-Type: application/json" \
+                    https://api.github.com/repos/${{ github.repository }}/issues/${{ steps.existing_issue.outputs.number }} \
+                    -d @- <<EOF
+                  {
+                    "title": "⚠️ kilocode-legacy/main has ${{ steps.commits.outputs.ahead_by }} new commit(s) — sync needed",
+                    "body": "## kilocode-legacy/main is ahead of our main branch\n\n**Commits ahead:** ${{ steps.commits.outputs.ahead_by }}\n\n**New commits:**\n${{ steps.commits.outputs.commits }}\n\n**Compare:** [View diff](https://github.com/Kilo-Org/kilocode-legacy/compare/${{ steps.ours.outputs.sha }}...${{ steps.legacy.outputs.sha }})\n\n---\n_This issue was last updated automatically by the [Watch kilocode-legacy](https://github.com/${{ github.repository }}/actions/workflows/watch-legacy.yml) workflow. Say **\"we have new version\"** to trigger the sync workflow._"
+                  }
+                  EOF
