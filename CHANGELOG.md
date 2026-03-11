@@ -1,5 +1,13 @@
 # kilo-code
 
+## 5.10.1
+
+### Patch Changes
+
+- [#32](https://github.com/Kilo-Org/kilocode-legacy/pull/32) [`b8fda59`](https://github.com/Kilo-Org/kilocode-legacy/commit/b8fda597055785efd17ddba7185f1e2b2a3404f2) Thanks [@dmkononenko](https://github.com/dmkononenko)! - Add gpt-5.4-codex configuration
+
+- [#33](https://github.com/Kilo-Org/kilocode-legacy/pull/33) [`2c17b43`](https://github.com/Kilo-Org/kilocode-legacy/commit/2c17b43787b17c09a8b0955b350ef9c807b50491) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Use separate marketplace README without deprecation notice for VS Code marketplace listing
+
 ## 5.10.0
 
 ### Minor Changes
