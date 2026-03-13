@@ -1,5 +1,11 @@
 # kilo-code
 
+## 5.10.4
+
+### Patch Changes
+
+- [#54](https://github.com/Kilo-Org/kilocode-legacy/pull/54) [`7de6525`](https://github.com/Kilo-Org/kilocode-legacy/commit/7de652520851d8debad92b72d6cb9dfa10edb399) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Update onboarding premium models text to reflect new first top-up bonus credits offer
+
 ## 5.10.3
 
 ### Patch Changes
