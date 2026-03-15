@@ -40,16 +40,20 @@ print_step "Detecting build artifacts..."
 # Find the most recent VSIX file
 VSIX_SOURCE=$(find bin -maxdepth 1 -name "kilo-code-*.vsix" -type f -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 if [ -z "$VSIX_SOURCE" ]; then
-    print_error "No VSCode VSIX found in bin/ directory"
+    print_warning "No VSCode VSIX found in bin/ directory - skipping"
     print_warning "Run ./build-vsix-plugin.sh first to build the VSCode extension"
-    exit 1
 fi
 
 # Find the most recent JetBrains plugin ZIP file
 JETBRAINS_SOURCE=$(find jetbrains/plugin/build/distributions -maxdepth 1 -name "Kilo Code-*.zip" -type f -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 if [ -z "$JETBRAINS_SOURCE" ]; then
-    print_error "No JetBrains plugin found in jetbrains/plugin/build/distributions/ directory"
+    print_warning "No JetBrains plugin found in jetbrains/plugin/build/distributions/ directory - skipping"
     print_warning "Run ./build-jetbrains-plugin.sh release first to build the JetBrains plugin"
+fi
+
+# Exit only if both are missing
+if [ -z "$VSIX_SOURCE" ] && [ -z "$JETBRAINS_SOURCE" ]; then
+    print_error "No build artifacts found at all. Nothing to copy."
     exit 1
 fi
 
@@ -58,8 +62,10 @@ VSIX_FILENAME=$(basename "$VSIX_SOURCE")
 JETBRAINS_FILENAME=$(basename "$JETBRAINS_SOURCE")
 
 # Extract version numbers
-VSIX_VERSION=$(echo "$VSIX_FILENAME" | grep -oP 'kilo-code-\K[0-9]+\.[0-9]+\.[0-9]+')
-JETBRAINS_VERSION=$(echo "$JETBRAINS_FILENAME" | grep -oP 'Kilo Code-\K[0-9]+\.[0-9]+\.[0-9]+')
+VSIX_VERSION=""
+JETBRAINS_VERSION=""
+[ -n "$VSIX_SOURCE" ] && VSIX_VERSION=$(echo "$VSIX_FILENAME" | grep -oP 'kilo-code-\K[0-9]+\.[0-9]+\.[0-9]+')
+[ -n "$JETBRAINS_SOURCE" ] && JETBRAINS_VERSION=$(echo "$JETBRAINS_FILENAME" | grep -oP 'Kilo Code-\K[0-9]+\.[0-9]+\.[0-9]+')
 
 # Define Windows Desktop path (works in WSL, Git Bash, and Cygwin)
 if [[ -n "$WSLENV" ]]; then
@@ -78,16 +84,18 @@ print_info "=========================="
 echo ""
 
 # Display detected files with versions
-print_info "✓ Found VSCode VSIX: $VSIX_SOURCE (v$VSIX_VERSION)"
-print_info "✓ Found JetBrains plugin: $JETBRAINS_SOURCE (v$JETBRAINS_VERSION)"
+[ -n "$VSIX_SOURCE" ] && print_info "✓ Found VSCode VSIX: $VSIX_SOURCE (v$VSIX_VERSION)"
+[ -n "$JETBRAINS_SOURCE" ] && print_info "✓ Found JetBrains plugin: $JETBRAINS_SOURCE (v$JETBRAINS_VERSION)"
 
-# Check if versions match
-if [ "$VSIX_VERSION" != "$JETBRAINS_VERSION" ]; then
-    print_warning "Version mismatch detected!"
-    print_warning "  VSCode: v$VSIX_VERSION"
-    print_warning "  JetBrains: v$JETBRAINS_VERSION"
-else
-    print_info "✓ Both plugins are at version $VSIX_VERSION"
+# Check if versions match (only when both are present)
+if [ -n "$VSIX_VERSION" ] && [ -n "$JETBRAINS_VERSION" ]; then
+    if [ "$VSIX_VERSION" != "$JETBRAINS_VERSION" ]; then
+        print_warning "Version mismatch detected!"
+        print_warning "  VSCode: v$VSIX_VERSION"
+        print_warning "  JetBrains: v$JETBRAINS_VERSION"
+    else
+        print_info "✓ Both plugins are at version $VSIX_VERSION"
+    fi
 fi
 
 echo ""
@@ -106,12 +114,14 @@ print_info "✓ Desktop directory exists: $DESKTOP_PATH"
 echo ""
 
 # Get file sizes
-VSIX_SIZE=$(du -h "$VSIX_SOURCE" | cut -f1)
-JETBRAINS_SIZE=$(du -h "$JETBRAINS_SOURCE" | cut -f1)
+VSIX_SIZE=""
+JETBRAINS_SIZE=""
+[ -n "$VSIX_SOURCE" ] && VSIX_SIZE=$(du -h "$VSIX_SOURCE" | cut -f1)
+[ -n "$JETBRAINS_SOURCE" ] && JETBRAINS_SIZE=$(du -h "$JETBRAINS_SOURCE" | cut -f1)
 
 print_info "File sizes:"
-print_info "  - VSCode VSIX: $VSIX_SIZE"
-print_info "  - JetBrains Plugin: $JETBRAINS_SIZE"
+[ -n "$VSIX_SOURCE" ] && print_info "  - VSCode VSIX: $VSIX_SIZE"
+[ -n "$JETBRAINS_SOURCE" ] && print_info "  - JetBrains Plugin: $JETBRAINS_SIZE"
 
 echo ""
 
@@ -119,21 +129,25 @@ echo ""
 print_step "Copying files to Desktop..."
 
 # Copy VSCode VSIX
-print_info "Copying VSCode extension..."
-if cp "$VSIX_SOURCE" "$DESKTOP_PATH/"; then
-    print_info "✓ VSCode VSIX copied successfully"
-else
-    print_error "Failed to copy VSCode VSIX"
-    exit 1
+if [ -n "$VSIX_SOURCE" ]; then
+    print_info "Copying VSCode extension..."
+    if cp "$VSIX_SOURCE" "$DESKTOP_PATH/"; then
+        print_info "✓ VSCode VSIX copied successfully"
+    else
+        print_error "Failed to copy VSCode VSIX"
+        exit 1
+    fi
 fi
 
 # Copy JetBrains plugin
-print_info "Copying JetBrains plugin..."
-if cp "$JETBRAINS_SOURCE" "$DESKTOP_PATH/"; then
-    print_info "✓ JetBrains plugin copied successfully"
-else
-    print_error "Failed to copy JetBrains plugin"
-    exit 1
+if [ -n "$JETBRAINS_SOURCE" ]; then
+    print_info "Copying JetBrains plugin..."
+    if cp "$JETBRAINS_SOURCE" "$DESKTOP_PATH/"; then
+        print_info "✓ JetBrains plugin copied successfully"
+    else
+        print_error "Failed to copy JetBrains plugin"
+        exit 1
+    fi
 fi
 
 echo ""
@@ -141,23 +155,26 @@ echo ""
 # Verify copied files
 print_step "Verifying copied files..."
 
-VSIX_DEST="$DESKTOP_PATH/$VSIX_FILENAME"
-JETBRAINS_DEST="$DESKTOP_PATH/$JETBRAINS_FILENAME"
-
-if [ -f "$VSIX_DEST" ]; then
-    VSIX_DEST_SIZE=$(du -h "$VSIX_DEST" | cut -f1)
-    print_info "✓ VSCode VSIX verified ($VSIX_DEST_SIZE)"
-else
-    print_error "VSCode VSIX not found at destination"
-    exit 1
+if [ -n "$VSIX_SOURCE" ]; then
+    VSIX_DEST="$DESKTOP_PATH/$VSIX_FILENAME"
+    if [ -f "$VSIX_DEST" ]; then
+        VSIX_DEST_SIZE=$(du -h "$VSIX_DEST" | cut -f1)
+        print_info "✓ VSCode VSIX verified ($VSIX_DEST_SIZE)"
+    else
+        print_error "VSCode VSIX not found at destination"
+        exit 1
+    fi
 fi
 
-if [ -f "$JETBRAINS_DEST" ]; then
-    JETBRAINS_DEST_SIZE=$(du -h "$JETBRAINS_DEST" | cut -f1)
-    print_info "✓ JetBrains plugin verified ($JETBRAINS_DEST_SIZE)"
-else
-    print_error "JetBrains plugin not found at destination"
-    exit 1
+if [ -n "$JETBRAINS_SOURCE" ]; then
+    JETBRAINS_DEST="$DESKTOP_PATH/$JETBRAINS_FILENAME"
+    if [ -f "$JETBRAINS_DEST" ]; then
+        JETBRAINS_DEST_SIZE=$(du -h "$JETBRAINS_DEST" | cut -f1)
+        print_info "✓ JetBrains plugin verified ($JETBRAINS_DEST_SIZE)"
+    else
+        print_error "JetBrains plugin not found at destination"
+        exit 1
+    fi
 fi
 
 echo ""
