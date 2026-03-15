@@ -6,7 +6,7 @@ Kilo Code is an open source AI coding plugin for VS Code and JetBrains tools tha
 
 **IMPORTANT**: This project uses a dual-branch development strategy:
 
-- **`main`**: Fork of Kilo Code GitHub `main` branch - tracks upstream repository
+- **`main`**: Fork of Kilo-Org/kilocode-legacy `main` branch - tracks upstream repository
 - **`main-vertex`**: **Current project MAIN branch** - contains project-specific development
 
 **All development work should be based on `main-vertex`, not `main`.**
@@ -170,7 +170,7 @@ cd webview-ui && pnpm test src/path/to/test-file
 
 When the user says phrases like "new version was released", "we have new version", or similar, interpret this as the following required workflow:
 
-1. Update branch `main` from upstream latest (`Kilo-Org/kilocode` `main`).
+1. Update branch `main` from upstream latest (`Kilo-Org/kilocode-legacy` `main`).
 2. Merge latest `main` into `main-vertex`.
 3. Resolve merge conflicts with priority to project-specific fixes:
     - Vertex AI fix
