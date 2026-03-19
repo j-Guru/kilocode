@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Kilo Code is an open source AI coding plugin for VS Code and JetBrains tools that generates code from natural language, automates tasks, and supports 500+ AI models.
+Kilo Code is an open source AI coding plugin for VS Code and JetBrains IDEs that generates code from natural language, automates tasks, and supports 500+ AI models.
 
 ## Branch Structure
 
