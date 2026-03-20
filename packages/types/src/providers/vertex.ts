@@ -6,22 +6,6 @@ export type VertexModelId = keyof typeof vertexModels
 export const vertexDefaultModelId: VertexModelId = "gemini-3-flash-preview"
 
 export const vertexModels = {
-	// kilocode_change start
-	"claude-opus-4-6": {
-		maxTokens: 128_000,
-		contextWindow: 200_000,
-		supportsImages: true,
-		supportsPromptCache: true,
-		supportsNativeTools: true,
-		defaultToolProtocol: "native",
-		inputPrice: 5.0,
-		outputPrice: 25.0,
-		cacheWritesPrice: 6.25,
-		cacheReadsPrice: 0.5,
-		supportsAdaptiveThinking: true,
-		supportsVerbosity: ["low", "medium", "high", "max"],
-	},
-	// kilocode_change end
 	"gemini-3.1-pro-preview": {
 		maxTokens: 65_536,
 		contextWindow: 1_048_576,
@@ -242,7 +226,6 @@ export function normalizeVertexModelId(modelId: string): VertexModelId {
 	switch (normalized.toLowerCase()) {
 		case "claude-opus-4-6@default":
 		case "claude-opus-4-6@vertex":
-			return "claude-opus-4-6"
 		default:
 			return vertexDefaultModelId
 	}
