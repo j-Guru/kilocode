@@ -5,43 +5,9 @@ import type { ModelInfo } from "../model.js"
 // https://platform.minimax.io/docs/api-reference/text-openai-api
 // https://platform.minimax.io/docs/api-reference/text-anthropic-api
 export type MinimaxModelId = keyof typeof minimaxModels
-export const minimaxDefaultModelId: MinimaxModelId = "MiniMax-M2"
+export const minimaxDefaultModelId: MinimaxModelId = "MiniMax-M2.1"
 
 export const minimaxModels = {
-	"MiniMax-M2": {
-		maxTokens: 16_384,
-		contextWindow: 192_000,
-		supportsImages: false,
-		supportsPromptCache: true,
-		supportsNativeTools: true,
-		defaultToolProtocol: "native",
-		includedTools: ["search_and_replace"],
-		excludedTools: ["apply_diff"],
-		preserveReasoning: true,
-		inputPrice: 0.3,
-		outputPrice: 1.2,
-		cacheWritesPrice: 0.375,
-		cacheReadsPrice: 0.03,
-		description:
-			"MiniMax M2, a model born for Agents and code, featuring Top-tier Coding Capabilities, Powerful Agentic Performance, and Ultimate Cost-Effectiveness & Speed.",
-	},
-	"MiniMax-M2-Stable": {
-		maxTokens: 16_384,
-		contextWindow: 192_000,
-		supportsImages: false,
-		supportsPromptCache: true,
-		supportsNativeTools: true,
-		defaultToolProtocol: "native",
-		includedTools: ["search_and_replace"],
-		excludedTools: ["apply_diff"],
-		preserveReasoning: true,
-		inputPrice: 0.3,
-		outputPrice: 1.2,
-		cacheWritesPrice: 0.375,
-		cacheReadsPrice: 0.03,
-		description:
-			"MiniMax M2 Stable (High Concurrency, Commercial Use), a model born for Agents and code, featuring Top-tier Coding Capabilities, Powerful Agentic Performance, and Ultimate Cost-Effectiveness & Speed.",
-	},
 	"MiniMax-M2.1": {
 		maxTokens: 16_384,
 		contextWindow: 192_000,
@@ -109,6 +75,40 @@ export const minimaxModels = {
 		cacheReadsPrice: 0.03,
 		description:
 			"(high-speed) MiniMax M2.5 builds on M2.1 with improved overall performance for agentic coding tasks and significantly faster response times.",
+	},
+	"MiniMax-M2.7": {
+		maxTokens: 16_384,
+		contextWindow: 192_000,
+		supportsImages: false,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		includedTools: ["search_and_replace"],
+		excludedTools: ["apply_diff"],
+		preserveReasoning: true,
+		inputPrice: 0.3,
+		outputPrice: 1.2,
+		cacheWritesPrice: 0.375,
+		cacheReadsPrice: 0.03,
+		description:
+			"MiniMax M2.7 - New SoTA model with improved overall performance for agentic coding tasks and the same response times.",
+	},
+	"MiniMax-M2.7-highspeed": {
+		maxTokens: 16_384,
+		contextWindow: 192_000,
+		supportsImages: false,
+		supportsPromptCache: true,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		includedTools: ["search_and_replace"],
+		excludedTools: ["apply_diff"],
+		preserveReasoning: true,
+		inputPrice: 0.6,
+		outputPrice: 2.4,
+		cacheWritesPrice: 0.375,
+		cacheReadsPrice: 0.03,
+		description:
+			"(high-speed) MiniMax M2.7 - New SoTA model with improved overall performance for agentic coding tasks and significantly faster response times.",
 	},
 } as const satisfies Record<string, ModelInfo>
 
