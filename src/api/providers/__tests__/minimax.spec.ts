@@ -77,7 +77,7 @@ describe("MiniMaxHandler", () => {
 		})
 
 		it("should return specified model when valid model is provided", () => {
-			const testModelId: MinimaxModelId = "MiniMax-M2"
+			const testModelId: MinimaxModelId = "MiniMax-M2.1"
 			const handlerWithModel = new MiniMaxHandler({
 				apiModelId: testModelId,
 				minimaxApiKey: "test-minimax-api-key",
@@ -87,8 +87,8 @@ describe("MiniMaxHandler", () => {
 			expect(model.info).toEqual(minimaxModels[testModelId])
 		})
 
-		it("should return MiniMax-M2 model with correct configuration", () => {
-			const testModelId: MinimaxModelId = "MiniMax-M2"
+		it("should return MiniMax-M2.1 model with correct configuration", () => {
+			const testModelId: MinimaxModelId = "MiniMax-M2.1"
 			const handlerWithModel = new MiniMaxHandler({
 				apiModelId: testModelId,
 				minimaxApiKey: "test-minimax-api-key",
@@ -103,8 +103,8 @@ describe("MiniMaxHandler", () => {
 			expect(model.info.cacheReadsPrice).toBe(0.03)
 		})
 
-		it("should return MiniMax-M2-Stable model with correct configuration", () => {
-			const testModelId: MinimaxModelId = "MiniMax-M2-Stable"
+		it("should return MiniMax-M2.5 model with correct configuration", () => {
+			const testModelId: MinimaxModelId = "MiniMax-M2.5"
 			const handlerWithModel = new MiniMaxHandler({
 				apiModelId: testModelId,
 				minimaxApiKey: "test-minimax-api-key",
@@ -229,10 +229,10 @@ describe("MiniMaxHandler", () => {
 			expect(model.info).toEqual(minimaxModels[minimaxDefaultModelId])
 		})
 
-		it("should default to MiniMax-M2 model", () => {
+		it("should default to MiniMax-M2.1 model", () => {
 			const handlerDefault = new MiniMaxHandler({ minimaxApiKey: "test-minimax-api-key" })
 			const model = handlerDefault.getModel()
-			expect(model.id).toBe("MiniMax-M2")
+			expect(model.id).toBe("MiniMax-M2.1")
 		})
 	})
 
@@ -311,7 +311,7 @@ describe("MiniMaxHandler", () => {
 		})
 
 		it("createMessage should pass correct parameters to MiniMax client", async () => {
-			const modelId: MinimaxModelId = "MiniMax-M2"
+			const modelId: MinimaxModelId = "MiniMax-M2.1"
 			const modelInfo = minimaxModels[modelId]
 			const handlerWithModel = new MiniMaxHandler({
 				apiModelId: modelId,
@@ -434,8 +434,8 @@ describe("MiniMaxHandler", () => {
 	})
 
 	describe("Model Configuration", () => {
-		it("should correctly configure MiniMax-M2 model properties", () => {
-			const model = minimaxModels["MiniMax-M2"]
+		it("should correctly configure MiniMax-M2.1 model properties", () => {
+			const model = minimaxModels["MiniMax-M2.1"]
 			expect(model.maxTokens).toBe(16_384)
 			expect(model.contextWindow).toBe(192_000)
 			expect(model.supportsImages).toBe(false)
@@ -446,8 +446,8 @@ describe("MiniMaxHandler", () => {
 			expect(model.cacheReadsPrice).toBe(0.03)
 		})
 
-		it("should correctly configure MiniMax-M2-Stable model properties", () => {
-			const model = minimaxModels["MiniMax-M2-Stable"]
+		it("should correctly configure MiniMax-M2.5 model properties", () => {
+			const model = minimaxModels["MiniMax-M2.5"]
 			expect(model.maxTokens).toBe(16_384)
 			expect(model.contextWindow).toBe(192_000)
 			expect(model.supportsImages).toBe(false)
