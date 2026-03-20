@@ -1,5 +1,19 @@
 # kilo-code
 
+## 5.11.0
+
+### Minor Changes
+
+- [#74](https://github.com/Kilo-Org/kilocode-legacy/pull/74) [`985f714`](https://github.com/Kilo-Org/kilocode-legacy/commit/985f714c6ed4663610a8a2fe7936fb86dbe4462a) Thanks [@chrarnoldus](https://github.com/chrarnoldus)! - Added notification about the completely rebuilt Kilo Code extension for VS Code.
+
+## 5.10.5
+
+### Patch Changes
+
+- [#69](https://github.com/Kilo-Org/kilocode-legacy/pull/69) [`ac89448`](https://github.com/Kilo-Org/kilocode-legacy/commit/ac89448a886d2bc59e0585174db85b77ea54a643) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Add MiniMax-M2.7 and MiniMax-M2.7-highspeed models to the MiniMax provider
+
+- [#65](https://github.com/Kilo-Org/kilocode-legacy/pull/65) [`08029f2`](https://github.com/Kilo-Org/kilocode-legacy/commit/08029f26c4f038e0101484b9bf4430b8b7054168) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Update new user welcome credits from $5 to $2.50
+
 ## 5.10.4
 
 ### Patch Changes

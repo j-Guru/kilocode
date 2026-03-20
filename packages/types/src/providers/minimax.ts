@@ -89,9 +89,9 @@ export const minimaxModels = {
 		inputPrice: 0.3,
 		outputPrice: 1.2,
 		cacheWritesPrice: 0.375,
-		cacheReadsPrice: 0.03,
+		cacheReadsPrice: 0.06,
 		description:
-			"MiniMax M2.7 - New SoTA model with improved overall performance for agentic coding tasks and the same response times.",
+			"MiniMax M2.7 builds on M2.5 with improved overall performance for agentic coding tasks and the same response times.",
 	},
 	"MiniMax-M2.7-highspeed": {
 		maxTokens: 16_384,
@@ -106,9 +106,9 @@ export const minimaxModels = {
 		inputPrice: 0.6,
 		outputPrice: 2.4,
 		cacheWritesPrice: 0.375,
-		cacheReadsPrice: 0.03,
+		cacheReadsPrice: 0.06,
 		description:
-			"(high-speed) MiniMax M2.7 - New SoTA model with improved overall performance for agentic coding tasks and significantly faster response times.",
+			"(high-speed) MiniMax M2.7 builds on M2.5 with improved overall performance for agentic coding tasks and significantly faster response times.",
 	},
 } as const satisfies Record<string, ModelInfo>
 
