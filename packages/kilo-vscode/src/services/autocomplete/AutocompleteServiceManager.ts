@@ -93,7 +93,7 @@ export class AutocompleteServiceManager {
     // Also reset error backoff — a reconnect may mean the user re-authenticated
     // or added credits, so we should give autocomplete a fresh chance.
     this.unsubscribeState = connectionService.onStateChange(() => {
-      this.inlineCompletionProvider.backoff.reset()
+      this.inlineCompletionProvider.resetBackoff()
       void this.load()
     })
 
@@ -102,7 +102,7 @@ export class AutocompleteServiceManager {
     // reliable signal that credentials may have changed.
     this.unsubscribeEvent = connectionService.onEventFiltered(
       (event) => event.type === "global.disposed",
-      () => this.inlineCompletionProvider.backoff.reset(),
+      () => this.inlineCompletionProvider.resetBackoff(),
     )
 
     void this.load()

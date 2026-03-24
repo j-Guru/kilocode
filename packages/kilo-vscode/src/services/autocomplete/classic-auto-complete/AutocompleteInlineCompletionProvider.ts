@@ -286,6 +286,15 @@ export class AutocompleteInlineCompletionProvider implements vscode.InlineComple
     }
   }
 
+  /**
+   * Reset error backoff and allow fatal notifications to fire again.
+   * Call this when auth state changes (login, reconnect, org switch).
+   */
+  public resetBackoff(): void {
+    this.backoff.reset()
+    this.fatalNotified = false
+  }
+
   public dispose(): void {
     if (this.debounceTimer !== null) {
       clearTimeout(this.debounceTimer)
