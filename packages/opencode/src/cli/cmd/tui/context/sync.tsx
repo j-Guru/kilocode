@@ -131,6 +131,14 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
       fullSyncedSessions.delete(sessionID)
     }
 
+    // Strip summary.diffs from user messages — the TUI never reads them
+    // and they can carry multi-MB before/after file content strings.
+    function strip(msg: Message): Message {
+      if (msg.role !== "user" || !msg.summary?.diffs) return msg
+      const { summary, ...rest } = msg
+      return { ...rest, summary: { ...summary, diffs: [] } } as Message
+    }
+
     sdk.event.listen((e) => {
       const event = e.details
       switch (event.type) {
@@ -259,30 +267,31 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
         }
 
         case "message.updated": {
-          const messages = store.message[event.properties.info.sessionID]
+          const info = strip(event.properties.info)
+          const messages = store.message[info.sessionID]
           if (!messages) {
-            setStore("message", event.properties.info.sessionID, [event.properties.info])
+            setStore("message", info.sessionID, [info])
             break
           }
-          const result = Binary.search(messages, event.properties.info.id, (m) => m.id)
+          const result = Binary.search(messages, info.id, (m) => m.id)
           if (result.found) {
-            setStore("message", event.properties.info.sessionID, result.index, reconcile(event.properties.info))
+            setStore("message", info.sessionID, result.index, reconcile(info))
             break
           }
           setStore(
             "message",
-            event.properties.info.sessionID,
+            info.sessionID,
             produce((draft) => {
-              draft.splice(result.index, 0, event.properties.info)
+              draft.splice(result.index, 0, info)
             }),
           )
-          const updated = store.message[event.properties.info.sessionID]
+          const updated = store.message[info.sessionID]
           if (updated.length > 100) {
             const oldest = updated[0]
             batch(() => {
               setStore(
                 "message",
-                event.properties.info.sessionID,
+                info.sessionID,
                 produce((draft) => {
                   draft.shift()
                 }),
@@ -504,7 +513,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
               if (match.found) draft.session[match.index] = session.data!
               if (!match.found) draft.session.splice(match.index, 0, session.data!)
               draft.todo[sessionID] = todo.data ?? []
-              draft.message[sessionID] = messages.data!.map((x) => x.info)
+              draft.message[sessionID] = messages.data!.map((x) => strip(x.info))
               for (const message of messages.data!) {
                 draft.part[message.info.id] = message.parts
               }
