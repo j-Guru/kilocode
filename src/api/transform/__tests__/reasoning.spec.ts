@@ -15,7 +15,6 @@ import {
 	RooReasoningParams,
 	GeminiReasoningParams,
 	GeminiThinkingLevel,
-	GeminiThinkingLevelApi,
 } from "../reasoning"
 
 describe("reasoning.ts", () => {
@@ -697,7 +696,7 @@ describe("reasoning.ts", () => {
 
 		it("should handle all four Gemini thinking levels", () => {
 			const levels: GeminiThinkingLevel[] = ["minimal", "low", "medium", "high"]
-			const expectedApiLevels: GeminiThinkingLevelApi[] = ["MINIMAL", "LOW", "MEDIUM", "HIGH"]
+			const expectedApiLevels: Array<"MINIMAL" | "LOW" | "MEDIUM" | "HIGH"> = ["MINIMAL", "LOW", "MEDIUM", "HIGH"]
 
 			levels.forEach((level, index) => {
 				const geminiModel: ModelInfo = {

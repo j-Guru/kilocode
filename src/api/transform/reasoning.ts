@@ -1,6 +1,6 @@
 import { BetaThinkingConfigParam } from "@anthropic-ai/sdk/resources/beta"
 import OpenAI from "openai"
-import type { GenerateContentConfig } from "@google/genai"
+import type { GenerateContentConfig, ThinkingLevel } from "@google/genai"
 
 import type { ModelInfo, ProviderSettings, ReasoningEffortExtended } from "@roo-code/types"
 
@@ -31,16 +31,13 @@ const GEMINI_THINKING_LEVELS = ["minimal", "low", "medium", "high"] as const
 // Internal type for settings (lowercase)
 export type GeminiThinkingLevel = (typeof GEMINI_THINKING_LEVELS)[number]
 
-// API type for Gemini 3+ (uppercase enum values)
-export type GeminiThinkingLevelApi = "MINIMAL" | "LOW" | "MEDIUM" | "HIGH"
-
 export function isGeminiThinkingLevel(value: unknown): value is GeminiThinkingLevel {
 	return typeof value === "string" && GEMINI_THINKING_LEVELS.includes(value as GeminiThinkingLevel)
 }
 
 export type GeminiReasoningParams = GenerateContentConfig["thinkingConfig"] & {
-	// API expects uppercase values for Gemini 3+
-	thinkingLevel?: GeminiThinkingLevelApi
+	// API expects uppercase ThinkingLevel enum values for Gemini 3+
+	thinkingLevel?: ThinkingLevel
 }
 
 export type GetModelReasoningOptions = {
@@ -178,9 +175,8 @@ export const getGeminiReasoning = ({
 		return undefined
 	}
 
-	// Gemini 3+ API expects uppercase thinking level values: MINIMAL, LOW, MEDIUM, HIGH
-	// The SDK types don't include thinkingLevel yet, but the REST API accepts it.
-	// Cast to uppercase to match the API enum values.
-	const thinkingLevelUpper = selectedEffort.toUpperCase() as "MINIMAL" | "LOW" | "MEDIUM" | "HIGH"
-	return { thinkingLevel: thinkingLevelUpper, includeThoughts: true }
+	// Gemini 3+ API expects uppercase ThinkingLevel enum values: MINIMAL, LOW, MEDIUM, HIGH
+	// Cast the lowercase effort to the SDK's ThinkingLevel enum type.
+	const thinkingLevel = selectedEffort.toUpperCase() as ThinkingLevel
+	return { thinkingLevel, includeThoughts: true }
 }
