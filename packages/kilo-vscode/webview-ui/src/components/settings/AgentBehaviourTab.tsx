@@ -73,10 +73,6 @@ const AgentBehaviourTab: Component = () => {
   const [newPrompt, setNewPrompt] = createSignal("")
   const [nameError, setNameError] = createSignal("")
 
-  // Edit mode form state (for description/prompt of custom modes)
-  const [editDescription, setEditDescription] = createSignal("")
-  const [editPrompt, setEditPrompt] = createSignal("")
-
   // Fetch skills whenever the skills subtab becomes active
   createEffect(() => {
     if (activeSubtab() === "skills") {
@@ -280,29 +276,9 @@ const AgentBehaviourTab: Component = () => {
 
   // Start editing a mode
   const startEdit = (name: string) => {
-    const agent = session.agents().find((a) => a.name === name)
-    const cfg = config().agent?.[name] ?? {}
     setEditingAgent(name)
-    setEditDescription(agent?.description ?? (cfg as Record<string, string>).description ?? "")
-    setEditPrompt(cfg.prompt ?? "")
     setSelectedAgent(name)
     setAgentView("edit")
-  }
-
-  // Save edits to a mode (accumulates in config draft, persisted via Save Bar)
-  const handleSaveEdit = () => {
-    const name = editingAgent()
-    if (!name) return
-    const agent = session.agents().find((a) => a.name === name)
-    const partial: Partial<AgentConfig> = {
-      prompt: editPrompt().trim() || undefined,
-    }
-    if (!agent?.native) {
-      partial.description = editDescription().trim() || undefined
-    }
-    updateAgentConfig(name, partial)
-    setAgentView("list")
-    setEditingAgent("")
   }
 
   const renderCreateModeView = () => (
@@ -468,9 +444,9 @@ const AgentBehaviourTab: Component = () => {
               {language.t("settings.agentBehaviour.editMode.description")}
             </div>
             <TextField
-              value={editDescription()}
+              value={currentAgentConfig().description ?? ""}
               placeholder={language.t("settings.agentBehaviour.createMode.description.placeholder")}
-              onChange={(val) => setEditDescription(val)}
+              onChange={(val) => updateAgentConfig(name, { description: val.trim() || undefined })}
             />
           </Card>
         </Show>
@@ -483,10 +459,10 @@ const AgentBehaviourTab: Component = () => {
               : language.t("settings.agentBehaviour.editMode.prompt")}
           </div>
           <TextField
-            value={editPrompt()}
+            value={currentAgentConfig().prompt ?? ""}
             placeholder={language.t("settings.agentBehaviour.createMode.prompt.placeholder")}
             multiline
-            onChange={(val) => setEditPrompt(val)}
+            onChange={(val) => updateAgentConfig(name, { prompt: val.trim() || undefined })}
           />
         </Card>
 
@@ -554,21 +530,6 @@ const AgentBehaviourTab: Component = () => {
             />
           </SettingsRow>
         </Card>
-
-        <div style={{ display: "flex", gap: "8px", "justify-content": "flex-end" }}>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setAgentView("list")
-              setEditingAgent("")
-            }}
-          >
-            {language.t("settings.agentBehaviour.editMode.back")}
-          </Button>
-          <Button variant="primary" onClick={handleSaveEdit}>
-            {language.t("settings.agentBehaviour.editMode.save")}
-          </Button>
-        </div>
       </div>
     )
   }
