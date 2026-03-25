@@ -15,6 +15,7 @@ import {
 	RooReasoningParams,
 	GeminiReasoningParams,
 	GeminiThinkingLevel,
+	GeminiThinkingLevelApi,
 } from "../reasoning"
 
 describe("reasoning.ts", () => {
@@ -615,7 +616,8 @@ describe("reasoning.ts", () => {
 			const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
 
 			// Budget should not be used for effort-only models
-			expect(result).toEqual({ thinkingLevel: "high", includeThoughts: true })
+			// Gemini 3+ API expects uppercase thinking level values
+			expect(result).toEqual({ thinkingLevel: "HIGH", includeThoughts: true })
 		})
 
 		it("should still return thinkingLevel when enableReasoningEffort is false but effort is explicitly set", () => {
@@ -641,7 +643,8 @@ describe("reasoning.ts", () => {
 			}
 
 			const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
-			expect(result).toEqual({ thinkingLevel: "high", includeThoughts: true })
+			// Gemini 3+ API expects uppercase thinking level values
+			expect(result).toEqual({ thinkingLevel: "HIGH", includeThoughts: true })
 		})
 
 		it("should return thinkingLevel for minimal effort", () => {
@@ -664,7 +667,8 @@ describe("reasoning.ts", () => {
 			}
 
 			const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
-			expect(result).toEqual({ thinkingLevel: "minimal", includeThoughts: true })
+			// Gemini 3+ API expects uppercase thinking level values
+			expect(result).toEqual({ thinkingLevel: "MINIMAL", includeThoughts: true })
 		})
 
 		it("should return thinkingLevel for medium effort", () => {
@@ -687,13 +691,15 @@ describe("reasoning.ts", () => {
 			}
 
 			const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
-			expect(result).toEqual({ thinkingLevel: "medium", includeThoughts: true })
+			// Gemini 3+ API expects uppercase thinking level values
+			expect(result).toEqual({ thinkingLevel: "MEDIUM", includeThoughts: true })
 		})
 
 		it("should handle all four Gemini thinking levels", () => {
 			const levels: GeminiThinkingLevel[] = ["minimal", "low", "medium", "high"]
+			const expectedApiLevels: GeminiThinkingLevelApi[] = ["MINIMAL", "LOW", "MEDIUM", "HIGH"]
 
-			levels.forEach((level) => {
+			levels.forEach((level, index) => {
 				const geminiModel: ModelInfo = {
 					...baseModel,
 					supportsReasoningEffort: [
@@ -718,7 +724,8 @@ describe("reasoning.ts", () => {
 				}
 
 				const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
-				expect(result).toEqual({ thinkingLevel: level, includeThoughts: true })
+				// Gemini 3+ API expects uppercase thinking level values
+				expect(result).toEqual({ thinkingLevel: expectedApiLevels[index], includeThoughts: true })
 			})
 		})
 
@@ -836,7 +843,8 @@ describe("reasoning.ts", () => {
 			}
 
 			const result = getGeminiReasoning(options) as GeminiReasoningParams | undefined
-			expect(result).toEqual({ thinkingLevel: "medium", includeThoughts: true })
+			// Gemini 3+ API expects uppercase thinking level values
+			expect(result).toEqual({ thinkingLevel: "MEDIUM", includeThoughts: true })
 		})
 
 		// kilocode_change start

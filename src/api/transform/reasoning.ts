@@ -25,16 +25,22 @@ export type AnthropicReasoningParams = BetaThinkingConfigParam | { type: "adapti
 export type OpenAiReasoningParams = { reasoning_effort: OpenAI.Chat.ChatCompletionCreateParams["reasoning_effort"] }
 
 // Valid Gemini thinking levels for effort-based reasoning
+// Internal lowercase values used in settings/model config
 const GEMINI_THINKING_LEVELS = ["minimal", "low", "medium", "high"] as const
 
+// Internal type for settings (lowercase)
 export type GeminiThinkingLevel = (typeof GEMINI_THINKING_LEVELS)[number]
+
+// API type for Gemini 3+ (uppercase enum values)
+export type GeminiThinkingLevelApi = "MINIMAL" | "LOW" | "MEDIUM" | "HIGH"
 
 export function isGeminiThinkingLevel(value: unknown): value is GeminiThinkingLevel {
 	return typeof value === "string" && GEMINI_THINKING_LEVELS.includes(value as GeminiThinkingLevel)
 }
 
 export type GeminiReasoningParams = GenerateContentConfig["thinkingConfig"] & {
-	thinkingLevel?: GeminiThinkingLevel
+	// API expects uppercase values for Gemini 3+
+	thinkingLevel?: GeminiThinkingLevelApi
 }
 
 export type GetModelReasoningOptions = {
@@ -172,5 +178,9 @@ export const getGeminiReasoning = ({
 		return undefined
 	}
 
-	return { thinkingLevel: selectedEffort, includeThoughts: true }
+	// Gemini 3+ API expects uppercase thinking level values: MINIMAL, LOW, MEDIUM, HIGH
+	// The SDK types don't include thinkingLevel yet, but the REST API accepts it.
+	// Cast to uppercase to match the API enum values.
+	const thinkingLevelUpper = selectedEffort.toUpperCase() as "MINIMAL" | "LOW" | "MEDIUM" | "HIGH"
+	return { thinkingLevel: thinkingLevelUpper, includeThoughts: true }
 }
