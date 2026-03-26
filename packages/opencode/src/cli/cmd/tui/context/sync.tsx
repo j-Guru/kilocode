@@ -139,8 +139,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
     // and they can carry multi-MB before/after file content strings.
     function strip(msg: Message): Message {
       if (msg.role !== "user" || !msg.summary?.diffs) return msg
-      const { summary, ...rest } = msg
-      return { ...rest, summary: { ...summary, diffs: [] } } as Message
+      return { ...msg, summary: { ...msg.summary, diffs: [] } } as Message
     }
     // kilocode_change end
 
