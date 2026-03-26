@@ -2303,10 +2303,24 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
       await config.update(leaf, undefined, vscode.ConfigurationTarget.Global)
     }
 
+    // Clear globalState items that are not part of the configuration
+    await this.extensionContext?.globalState.update("variantSelections", undefined)
+    await this.extensionContext?.globalState.update("recentModels", undefined)
+    await this.extensionContext?.globalState.update("kilo.dismissedNotificationIds", undefined)
+
     // Re-send all settings to the webview so the UI reflects the reset
     this.sendAutocompleteSettings()
     this.sendBrowserSettings()
     this.sendNotificationSettings()
+
+    // Re-send globalState items to the webview
+    this.postMessage({ type: "variantsLoaded", variants: {} })
+    this.postMessage({ type: "recentsLoaded", recents: [] })
+
+    // Re-fetch notifications to reflect cleared dismissed IDs
+    await this.fetchAndSendNotifications()
+
+    vscode.window.showInformationMessage("Kilo Code settings have been reset to defaults.")
   }
 
   /**
