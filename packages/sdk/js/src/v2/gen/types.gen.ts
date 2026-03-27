@@ -4039,6 +4039,43 @@ export type PermissionSaveAlwaysRulesResponses = {
 export type PermissionSaveAlwaysRulesResponse =
   PermissionSaveAlwaysRulesResponses[keyof PermissionSaveAlwaysRulesResponses]
 
+export type PermissionAllowEverythingData = {
+  body?: {
+    enable: boolean
+    requestID?: string
+    sessionID?: string
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/permission/allow-everything"
+}
+
+export type PermissionAllowEverythingErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type PermissionAllowEverythingError = PermissionAllowEverythingErrors[keyof PermissionAllowEverythingErrors]
+
+export type PermissionAllowEverythingResponses = {
+  /**
+   * Success
+   */
+  200: boolean
+}
+
+export type PermissionAllowEverythingResponse =
+  PermissionAllowEverythingResponses[keyof PermissionAllowEverythingResponses]
+
 export type PermissionListData = {
   body?: never
   path?: never
