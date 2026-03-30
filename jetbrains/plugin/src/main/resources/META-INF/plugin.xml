@@ -30,10 +30,9 @@ SPDX-License-Identifier: Apache-2.0
    
    <!-- Change notes for the plugin -->
    <change-notes><![CDATA[
-        <h3>Version 5.10.0</h3>
+        <h3>Version 5.11.0</h3>
         <ul>
-            <li>Add Oracle Code Assist provider</li>
-            <li>Rename leftover `roo-preview` and `roo-debug` temp filenames to `kilo-preview` and `kilo-debug`</li>
+            <li>Added notification about the completely rebuilt Kilo Code extension for VS Code.</li>
         </ul>
     ]]></change-notes>
 

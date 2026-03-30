@@ -275,7 +275,26 @@ export class GeminiHandler extends BaseProvider implements SingleCompletionHandl
 			}
 		}
 
+		// For Gemini 3+ models, ensure thinkingLevel is passed correctly to the API.
+		// The SDK types don't include thinkingLevel yet, but the REST API accepts it.
+		// We need to force it through type assertion to avoid TypeScript stripping it.
+		if (thinkingConfig && "thinkingLevel" in thinkingConfig) {
+			config.thinkingConfig = {
+				includeThoughts: thinkingConfig.includeThoughts,
+				thinkingLevel: (thinkingConfig as any).thinkingLevel,
+			} as any
+		}
+
 		const params: GenerateContentParameters = { model, contents, config }
+
+		// DEBUG: Log thinkingConfig for Gemini 3 models to diagnose INVALID_ARGUMENT errors
+		if (model.startsWith("gemini-3") || model.startsWith("gemini-3.")) {
+			console.log("[GeminiHandler] DEBUG Gemini 3 request:", {
+				model,
+				thinkingConfig: config.thinkingConfig,
+				thinkingConfigKeys: config.thinkingConfig ? Object.keys(config.thinkingConfig) : undefined,
+			})
+		}
 
 		try {
 			const result = await this.client.models.generateContentStream(params)
