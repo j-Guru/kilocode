@@ -1,5 +1,11 @@
 # kilo-code
 
+## 5.12.0
+
+### Minor Changes
+
+- [#80](https://github.com/Kilo-Org/kilocode-legacy/pull/80) [`cf557ce`](https://github.com/Kilo-Org/kilocode-legacy/commit/cf557ce90f51e820daa2f079b21e4b5a1a9eb490) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Add GLM-5-Turbo and GLM-5.1 models to the Z.AI provider
+
 ## 5.11.0
 
 ### Minor Changes
