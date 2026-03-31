@@ -1244,7 +1244,6 @@ export const dict = {
 
   // Screen 1 — What's New
   "migration.whatsNew.title": "Co nowego w Kilo Code",
-  "migration.whatsNew.badge": "Beta",
   "migration.whatsNew.subtitle": "Przebudowaliśmy rozszerzenie na szybszym i wydajniejszym fundamencie.",
   "migration.whatsNew.features.performance.title": "Szybsza wydajność agenta",
   "migration.whatsNew.features.performance.detail":
