@@ -29,18 +29,20 @@ export const TaskHeader: Component<TaskHeaderProps> = (props) => {
 
   const fmt = (n: number) => new Intl.NumberFormat(language.locale(), { style: "currency", currency: "USD" }).format(n)
 
+  const breakdown = () => session.costBreakdown()
+
   const cost = createMemo(() => {
-    const total = session.totalCost()
+    const total = breakdown().reduce((sum, e) => sum + e.cost, 0)
     if (total === 0) return undefined
     return fmt(total)
   })
 
   const costTooltip = createMemo(() => {
-    const breakdown = session.costBreakdown()
-    if (breakdown.length <= 1) return <span>{language.t("context.usage.sessionCost")}</span>
+    const items = breakdown()
+    if (items.length <= 1) return <span>{language.t("context.usage.sessionCost")}</span>
     return (
       <div style={{ "text-align": "left", "white-space": "nowrap" }}>
-        <For each={breakdown}>{(e) => <div>{`${e.label}: ${fmt(e.cost)}`}</div>}</For>
+        <For each={items}>{(e) => <div>{`${e.label}: ${fmt(e.cost)}`}</div>}</For>
       </div>
     )
   })

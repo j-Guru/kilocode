@@ -126,7 +126,6 @@ interface SessionContextValue {
   clearModelOverride: () => void
 
   // Cost and context usage for the current session
-  totalCost: Accessor<number>
   costBreakdown: Accessor<Array<{ label: string; cost: number }>>
   contextUsage: Accessor<ContextUsage | undefined>
 
@@ -1621,17 +1620,6 @@ export const SessionProvider: ParentComponent = (props) => {
       .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()),
   )
 
-  const totalCost = createMemo(() => {
-    const id = currentSessionID()
-    if (!id) return calcTotalCost(messages())
-    const family = sessionFamily(id)
-    let total = 0
-    for (const sid of family) {
-      total += calcTotalCost(store.messages[sid] ?? [])
-    }
-    return total
-  })
-
   /**
    * Per-session cost breakdown for the current session family.
    * Returns entries only for sessions with non-zero cost.
@@ -1729,7 +1717,6 @@ export const SessionProvider: ParentComponent = (props) => {
     selectModel,
     hasModelOverride,
     clearModelOverride,
-    totalCost,
     costBreakdown,
     contextUsage,
     agents,
