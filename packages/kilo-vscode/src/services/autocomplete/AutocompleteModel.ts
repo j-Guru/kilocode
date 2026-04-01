@@ -5,7 +5,7 @@ const DEFAULT_MODEL = "mistralai/codestral-2508"
 
 const MODEL_PROVIDERS: Record<string, string> = {
   "mistralai/codestral-2508": "Kilo Gateway",
-  "mercury-edit": "Inception",
+  "inception/mercury-edit": "Inception",
 }
 
 /** Chunk from an LLM streaming response */
@@ -79,15 +79,13 @@ export class AutocompleteModel {
     // ends the stream. Without this, errors never reach ErrorBackoff.
     let sseError: Error | undefined
 
-    const isMercury = this.currentModel.toLowerCase().includes("mercury")
-
     const { stream } = await client.kilo.fim(
       {
         prefix,
         suffix,
         model: this.currentModel,
         maxTokens: 256,
-        temperature: isMercury ? 0 : 0.2,
+        temperature: 0.2,
       },
       {
         signal,

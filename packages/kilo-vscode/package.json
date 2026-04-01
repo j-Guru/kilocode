@@ -672,7 +672,7 @@
           "default": "mistralai/codestral-2508",
           "enum": [
             "mistralai/codestral-2508",
-            "mercury-edit"
+            "inception/mercury-edit"
           ],
           "enumDescriptions": [
             "Codestral by Mistral AI (default)",
