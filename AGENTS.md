@@ -135,6 +135,38 @@ pnpm check-types      # TypeScript type checking
 5. Run linting: `pnpm lint`
 6. Create a changeset: `pnpm changeset` (if needed)
 
+### Git Commands
+
+**IMPORTANT**: When running git commands via terminal tools, two rules must both be followed:
+
+#### 1. Working Directory
+
+Always set the working directory (`cd`) to the **project root directory name**, not the full absolute path:
+
+- ✅ Correct: `cd` = `kilocode`
+- ❌ Wrong: `cd` = `/home/jguru/projects/kilocode`
+
+The terminal tool resolves the working directory relative to the project workspace. Using the full absolute path will fail with a "not in any of the project's worktrees" error.
+
+#### 2. Pager
+
+Always use `--no-pager` (or equivalent) with all git commands to prevent the interactive pager from blocking execution:
+
+```bash
+git --no-pager log
+git --no-pager diff
+git --no-pager branch -a
+git --no-pager status
+```
+
+Alternatively, set `GIT_PAGER=cat` for a single command:
+
+```bash
+GIT_PAGER=cat git log
+```
+
+Failing to use `--no-pager` will cause git commands to hang waiting for user input in non-interactive environments.
+
 ### Testing
 
 - The vitest framework is used for testing
@@ -297,12 +329,13 @@ Keep changes to core extension code minimal to reduce merge conflicts during ups
 
 ## Common Pitfalls
 
-1. **Branch Confusion**: Always work on `main-vertex`, not `main`
-2. **Test Execution**: Don't run tests from project root
-3. **Missing Changesets**: Remember to create changesets for user-facing changes
-4. **Missing kilocode_change Markers**: Mark changes in shared code properly
-5. **Lint Errors**: Run linting before committing
-6. **Empty Catch Blocks**: Always handle or log errors
+1. **Git Pager Blocking**: Always use `--no-pager` flag with git commands (e.g. `git --no-pager diff`) to prevent interactive pager from hanging execution
+2. **Branch Confusion**: Always work on `main-vertex`, not `main`
+3. **Test Execution**: Don't run tests from project root
+4. **Missing Changesets**: Remember to create changesets for user-facing changes
+5. **Missing kilocode_change Markers**: Mark changes in shared code properly
+6. **Lint Errors**: Run linting before committing
+7. **Empty Catch Blocks**: Always handle or log errors
 
 ## Quick Reference
 
