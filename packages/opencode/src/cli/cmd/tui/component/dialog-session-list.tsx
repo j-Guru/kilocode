@@ -2,6 +2,7 @@ import { useDialog } from "@tui/ui/dialog"
 import { DialogSelect } from "@tui/ui/dialog-select"
 import { useRoute } from "@tui/context/route"
 import { useSync } from "@tui/context/sync"
+import path from "path"
 import { createMemo, createSignal, createResource, onMount, Show } from "solid-js"
 import { Locale } from "@/util/locale"
 import { useKeybind } from "../context/keybind"
@@ -65,8 +66,9 @@ export function DialogSessionList() {
         const isWorking = status?.type === "busy"
         // kilocode_change start
         const project =
-          all && "project" in x ? (x as { project?: { name?: string; worktree?: string } | null }).project : undefined
-        const suffix = project ? ` [${project.name ?? project.worktree ?? ""}]` : ""
+          all && "project" in x ? (x as { project?: { name?: string; worktree: string } | null }).project : undefined
+        const root = project?.name ?? (project ? path.basename(project.worktree) || project.worktree : "")
+        const suffix = root ? ` [${root}]` : ""
         // kilocode_change end
         return {
           title: isDeleting ? `Press ${keybind.print("session_delete")} again to confirm` : x.title + suffix, // kilocode_change
