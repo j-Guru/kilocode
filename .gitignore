@@ -39,6 +39,17 @@ opencode-dev
 logs/
 *.bun-build
 
+# Build artifacts and binaries
+bin/
+bin-unpacked/
+*.vsix
+
+# Log files
+firebase-debug.log
+
+# Vendored dependencies (use submodule if needed)
+deps/
+
 # Telemetry ID
 telemetry-id
 tsconfig.tsbuildinfo

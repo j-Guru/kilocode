@@ -1,0 +1,17 @@
+# .env
+!.env
+
+# next.js
+.next
+
+# typescript
+tsconfig.tsbuildinfo
+
+# dependencies
+node_modules
+
+# production
+/build
+
+# misc
+.DS_Store
