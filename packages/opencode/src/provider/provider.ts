@@ -10,6 +10,7 @@ import { Hash } from "../util/hash"
 import { Plugin } from "../plugin"
 import { NamedError } from "@opencode-ai/util/error"
 import { AiSdkProvider, ModelsDev, Prompt } from "./models" // kilocode_change
+import { VERTEX_MAAS_MODELS } from "@/kilocode/vertex-maas" // kilocode_change
 import { Auth } from "../auth"
 import { Env } from "../env"
 import { Instance } from "../project/instance"
@@ -376,9 +377,13 @@ export namespace Provider {
           project,
           location,
           fetch: async (input: RequestInfo | URL, init?: RequestInit) => {
-            const auth = new GoogleAuth()
-            const client = await auth.getApplicationDefault()
-            const token = await client.credential.getAccessToken()
+            // kilocode_change: use explicit cloud-platform scope with getClient() so that
+            // MaaS models (OpenAI-compatible) receive a properly-scoped access token.
+            // getApplicationDefault() without scopes can produce an ID token or a
+            // token with no scope, causing "invalid_scope" errors from the MaaS endpoint.
+            const auth = new GoogleAuth({ scopes: ["https://www.googleapis.com/auth/cloud-platform"] })
+            const client = await auth.getClient()
+            const token = await client.getAccessToken()
 
             const headers = new Headers(init?.headers)
             headers.set("Authorization", `Bearer ${token.token}`)
@@ -837,6 +842,14 @@ export namespace Provider {
     log.info("init")
 
     const configProviders = Object.entries(config.provider ?? {})
+
+    // kilocode_change start - inject Vertex MaaS models into google-vertex provider
+    if (database["google-vertex"]) {
+      for (const model of VERTEX_MAAS_MODELS) {
+        database["google-vertex"].models[model.id] = model
+      }
+    }
+    // kilocode_change end
 
     // Add GitHub Copilot Enterprise provider that inherits from GitHub Copilot
     if (database["github-copilot"]) {
