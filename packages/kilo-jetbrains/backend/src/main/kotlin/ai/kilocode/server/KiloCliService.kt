@@ -1,4 +1,4 @@
-package ai.kilocode.jetbrains
+package ai.kilocode.server
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.PathManager
@@ -24,28 +24,28 @@ import java.util.concurrent.TimeUnit
  * Application-level service that manages the Kilo CLI binary lifecycle.
  *
  * Extracts the bundled CLI from JAR resources into IntelliJ's system directory,
- * spawns `kilo serve --port 0`, and exposes the result as [KiloConnection].
+ * spawns `kilo serve --port 0`, and exposes the result as [KiloProcessState].
  *
  * All concurrent callers of [init] share the same startup flow — only one
  * CLI process is ever spawned.
  */
 @Service(Service.Level.APP)
-class KiloManager(private val cs: CoroutineScope) : Disposable {
+class KiloCliService(private val cs: CoroutineScope) : Disposable {
 
     companion object {
-        private val LOG = Logger.getInstance(KiloManager::class.java)
+        private val LOG = Logger.getInstance(KiloCliService::class.java)
         private const val STARTUP_TIMEOUT_MS = 30_000L
         private const val KILL_TIMEOUT_SECONDS = 5L
         private val PORT_REGEX = Regex("""listening on http://[\w.]+:(\d+)""")
     }
 
     private val mutex = Mutex()
-    private var pending: Deferred<KiloConnection>? = null
+    private var pending: Deferred<KiloProcessState>? = null
     private var process: Process? = null
 
     fun process(): Process? = process
 
-    suspend fun init(): KiloConnection {
+    suspend fun init(): KiloProcessState {
         mutex.withLock {
             pending?.let { return@withLock }
             pending = cs.async(Dispatchers.IO) { start() }
@@ -53,7 +53,7 @@ class KiloManager(private val cs: CoroutineScope) : Disposable {
         return pending!!.await()
     }
 
-    private suspend fun start(): KiloConnection {
+    private suspend fun start(): KiloProcessState {
         return try {
             val path = extractCli()
             withTimeout(STARTUP_TIMEOUT_MS) {
@@ -61,7 +61,7 @@ class KiloManager(private val cs: CoroutineScope) : Disposable {
             }
         } catch (e: Exception) {
             LOG.warn("CLI startup failed", e)
-            KiloConnection.Error(
+            KiloProcessState.Error(
                 message = e.message ?: "Unknown error",
                 details = e.stackTraceToString(),
             )
@@ -99,7 +99,7 @@ class KiloManager(private val cs: CoroutineScope) : Disposable {
         target
     }
 
-    private suspend fun spawn(cli: File): KiloConnection = withContext(Dispatchers.IO) {
+    private suspend fun spawn(cli: File): KiloProcessState = withContext(Dispatchers.IO) {
         val pwd = generatePassword()
 
         val env = buildMap {
@@ -138,7 +138,7 @@ class KiloManager(private val cs: CoroutineScope) : Disposable {
                 if (match != null) {
                     val p = match.groupValues[1].toInt()
                     LOG.info("CLI server ready on port $p")
-                    return@withContext KiloConnection.Ready(port = p, password = pwd)
+                    return@withContext KiloProcessState.Ready(port = p, password = pwd)
                 }
 
                 if (!proc.isAlive) break
@@ -148,7 +148,7 @@ class KiloManager(private val cs: CoroutineScope) : Disposable {
         val code = proc.waitFor()
         val details = synchronized(stderr) { stderr.toString().trim() }
         process = null
-        KiloConnection.Error(
+        KiloProcessState.Error(
             message = "CLI process exited with code $code before announcing a port",
             details = details.ifEmpty { null },
         )

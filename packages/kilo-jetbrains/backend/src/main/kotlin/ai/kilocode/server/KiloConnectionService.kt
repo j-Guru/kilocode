@@ -1,4 +1,4 @@
-package ai.kilocode.jetbrains
+package ai.kilocode.server
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
@@ -70,15 +70,15 @@ class KiloConnectionService(private val cs: CoroutineScope) : Disposable {
 
         setState(ConnectionState.Connecting)
 
-        val manager = service<KiloManager>()
-        val conn = manager.init()
+        val cliService = service<KiloCliService>()
+        val processState = cliService.init()
 
-        if (conn is KiloConnection.Error) {
-            setState(ConnectionState.Error(conn.message))
+        if (processState is KiloProcessState.Error) {
+            setState(ConnectionState.Error(processState.message))
             return
         }
 
-        val ready = conn as KiloConnection.Ready
+        val ready = processState as KiloProcessState.Ready
         port = ready.port
         password = ready.password
 
@@ -97,7 +97,7 @@ class KiloConnectionService(private val cs: CoroutineScope) : Disposable {
         startSse()
         startHeartbeatWatcher()
         healthJob = healthLoop()
-        manager.process()?.let { proc ->
+        cliService.process()?.let { proc ->
             processJob = monitorProcess(proc)
         }
     }
