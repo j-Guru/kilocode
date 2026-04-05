@@ -2,10 +2,65 @@
 
 Kilo CLI is an open source AI coding agent that generates code from natural language, automates tasks, and supports 500+ AI models.
 
-- ALWAYS USE PARALLEL TOOLS WHEN APPLICABLE.
-- The default branch in this repo is `main`.
-- Prefer automation: execute requested actions without confirmation unless blocked by missing info or safety/irreversibility.
-- You may be running in a git worktree. All changes must be made in your current working directory — never modify files in the main repo checkout.
+**IMPORTANT**: This project uses a dual-branch development strategy:
+
+- **`kilo-new-upstream`**: Fork of Kilo-Org/kilocode `main` branch - tracks upstream repository
+- **`main-vertex-new`**: **Current project MAIN branch** - contains project-specific development
+
+**All development work should be based on `main-vertex-new`, not `kilo-new-upstream`.**
+
+This branching strategy allows for upstream synchronization while maintaining project-specific development.
+
+## Fork Information
+
+- **Merge Strategy**: We periodically merge upstream changes
+- **Conflict Resolution**: Use `kilocode_change` markers to minimize merge conflicts when syncing with upstream
+
+### Release Sync Trigger (Important)
+
+When the user says phrases like **"new version"**, **"we have new version"**, **"new version was released"**, or any similar phrasing indicating an upstream release, interpret this as the following required workflow:
+
+1. Update branch `kilo-new-upstream` from upstream latest (`Kilo-Org/kilocode` `main`).
+2. Merge latest `kilo-new-upstream` into `main-vertex-new`.
+3. Resolve merge conflicts with priority to project-specific fixes:
+   - Vertex AI fix -
+4. If any conflict is unclear, **stop and ask the user explicitly** how to resolve it before continuing.
+5. After merge/conflict resolution, run a local VS Code plugin build.
+6. If build succeeds, send this exact confirmation format:
+   `New VS Code plugin (version x.y.z) is READY TO TEST!`
+   Replace `x.y.z` with the actual built version.
+
+### Git Commands
+
+**IMPORTANT**: When running git commands via terminal tools, two rules must both be followed:
+
+#### 1. Working Directory
+
+Always set the working directory (`cd`) to the **project root directory name**, not the full absolute path:
+
+- ✅ Correct: `cd` = `kilocode`
+- ❌ Wrong: `cd` = `/home/jguru/projects/kilocode`
+
+The terminal tool resolves the working directory relative to the project workspace. Using the full absolute path will fail with a "not in any of the project's worktrees" error.
+
+#### 2. Pager
+
+Always use `--no-pager` (or equivalent) with all git commands to prevent the interactive pager from blocking execution:
+
+```bash
+git --no-pager log
+git --no-pager diff
+git --no-pager branch -a
+git --no-pager status
+```
+
+Alternatively, set `GIT_PAGER=cat` for a single command:
+
+```bash
+GIT_PAGER=cat git log
+```
+
+Failing to use `--no-pager` will cause git commands to hang waiting for user input in non-interactive environments.
 
 ## Build and Dev
 
@@ -178,6 +233,7 @@ Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
 We regularly merge upstream changes from opencode. To minimize merge conflicts and keep the sync process smooth:
 
 1. **Prefer `kilocode` directories** - Place Kilo-specific code in dedicated directories whenever possible:
+
    - `packages/opencode/src/kilocode/` - Kilo-specific source code
    - `packages/opencode/test/kilocode/` - Kilo-specific tests
    - `packages/kilo-gateway/` - The Kilo Gateway package

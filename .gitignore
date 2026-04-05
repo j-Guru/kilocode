@@ -43,6 +43,7 @@ logs/
 bin/
 bin-unpacked/
 *.vsix
+/src
 
 # Log files
 firebase-debug.log
