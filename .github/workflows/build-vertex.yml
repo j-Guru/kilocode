@@ -1,0 +1,83 @@
+name: Build Vertex Artifacts
+
+on:
+  push:
+    branches:
+      - main-vertex-new
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup Bun
+        uses: ./.github/actions/setup-bun
+
+      - name: Install @vscode/vsce
+        run: bun install -g @vscode/vsce
+
+      - name: Get version
+        id: version
+        run: |
+          version=$(node -p "require('./packages/opencode/package.json').version")
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "Version: ${version}"
+
+      - name: Build CLI binaries
+        run: ./packages/opencode/script/build.ts
+        env:
+          KILO_VERSION: ${{ steps.version.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Upload kilo.exe (Windows x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kilo-windows-x64
+          path: packages/opencode/dist/@kilocode/cli-windows-x64/bin/kilo.exe
+          retention-days: 14
+
+      - name: Upload kilo (Linux x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kilo-linux-x64
+          path: packages/opencode/dist/@kilocode/cli-linux-x64/bin/kilo
+          retention-days: 14
+
+      - name: Prepare VSIX build
+        working-directory: packages/kilo-vscode
+        run: |
+          rm -rf bin/ dist/ out/
+          rm -f *.vsix
+          mkdir -p bin
+          cp ../../opencode/dist/@kilocode/cli-windows-x64/bin/kilo.exe bin/kilo.exe
+
+      - name: Rebuild SDK
+        run: bun run --cwd packages/sdk/js build
+
+      - name: Compile extension
+        working-directory: packages/kilo-vscode
+        run: |
+          bun run check-types
+          bun run lint
+          node esbuild.js --production
+
+      - name: Package VSIX (win32-x64)
+        working-directory: packages/kilo-vscode
+        run: |
+          vsce package --no-dependencies --skip-license --target win32-x64 -o kilo-vscode-win32-x64.vsix
+
+      - name: Upload VSIX (win32-x64)
+        uses: actions/upload-artifact@v4
+        with:
+          name: kilo-vscode-win32-x64
+          path: packages/kilo-vscode/kilo-vscode-win32-x64.vsix
+          retention-days: 14
