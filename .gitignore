@@ -54,3 +54,6 @@ deps/
 # Telemetry ID
 telemetry-id
 tsconfig.tsbuildinfo
+
+# Local dev scripts
+update-new-kilo.sh
