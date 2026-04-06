@@ -274,7 +274,7 @@
     },
     "packages/kilo-vscode": {
       "name": "kilo-code",
-      "version": "7.1.21",
+      "version": "7.1.21-jg",
       "dependencies": {
         "@anthropic-ai/sdk": "^0.39.0",
         "@kilocode/kilo-i18n": "workspace:*",
