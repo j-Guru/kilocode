@@ -74,6 +74,86 @@ Failing to use `--no-pager` will cause git commands to hang waiting for user inp
 - **Source links**: After adding or changing URLs in `packages/kilo-vscode/`, `packages/kilo-vscode/webview-ui/`, or `packages/opencode/src/`, run `bun run script/extract-source-links.ts` from the repo root and commit the updated `packages/kilo-docs/source-links.md`. CI runs this check — the build fails if the file is stale.
 - **kilocode_change check**: `bun run check-kilocode-change` from `packages/kilo-vscode/`. CI runs this — `kilocode_change` is a marker for upstream merge conflicts and must not appear in `packages/kilo-vscode/` or `packages/kilo-ui/` (these are entirely Kilo Code additions). Remove the markers before pushing.
 
+### Building the VSIX (VS Code Extension Package)
+
+The authoritative build script is `packages/kilo-vscode/script/build.ts` — this is what CI uses. It cleans all output directories, rebuilds everything, and produces per-platform `.vsix` files.
+
+#### CI / full multi-platform build
+
+Requires all CLI platform binaries to be present under `packages/opencode/dist/` (produced by `packages/opencode/script/build.ts`). Run from `packages/kilo-vscode/`:
+
+```bash
+bun script/build.ts
+```
+
+This script:
+
+1. **Cleans** `bin/`, `dist/`, and `out/` directories first
+2. Rebuilds the SDK (`packages/sdk/js/`)
+3. Typechecks and lints
+4. Compiles JS via esbuild in production mode
+5. For each platform target, copies the matching CLI binary into `bin/` and runs:
+   ```bash
+   vsce package --no-dependencies --skip-license --target {platform} -o out/kilo-vscode-{platform}.vsix
+   ```
+
+Output: `packages/kilo-vscode/out/kilo-vscode-{platform}.vsix` for each target platform.
+
+#### Local platform-targeted build (recommended)
+
+This is the correct way to build a VSIX for a specific platform locally. The process is:
+
+**Step 1 — Clean everything:**
+
+```bash
+cd packages/kilo-vscode
+rm -rf bin/ dist/ out/ && rm -f *.vsix
+```
+
+**Step 2 — Get the CLI binary for the target platform.**
+
+The binary must come from the matching GitHub release asset (e.g. `v7.1.21`). Download and extract into `bin/`:
+
+- **Windows x64**: download `kilo-windows-x64.zip`, extract `kilo.exe` → `bin/kilo.exe`
+- **Linux x64**: download `kilo-linux-x64.tar.gz`, extract `kilo` → `bin/kilo`
+- **macOS arm64**: download `kilo-darwin-arm64.zip`, extract `kilo` → `bin/kilo`
+
+Example for Windows x64:
+
+```bash
+curl -L "https://github.com/Kilo-Org/kilocode/releases/download/v{version}/kilo-windows-x64.zip" -o /tmp/kilo-windows-x64.zip
+mkdir -p packages/kilo-vscode/bin
+unzip -j /tmp/kilo-windows-x64.zip "kilo.exe" -d packages/kilo-vscode/bin/
+```
+
+**Step 3 — Compile the extension:**
+
+```bash
+cd packages/kilo-vscode
+bun run package
+```
+
+This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. It reuses the binary placed in `bin/` in the previous step.
+
+**Step 4 — Package the VSIX:**
+
+```bash
+bunx vsce package --no-dependencies --skip-license --target win32-x64
+```
+
+Replace `win32-x64` with the appropriate target: `linux-x64`, `darwin-arm64`, `darwin-x64`, `linux-arm64`, `alpine-x64`, `win32-arm64`, etc.
+
+Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
+
+**Common mistakes to avoid**:
+
+- Do NOT run `bun run build` — that script does not exist in `packages/kilo-vscode/`.
+- Do NOT use `bun run extension` to produce a `.vsix` — that launches VS Code in dev mode, not packaging.
+- Do NOT skip the clean step — `bun run package` does not clean and will reuse stale output. The `rm -f *.vsix` is also required to remove old version `.vsix` files left from previous builds.
+- Do NOT omit `--skip-license` — it is required by the official build and avoids packaging errors.
+- Do NOT omit `--target` — without it, `vsce` produces a universal (non-platform-targeted) VSIX that bundles all binaries currently in `bin/` and may not install correctly on Windows.
+- The binary in `bin/` **must match the target platform** — e.g. `kilo.exe` for `win32-x64`, `kilo` (Linux ELF) for `linux-x64`. Mismatching binary and target will produce a broken extension.
+
 ## Products
 
 All products are clients of the **CLI** (`packages/opencode/`), which contains the AI agent runtime, HTTP server, and session management. Each client spawns or connects to a `kilo serve` process and communicates via HTTP + SSE using `@kilocode/sdk`.
@@ -233,7 +313,6 @@ Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
 We regularly merge upstream changes from opencode. To minimize merge conflicts and keep the sync process smooth:
 
 1. **Prefer `kilocode` directories** - Place Kilo-specific code in dedicated directories whenever possible:
-
    - `packages/opencode/src/kilocode/` - Kilo-specific source code
    - `packages/opencode/test/kilocode/` - Kilo-specific tests
    - `packages/kilo-gateway/` - The Kilo Gateway package
