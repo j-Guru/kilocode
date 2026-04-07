@@ -69,7 +69,11 @@ import {
   fetchAndSendPendingPermissions,
   type PermissionContext,
 } from "./kilo-provider/handlers/permission-handler"
-import { handleQuestionReply, handleQuestionReject } from "./kilo-provider/handlers/question"
+import {
+  handleQuestionReply,
+  handleQuestionReject,
+  fetchAndSendPendingQuestions,
+} from "./kilo-provider/handlers/question"
 
 import {
   buildActionContext,
@@ -332,8 +336,10 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     // Handle messages from webview (shared handler)
     this.setupWebviewMessageHandler(webviewView.webview)
 
-    // Pause stats polling when sidebar is hidden, resume when visible
+    // Track sidebar visibility for keybinding when-clauses and stats polling
+    vscode.commands.executeCommand("setContext", "kilo-code.new.sidebarVisible", webviewView.visible)
     webviewView.onDidChangeVisibility(() => {
+      vscode.commands.executeCommand("setContext", "kilo-code.new.sidebarVisible", webviewView.visible)
       this.statsPoller?.setEnabled(webviewView.visible)
     })
 
@@ -793,6 +799,9 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "requestNotificationSettings":
           this.sendNotificationSettings()
           break
+        case "requestTimelineSetting":
+          this.sendTimelineSetting()
+          break
         case "requestNotifications":
           this.fetchAndSendNotifications().catch((e) =>
             console.error("[Kilo New] fetchAndSendNotifications failed:", e),
@@ -1053,6 +1062,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             await this.syncWebviewState("sse-connected")
             await this.flushPendingSessionRefresh("sse-connected")
             await fetchAndSendPendingPermissions(this.permissionCtx)
+            await fetchAndSendPendingQuestions(this.questionCtx)
           } catch (error) {
             console.error("[Kilo New] KiloProvider: ❌ Failed during connected state handling:", error)
             this.postMessage({
@@ -1131,6 +1141,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         this.seedSessionStatusMap(),
       ])
       this.sendNotificationSettings()
+      this.sendTimelineSetting()
 
       // Start polling worktree diff stats for the sidebar badge
       this.startStatsPolling()
@@ -1337,6 +1348,12 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         sessionID,
         messages,
       })
+
+      // Recover any missed permission/question prompts emitted by the child before
+      // we started tracking it.  Both run fire-and-forget after messagesLoaded so
+      // the webview isn't blocked.
+      void fetchAndSendPendingPermissions(this.permissionCtx)
+      void fetchAndSendPendingQuestions(this.questionCtx)
     } catch (err) {
       this.syncedChildSessions.delete(sessionID)
       console.error("[Kilo New] KiloProvider: Failed to sync child session:", err)
@@ -2030,6 +2047,14 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     })
   }
 
+  private sendTimelineSetting(): void {
+    const config = vscode.workspace.getConfiguration("kilo-code.new")
+    this.postMessage({
+      type: "timelineSettingLoaded",
+      visible: config.get<boolean>("showTaskTimeline", true),
+    })
+  }
+
   /** Returns the number of sessions currently in "busy" state. */
   private getBusySessionCount(): number {
     return getBusySessionCount(this.sessionStatusMap)
@@ -2361,6 +2386,8 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     return {
       client: this.client,
       currentSessionId: this.currentSession?.id,
+      trackedSessionIds: this.trackedSessionIds,
+      sessionDirectories: this.sessionDirectories,
       postMessage: (msg: unknown) => this.postMessage(msg),
       getWorkspaceDirectory: (sid?: string) => this.getWorkspaceDirectory(sid),
     }
@@ -2532,6 +2559,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     this.sendAutocompleteSettings()
     this.sendBrowserSettings()
     this.sendNotificationSettings()
+    this.sendTimelineSetting()
 
     // Re-send globalState items to the webview
     this.postMessage({ type: "variantsLoaded", variants: {} })
@@ -2652,6 +2680,24 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     if (event.type === "session.updated" && this.currentSession?.id === event.properties.info.id) {
       this.currentSession = event.properties.info
       this.contextSessionID = event.properties.info.id
+    }
+
+    // Auto-adopt child sessions as soon as the task tool part reveals their ID.
+    // This means the child's permission/question events are tracked immediately —
+    // before the webview renderer has a chance to call syncSession — eliminating
+    // the race where the child blocks on a prompt that the UI never sees.
+    if (event.type === "message.part.updated") {
+      const part = event.properties.part as {
+        type?: string
+        tool?: string
+        metadata?: { sessionId?: string }
+        sessionID?: string
+      }
+      const childId = part.type === "tool" && part.tool === "task" ? part.metadata?.sessionId : undefined
+      if (childId && !this.trackedSessionIds.has(childId)) {
+        console.log("[Kilo New] KiloProvider: 🔗 Auto-adopting child session from task tool", { childId })
+        void this.handleSyncSession(childId, part.sessionID ?? sessionID)
+      }
     }
 
     const msg = mapSSEEventToWebviewMessage(event, sessionID)

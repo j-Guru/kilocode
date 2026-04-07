@@ -42,6 +42,7 @@ import {
 } from "./session-utils"
 import { Identifier } from "../utils/id"
 import { resolveModelSelection } from "./model-selection"
+import { resolveSessionAgent } from "./session-agent"
 import { KILO_AUTO, parseModelString } from "../../../src/shared/provider-model"
 
 const RECENT_LIMIT = 5
@@ -342,6 +343,8 @@ export const SessionProvider: ParentComponent = (props) => {
     return pendingAgentSelection() ?? defaultAgent()
   })
 
+  const agentNames = createMemo(() => new Set(agents().map((agent) => agent.name)))
+
   /** Per-mode model from config (e.g. config.agent.code.model). */
   function getModeModel(agentName: string): ModelSelection | null {
     return parseModelString(config().agent?.[agentName]?.model)
@@ -480,6 +483,17 @@ export const SessionProvider: ParentComponent = (props) => {
         }
       }),
     )
+
+    // Rescan already-loaded message history so sessions whose messagesLoaded
+    // arrived before agentsLoaded (and therefore got no agent selection) are
+    // backfilled now that we know the valid agent names.
+    batch(() => {
+      for (const [sid, msgs] of Object.entries(store.messages)) {
+        if (store.agentSelections[sid]) continue
+        const agent = resolveSessionAgent(msgs, names)
+        if (agent) setStore("agentSelections", sid, agent)
+      }
+    })
   })
 
   // Request agents in case the initial push was missed.
@@ -801,6 +815,11 @@ export const SessionProvider: ParentComponent = (props) => {
           setStore("parts", msg.id, reconcile(msg.parts, { key: "id" }))
         }
       }
+
+      const agent = resolveSessionAgent(messages, agentNames())
+      if (agent) {
+        setStore("agentSelections", sessionID, agent)
+      }
     })
   }
 
@@ -834,6 +853,13 @@ export const SessionProvider: ParentComponent = (props) => {
       }
       return [...msgs, message]
     })
+
+    if (message.role === "user") {
+      const agent = message.agent?.trim()
+      if (agent && agentNames().has(agent)) {
+        setStore("agentSelections", message.sessionID, agent)
+      }
+    }
 
     if (message.parts && message.parts.length > 0) {
       setStore("parts", message.id, message.parts)
@@ -1715,12 +1741,23 @@ export const SessionProvider: ParentComponent = (props) => {
   const statusText = createMemo<string | undefined>(() => {
     if (status() === "idle") return undefined
     const fallback = language.t("ui.sessionTurn.status.consideringNextSteps")
+    const id = currentSessionID()
     const msgs = messages()
     for (let i = msgs.length - 1; i >= 0; i--) {
       if (msgs[i].role !== "assistant") continue
       const parts = getParts(msgs[i].id)
       if (parts.length === 0) break
-      return computeStatus(parts[parts.length - 1], language.t) ?? fallback
+      const raw = computeStatus(parts[parts.length - 1], language.t) ?? fallback
+      // When delegating to a subagent and that subagent is blocked on a prompt,
+      // replace the generic "Delegating work" label with a more informative one
+      // so the user understands why nothing appears to be happening.
+      if (raw === language.t("ui.sessionTurn.status.delegating")) {
+        const scoped = scopedPermissions(id)
+        if (scoped.length > 0) return language.t("ui.sessionTurn.status.delegatingWaitingPermission")
+        const scopedQ = scopedQuestions(id)
+        if (scopedQ.length > 0) return language.t("ui.sessionTurn.status.delegatingWaitingQuestion")
+      }
+      return raw
     }
     return fallback
   })

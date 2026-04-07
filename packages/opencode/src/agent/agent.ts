@@ -224,18 +224,20 @@ export namespace Agent {
       },
       plan: {
         name: "plan",
-        description: "Plan mode. Disallows all edit tools.",
+        description: "Plan mode. Only allows editing plan files; asks before editing anything else.",
         options: {},
         permission: PermissionNext.merge(
           defaults,
           PermissionNext.fromConfig({
             question: "allow",
             plan_exit: "allow",
+            bash: readOnlyBash, // kilocode_change: read-only bash for plan mode (mirrors ask agent)
+            ...mcpRules, // kilocode_change: MCP with user approval for plan mode
             external_directory: {
               [path.join(Global.Path.data, "plans", "*")]: "allow",
             },
             edit: {
-              "*": "deny",
+              "*": "ask", // kilocode_change: ask (not deny) so user can approve edits outside plan files
               [path.join(".kilo", "plans", "*.md")]: "allow", // kilocode_change
               [path.join(".opencode", "plans", "*.md")]: "allow", // kilocode_change: .opencode fallback
               [path.relative(Instance.worktree, path.join(Global.Path.data, path.join("plans", "*.md")))]: "allow",
