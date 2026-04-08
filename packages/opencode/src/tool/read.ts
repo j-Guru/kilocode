@@ -11,6 +11,7 @@ import { Instance } from "../project/instance"
 import { assertExternalDirectory } from "./external-directory"
 import { InstructionPrompt } from "../session/instruction"
 import { Filesystem } from "../util/filesystem"
+import { Encoding } from "../kilocode/encoding" // kilocode_change
 
 const DEFAULT_READ_LIMIT = 2000
 const MAX_LINE_LENGTH = 2000
@@ -144,47 +145,40 @@ export const ReadTool = Tool.define("read", {
     const isBinary = await isBinaryFile(filepath, Number(stat.size))
     if (isBinary) throw new Error(`Cannot read binary file: ${filepath}`)
 
-    const stream = createReadStream(filepath, { encoding: "utf8" })
-    const rl = createInterface({
-      input: stream,
-      // Note: we use the crlfDelay option to recognize all instances of CR LF
-      // ('\r\n') in file as a single line break.
-      crlfDelay: Infinity,
-    })
+    // kilocode_change start - encoding-aware file reading
+    const encoded = await Filesystem.readEncoded(filepath)
+    const allLines = encoded.text.split(/\r\n|\r|\n/)
+    // Remove trailing empty element from split when file ends with newline
+    if (allLines.length > 0 && allLines[allLines.length - 1] === "") allLines.pop()
 
     const limit = params.limit ?? DEFAULT_READ_LIMIT
     const offset = params.offset ?? 1
     const start = offset - 1
     const raw: string[] = []
     let bytes = 0
-    let lines = 0
     let truncatedByBytes = false
     let hasMoreLines = false
-    try {
-      for await (const text of rl) {
-        lines += 1
-        if (lines <= start) continue
+    const lines = allLines.length
 
-        if (raw.length >= limit) {
-          hasMoreLines = true
-          continue
-        }
-
-        const line = text.length > MAX_LINE_LENGTH ? text.substring(0, MAX_LINE_LENGTH) + MAX_LINE_SUFFIX : text
-        const size = Buffer.byteLength(line, "utf-8") + (raw.length > 0 ? 1 : 0)
-        if (bytes + size > MAX_BYTES) {
-          truncatedByBytes = true
-          hasMoreLines = true
-          break
-        }
-
-        raw.push(line)
-        bytes += size
+    for (let i = start; i < allLines.length; i++) {
+      if (raw.length >= limit) {
+        hasMoreLines = true
+        break
       }
-    } finally {
-      rl.close()
-      stream.destroy()
+
+      const text = allLines[i]!
+      const line = text.length > MAX_LINE_LENGTH ? text.substring(0, MAX_LINE_LENGTH) + MAX_LINE_SUFFIX : text
+      const size = Buffer.byteLength(line, "utf-8") + (raw.length > 0 ? 1 : 0)
+      if (bytes + size > MAX_BYTES) {
+        truncatedByBytes = true
+        hasMoreLines = true
+        break
+      }
+
+      raw.push(line)
+      bytes += size
     }
+    // kilocode_change end
 
     if (lines < offset && !(lines === 0 && offset === 1)) {
       throw new Error(`Offset ${offset} is out of range for this file (${lines} lines)`)
@@ -277,6 +271,19 @@ async function isBinaryFile(filepath: string, fileSize: number): Promise<boolean
     const bytes = Buffer.alloc(sampleSize)
     const result = await fh.read(bytes, 0, sampleSize, 0)
     if (result.bytesRead === 0) return false
+
+    const sample = bytes.subarray(0, result.bytesRead)
+
+    // kilocode_change start - encoding-aware binary detection
+    // If encoding detection recognizes a known text encoding, it's not binary.
+    // This prevents UTF-16 (with null bytes) and CJK encodings from being
+    // falsely flagged as binary.
+    const info = Encoding.detect(sample)
+    if (info.encoding !== "iso-8859-1" && info.encoding !== "utf-8") {
+      // jschardet confidently identified a non-default encoding → text file
+      return false
+    }
+    // kilocode_change end
 
     let nonPrintableCount = 0
     for (let i = 0; i < result.bytesRead; i++) {
