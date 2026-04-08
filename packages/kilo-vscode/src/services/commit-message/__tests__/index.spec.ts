@@ -54,8 +54,7 @@ describe("commit-message service", () => {
     }
 
     mockConnectionService = {
-      getClient: vi.fn().mockReturnValue(mockClient),
-      connect: vi.fn().mockResolvedValue(undefined),
+      getClientAsync: vi.fn().mockResolvedValue(mockClient),
     } as any
   })
 
@@ -126,10 +125,7 @@ describe("commit-message service", () => {
           }),
         },
       })
-      ;(mockConnectionService.getClient as Mock).mockImplementation(() => {
-        throw new Error("Not connected")
-      })
-      ;(mockConnectionService.connect as Mock).mockRejectedValue(new Error("Connect failed"))
+      ;(mockConnectionService.getClientAsync as Mock).mockRejectedValue(new Error("Connect failed"))
 
       await commandCallback()
 
@@ -149,12 +145,6 @@ describe("commit-message service", () => {
           }),
         },
       })
-      // First call throws (not started), after connect() succeeds the second call returns the client
-      ;(mockConnectionService.getClient as Mock)
-        .mockImplementationOnce(() => {
-          throw new Error("Not connected")
-        })
-        .mockReturnValue(mockClient)
 
       const mockToken = { onCancellationRequested: vi.fn() }
       ;(vscode.window.withProgress as Mock).mockImplementation(async (_options: any, task: any) => {
@@ -163,7 +153,7 @@ describe("commit-message service", () => {
 
       await commandCallback()
 
-      expect(mockConnectionService.connect).toHaveBeenCalledWith("/auto-connect-repo")
+      expect(mockConnectionService.getClientAsync).toHaveBeenCalled()
       expect(mockInputBox.value).toBe("feat: add new feature")
     })
 
