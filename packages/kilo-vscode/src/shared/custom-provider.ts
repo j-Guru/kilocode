@@ -10,7 +10,7 @@ export const EnvSchema = z
   .string()
   .trim()
   .regex(/^[A-Z_][A-Z0-9_]*$/, INVALID_ENV)
-  
+
 const VariantConfigSchema = z.object({
   enable_thinking: z.boolean().optional(),
   thinking: z.object({ type: z.enum(["enabled", "disabled"]) }).optional(),
