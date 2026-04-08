@@ -936,16 +936,13 @@ export namespace Provider {
           headers: mergeDeep(existingModel?.headers ?? {}, model.headers ?? {}),
           family: model.family ?? existingModel?.family ?? "",
           release_date: model.release_date ?? existingModel?.release_date ?? "",
-          // kilocode_change start - pre-load user-defined variants so ProviderTransform.variants() can return them
+          // kilocode_change start
           variants: model.variants
             ? mapValues(
                 pickBy(model.variants, (v) => !v.disabled),
-                (v) => omit(v, ["disabled"]) as Record<string, any>,
+                (v) => omit(v, ["disabled"]),
               )
             : {},
-          // kilocode_change end
-
-          // kilocode_change start
           recommendedIndex: model.recommendedIndex ?? existingModel?.recommendedIndex,
           prompt: model.prompt ?? existingModel?.prompt,
           isFree: model.isFree ?? existingModel?.isFree,

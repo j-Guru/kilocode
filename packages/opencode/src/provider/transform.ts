@@ -380,18 +380,16 @@ export namespace ProviderTransform {
 
   export function variants(model: Provider.Model): Record<string, Record<string, any>> {
     // kilocode_change start
-    if (model.api.npm === "@kilocode/kilo-gateway" && model.variants && Object.keys(model.variants).length > 0) {
+    if (
+      ["@kilocode/kilo-gateway", "@ai-sdk/openai-compatible"].includes(model.api.npm) &&
+      model.variants &&
+      Object.keys(model.variants).length > 0
+    ) {
       return model.variants
     }
-
     // kilocode_change end
 
     if (!model.capabilities.reasoning) return {}
-
-    // For custom models with user-defined variants, return them directly when reasoning is enabled
-    if (model.api.npm === "@ai-sdk/openai-compatible" && model.variants && Object.keys(model.variants).length > 0) {
-      return model.variants
-    }
 
     const id = model.id.toLowerCase()
     const isAnthropicAdaptive = ["opus-4-6", "opus-4.6", "sonnet-4-6", "sonnet-4.6"].some((v) =>
