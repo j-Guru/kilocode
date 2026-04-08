@@ -213,6 +213,13 @@ export interface SlashCommandInfo {
   hints: string[]
 }
 
+// A single resolved permission rule from the CLI backend (matches PermissionNext.Rule)
+export interface PermissionRuleItem {
+  permission: string
+  pattern: string
+  action: PermissionLevel
+}
+
 // Agent/mode info from CLI backend
 export interface AgentInfo {
   name: string
@@ -223,6 +230,7 @@ export interface AgentInfo {
   hidden?: boolean
   deprecated?: boolean
   color?: string
+  permission?: PermissionRuleItem[]
 }
 
 // Server info
@@ -656,6 +664,7 @@ export interface ProvidersLoadedMessage {
 export interface AgentsLoadedMessage {
   type: "agentsLoaded"
   agents: AgentInfo[]
+  allAgents: AgentInfo[]
   defaultAgent: string
 }
 
@@ -799,6 +808,75 @@ export interface WorktreeState {
   groupId?: string
   /** User-provided display name for the worktree. */
   label?: string
+  /** Cached PR number for instant badge display on reload. */
+  prNumber?: number
+  /** Cached PR URL for instant badge display on reload. */
+  prUrl?: string
+  /** Cached PR state for correct badge color on reload (open/merged/closed/draft). */
+  prState?: string
+  /** Section this worktree belongs to, or undefined for ungrouped. */
+  sectionId?: string
+}
+
+export interface SectionState {
+  id: string
+  name: string
+  /** Color label (e.g. "Red", "Blue") or null for default. */
+  color: string | null
+  order: number
+  collapsed: boolean
+}
+
+// ---------------------------------------------------------------------------
+// PR status types (mirrored from extension types.ts)
+// ---------------------------------------------------------------------------
+
+export type PRState = "open" | "draft" | "merged" | "closed"
+export type ReviewDecision = "approved" | "changes_requested" | "pending"
+export type CheckStatus = "success" | "failure" | "pending" | "skipped" | "cancelled"
+export type AggregateCheckStatus = "success" | "failure" | "pending" | "none"
+
+export interface PRCheck {
+  name: string
+  status: CheckStatus
+  url?: string
+  duration?: string
+}
+
+export interface PRComment {
+  id: string
+  author: string
+  avatar?: string
+  body: string
+  file?: string
+  line?: number
+  url?: string
+  resolved: boolean
+  createdAt?: number
+}
+
+export interface PRStatus {
+  number: number
+  title: string
+  url: string
+  state: PRState
+  review: ReviewDecision | null
+  checks: {
+    status: AggregateCheckStatus
+    total: number
+    passed: number
+    failed: number
+    pending: number
+    items: PRCheck[]
+  }
+  comments?: {
+    total: number
+    unresolved: number
+    items: PRComment[]
+  }
+  additions: number
+  deletions: number
+  files: number
 }
 
 export interface ManagedSessionState {
@@ -827,6 +905,7 @@ export interface AgentManagerStateMessage {
   type: "agentManager.state"
   worktrees: WorktreeState[]
   sessions: ManagedSessionState[]
+  sections?: SectionState[]
   staleWorktreeIds?: string[]
   tabOrder?: Record<string, string[]>
   worktreeOrder?: string[]
@@ -981,6 +1060,14 @@ export interface LocalGitStats {
 export interface AgentManagerLocalStatsMessage {
   type: "agentManager.localStats"
   stats: LocalGitStats
+}
+
+// Agent Manager: PR status push (extension → webview)
+export interface AgentManagerPRStatusMessage {
+  type: "agentManager.prStatus"
+  worktreeId: string
+  pr: PRStatus | null
+  error?: "gh_missing" | "gh_auth" | "fetch_failed"
 }
 
 // Sidebar: Live worktree diff stats (extension → webview)
@@ -1196,6 +1283,10 @@ export interface ClearPendingPromptsMessage {
   type: "clearPendingPrompts"
 }
 
+export interface ExtensionDataReadyMessage {
+  type: "extensionDataReady"
+}
+
 // ============================================
 // Marketplace Messages
 // ============================================
@@ -1360,6 +1451,7 @@ export type ExtensionMessage =
   | AgentManagerApplyWorktreeDiffResultMessage
   | AgentManagerWorktreeStatsMessage
   | AgentManagerLocalStatsMessage
+  | AgentManagerPRStatusMessage
   // legacy-migration start
   | MigrationStateMessage
   | LegacyMigrationDataMessage
@@ -1387,6 +1479,7 @@ export type ExtensionMessage =
   | WorktreeStatsLoadedMessage
   | McpStatusLoadedMessage
   | ClearPendingPromptsMessage
+  | ExtensionDataReadyMessage
 
 // ============================================
 // Messages FROM webview TO extension
@@ -1959,6 +2052,17 @@ export interface StopDiffWatchMessage {
   type: "agentManager.stopDiffWatch"
 }
 
+// Agent Manager: PR messages (webview → extension)
+export interface RefreshPRMessage {
+  type: "agentManager.refreshPR"
+  worktreeId: string
+}
+
+export interface OpenPRMessage {
+  type: "agentManager.openPR"
+  worktreeId: string
+}
+
 export interface ApplyWorktreeDiffMessage {
   type: "agentManager.applyWorktreeDiff"
   worktreeId: string
@@ -2084,6 +2188,48 @@ export interface ContinueInWorktreeRequest {
   sessionId: string
 }
 
+// Section CRUD messages (webview → extension)
+export interface CreateSectionRequest {
+  type: "agentManager.createSection"
+  name: string
+  color?: string
+  worktreeIds?: string[]
+}
+
+export interface RenameSectionRequest {
+  type: "agentManager.renameSection"
+  sectionId: string
+  name: string
+}
+
+export interface DeleteSectionRequest {
+  type: "agentManager.deleteSection"
+  sectionId: string
+}
+
+export interface SetSectionColorRequest {
+  type: "agentManager.setSectionColor"
+  sectionId: string
+  color: string | null
+}
+
+export interface ToggleSectionCollapsedRequest {
+  type: "agentManager.toggleSectionCollapsed"
+  sectionId: string
+}
+
+export interface MoveToSectionRequest {
+  type: "agentManager.moveToSection"
+  worktreeIds: string[]
+  sectionId: string | null
+}
+
+export interface MoveSectionRequest {
+  type: "agentManager.moveSection"
+  sectionId: string
+  dir: -1 | 1
+}
+
 export type ContinueInWorktreeStatus =
   | "capturing"
   | "creating"
@@ -2198,6 +2344,8 @@ export type WebviewMessage =
   | RequestWorktreeDiffFileMessage
   | StartDiffWatchMessage
   | StopDiffWatchMessage
+  | RefreshPRMessage
+  | OpenPRMessage
   // legacy-migration start
   | RequestLegacyMigrationDataMessage
   | StartLegacyMigrationMessage
@@ -2227,6 +2375,13 @@ export type WebviewMessage =
   | ToggleFavoriteRequest
   | RequestFavoritesMessage
   | ContinueInWorktreeRequest
+  | CreateSectionRequest
+  | RenameSectionRequest
+  | DeleteSectionRequest
+  | SetSectionColorRequest
+  | ToggleSectionCollapsedRequest
+  | MoveToSectionRequest
+  | MoveSectionRequest
 
 // ============================================
 // VS Code API type
