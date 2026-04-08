@@ -972,6 +972,62 @@
         ]
       }
     },
+    "/config/warnings": {
+      "get": {
+        "operationId": "config.warnings",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "directory",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "workspace",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "summary": "Get config warnings",
+        "description": "Get warnings generated during config loading (e.g., invalid JSON, schema errors).",
+        "responses": {
+          "200": {
+            "description": "Config warnings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "path": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "detail": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["path", "message"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createKiloClient } from \"@kilocode/sdk\n\nconst client = createKiloClient()\nawait client.config.warnings({\n  ...\n})"
+          }
+        ]
+      }
+    },
     "/config/providers": {
       "get": {
         "operationId": "config.providers",
@@ -6001,6 +6057,9 @@
                   },
                   "projectID": {
                     "type": "string"
+                  },
+                  "force": {
+                    "type": "boolean"
                   },
                   "workspaceID": {
                     "type": "string"
