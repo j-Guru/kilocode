@@ -92,17 +92,22 @@ class KiloConnectionService(private val cs: CoroutineScope) : Disposable {
 
     /** Kill the CLI process and restart it. Tears down all connections first. */
     suspend fun restart() {
-        LOG.info("Restarting CLI")
+        LOG.info("restart: initiated — tearing down current connection")
         teardown()
+        LOG.info("restart: teardown complete — spawning new CLI process")
         open()
+        LOG.info("restart: open() returned — CLI process started")
     }
 
     /** Kill the CLI process, re-extract the binary from JAR, and restart. */
     suspend fun reinstall() {
-        LOG.info("Reinstalling CLI")
+        LOG.info("reinstall: initiated — tearing down current connection")
         teardown()
+        LOG.info("reinstall: teardown complete — setting forceExtract flag")
         service<ServerManager>().forceExtract = true
+        LOG.info("reinstall: spawning new CLI process (binary will be re-extracted)")
         open()
+        LOG.info("reinstall: open() returned — CLI process started with fresh binary")
     }
 
     /**
@@ -112,14 +117,19 @@ class KiloConnectionService(private val cs: CoroutineScope) : Disposable {
      * cannot race with the SSE close or process kill.
      */
     private suspend fun teardown() {
+        LOG.info("teardown: cancelling background jobs (reconnect, heartbeat, health, process)")
         reconnectJob?.cancel()
         heartbeatJob?.cancel()
         healthJob?.cancel()
         processJob?.cancel()
+        LOG.info("teardown: closing SSE event source")
         source.getAndSet(null)?.cancel()
+        LOG.info("teardown: shutting down OkHttp clients")
         close()
         setState(ConnectionState.Disconnected)
+        LOG.info("teardown: killing CLI process via ServerManager.stop()")
         service<ServerManager>().stop()
+        LOG.info("teardown: complete")
     }
 
     private suspend fun open() {

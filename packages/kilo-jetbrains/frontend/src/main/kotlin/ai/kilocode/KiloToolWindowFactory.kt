@@ -1,6 +1,7 @@
 package ai.kilocode
 
 import com.intellij.openapi.Disposable
+import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
@@ -56,6 +57,9 @@ class KiloToolWindowFactory : ToolWindowFactory {
         Disposer.register(ui, Disposable { job.cancel() })
         content.setDisposer(ui)
         toolWindow.contentManager.addContent(content)
+        ActionManager.getInstance().getAction("Kilo.Settings")?.let {
+            toolWindow.setTitleActions(listOf(it))
+        }
         svc.connect()
     }
 }

@@ -55,27 +55,48 @@ openApiGenerate {
 }
 
 // Fix openapi-generator 3.1.1 codegen bugs in generated Kotlin sources.
-// - Boolean const enums: `enum class Foo(val value: kotlin.Boolean) { TRUE("true") }` → fix string→boolean
+//
+// The OpenAPI spec uses `const: true` on boolean fields (e.g. `healthy`).
+// openapi-generator turns these into single-value enum classes:
+//
+//   val healthy: GlobalHealth200Response.Healthy
+//   enum class Healthy(val value: kotlin.Boolean) { @Json(name = "true") TRUE("true") }
+//
+// Moshi's EnumJsonAdapter calls nextString() for the value, but the server sends
+// a JSON boolean `true`, not a JSON string `"true"`, causing:
+//   JsonDataException: Expected a string but was BOOLEAN at path $.healthy
+//
+// Fix: replace the enum field type with kotlin.Boolean, remove the enum class.
 val fixGeneratedApi by tasks.registering {
     dependsOn("openApiGenerate")
     val dir = generatedApi
     doLast {
+        // Regex to find boolean const enum declarations inside data classes.
+        // Captures the enum name so we can find and fix the corresponding field.
+        val enumDecl = Regex(
+            """enum class (\w+)\(val value: kotlin\.Boolean\)"""
+        )
         dir.get().asFile.walkTopDown().filter { it.extension == "kt" }.forEach { file ->
             var text = file.readText()
-            var changed = false
-            // Fix: enum Xxx(val value: kotlin.Boolean) { @Json(name = "true") TRUE("true") }
-            //  →   enum Xxx(val value: kotlin.Boolean) { @Json(name = "true") TRUE(true) }
-            val boolEnum = Regex(
-                """(enum class \w+\(val value: kotlin\.Boolean\) \{[^}]*?@Json\(name = ")(true|false)("\) \w+\()"(true|false)"(\))"""
-            )
-            val replaced = boolEnum.replace(text) { m ->
-                "${m.groupValues[1]}${m.groupValues[2]}${m.groupValues[3]}${m.groupValues[4]}${m.groupValues[5]}"
+            val names = enumDecl.findAll(text).map { it.groupValues[1] }.toList()
+            if (names.isEmpty()) return@forEach
+
+            for (name in names) {
+                // Replace field type: `val foo: EnclosingClass.EnumName` → `val foo: kotlin.Boolean`
+                text = text.replace(Regex("""(val \w+:\s*)\w+\.$name""")) { m ->
+                    "${m.groupValues[1]}kotlin.Boolean"
+                }
+                // Remove the @JsonClass annotation + enum class block
+                text = text.replace(Regex(
+                    """\n\s*@JsonClass\(generateAdapter = false\)\s*\n\s*enum class $name\(val value: kotlin\.Boolean\)\s*\{[^}]*\}"""
+                ), "")
+                // Remove the orphaned KDoc block that preceded the enum (lines of ` *` ending with `*/`)
+                // These look like:  \n    /**\n     * \n     *\n     * Values: TRUE\n     */
+                text = text.replace(Regex(
+                    """\n\s*/\*\*\s*\n(\s*\*[^\n]*\n)*\s*\*/\s*(?=\n\s*\n)"""
+                ), "")
             }
-            if (replaced != text) {
-                text = replaced
-                changed = true
-            }
-            if (changed) file.writeText(text)
+            file.writeText(text)
         }
     }
 }

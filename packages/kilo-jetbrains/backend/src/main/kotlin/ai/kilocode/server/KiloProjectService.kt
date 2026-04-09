@@ -5,6 +5,7 @@ import ai.kilocode.rpc.dto.ConnectionStateDto
 import ai.kilocode.rpc.dto.HealthDto
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,10 @@ class KiloProjectService(
     private val project: Project,
     private val cs: CoroutineScope,
 ) {
+    companion object {
+        private val LOG = Logger.getInstance(KiloProjectService::class.java)
+    }
+
     private val connection: KiloConnectionService
         get() = service()
 
@@ -62,8 +67,14 @@ class KiloProjectService(
      * Returns [HealthDto] or throws if not connected / server unreachable.
      */
     suspend fun health(): HealthDto {
-        val client = api ?: throw IllegalStateException("Not connected")
+        val client = api
+        if (client == null) {
+            LOG.warn("health: API client is null — not connected")
+            throw IllegalStateException("Not connected")
+        }
+        LOG.info("health: calling /global/health")
         val response = client.globalHealth()
+        LOG.info("health: version=${response.version}")
         return HealthDto(healthy = true, version = response.version)
     }
 }
