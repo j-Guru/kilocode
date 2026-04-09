@@ -1219,7 +1219,6 @@ export function Session() {
               <Show when={permissions().length === 0 && questions().length > 0}>
                 <QuestionPrompt request={questions()[0]} />
               </Show>
-              {/* kilocode_change */}
               {/* kilocode_change start */}
               <Show when={permissions().length === 0 && questions().length === 0 && network().length > 0}>
                 <NetworkPrompt request={network()[0]} />
