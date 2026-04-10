@@ -170,6 +170,22 @@ const AboutKiloCodeTab: Component<AboutKiloCodeTabProps> = (props) => {
 
   return (
     <div>
+      {/* Test Build Notice */}
+      <div
+        style={{
+          padding: "8px 12px",
+          "margin-bottom": "12px",
+          "background-color": "var(--vscode-inputValidation-warningBackground, #352a05)",
+          border: "1px solid var(--vscode-inputValidation-warningBorder, #9d8012)",
+          "border-radius": "4px",
+          "font-size": "12px",
+          color: "var(--vscode-foreground)",
+          "line-height": "1.5",
+        }}
+      >
+        This is a test build with experimental text encoding detection. Tested with EUC, GBR, Shift-JIS.
+      </div>
+
       {/* Version Information */}
       <div style={sectionStyle}>
         <h4 style={headingStyle}>{language.t("settings.aboutKiloCode.versionInfo")}</h4>
