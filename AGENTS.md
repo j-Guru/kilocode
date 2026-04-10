@@ -105,39 +105,49 @@ Output: `packages/kilo-vscode/out/kilo-vscode-{platform}.vsix` for each target p
 
 This is the correct way to build a VSIX for a specific platform locally. The process is:
 
-**Step 1 — Clean everything:**
+> **Note on `bun` path**: If `bun` is not on your `PATH`, use the full path: `/c/Users/Admin/.bun/bin/bun.exe` on Windows. All `bun` commands below may need this substitution.
+
+**Step 1 — Ensure dependencies are installed:**
+
+Run from the **repo root** (bun workspaces require a single root install — do NOT run per-package):
+
+```bash
+bun install
+```
+
+This is only needed if `node_modules` is missing or incomplete. It is safe to skip if already done.
+
+**Step 2 — Clean everything:**
 
 ```bash
 cd packages/kilo-vscode
 rm -rf bin/ dist/ out/ && rm -f *.vsix
 ```
 
-**Step 2 — Get the CLI binary for the target platform.**
+**Step 3 — Build the CLI binary from source:**
 
-The binary must come from the matching GitHub release asset (e.g. `v7.1.21`). Download and extract into `bin/`:
+The binary MUST be built from our local source code (not downloaded from upstream releases) so that all project-specific fixes (e.g. Vertex AI) are included.
 
-- **Windows x64**: download `kilo-windows-x64.zip`, extract `kilo.exe` → `bin/kilo.exe`
-- **Linux x64**: download `kilo-linux-x64.tar.gz`, extract `kilo` → `bin/kilo`
-- **macOS arm64**: download `kilo-darwin-arm64.zip`, extract `kilo` → `bin/kilo`
-
-Example for Windows x64:
+Run from the **repo root**:
 
 ```bash
-curl -L "https://github.com/Kilo-Org/kilocode/releases/download/v{version}/kilo-windows-x64.zip" -o /tmp/kilo-windows-x64.zip
-mkdir -p packages/kilo-vscode/bin
-unzip -j /tmp/kilo-windows-x64.zip "kilo.exe" -d packages/kilo-vscode/bin/
+bun run packages/opencode/script/build.ts
 ```
 
-**Step 3 — Compile the extension:**
+This produces platform binaries under `packages/opencode/dist/@kilocode/cli-{platform}/bin/`.
+
+**Step 4 — Compile the extension:**
 
 ```bash
 cd packages/kilo-vscode
 bun run package
 ```
 
-This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. It reuses the binary placed in `bin/` in the previous step.
+This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. The `prepare:cli-binary` step (`script/local-bin.ts`) automatically detects the built binary in `packages/opencode/dist/` and copies it into `bin/` — no manual copy needed.
 
-**Step 4 — Package the VSIX:**
+> **Note**: `local-bin.ts` detects if the CLI source has changed since the last build (via git hash). If it has, it will delete `bin/kilo[.exe]` and `packages/opencode/dist/` and attempt a rebuild. Since it calls `bun` by name (requires `bun` on PATH), always pre-build in Step 3 using the full bun path to avoid this failure path.
+
+**Step 5 — Package the VSIX:**
 
 ```bash
 bunx vsce package --no-dependencies --skip-license --target win32-x64
@@ -149,12 +159,23 @@ Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
 
 **Common mistakes to avoid**:
 
+- Do NOT download CLI binaries from upstream `Kilo-Org/kilocode` releases — they won't contain our project-specific fixes. Always build from source.
+- Do NOT run `bun install` from a sub-package directory — it won't correctly resolve workspace packages and will attempt to install all 2500+ packages unnecessarily. Always run from repo root.
 - Do NOT run `bun run build` — that script does not exist in `packages/kilo-vscode/`.
 - Do NOT use `bun run extension` to produce a `.vsix` — that launches VS Code in dev mode, not packaging.
 - Do NOT skip the clean step — `bun run package` does not clean and will reuse stale output. The `rm -f *.vsix` is also required to remove old version `.vsix` files left from previous builds.
 - Do NOT omit `--skip-license` — it is required by the official build and avoids packaging errors.
 - Do NOT omit `--target` — without it, `vsce` produces a universal (non-platform-targeted) VSIX that bundles all binaries currently in `bin/` and may not install correctly on Windows.
 - The binary in `bin/` **must match the target platform** — e.g. `kilo.exe` for `win32-x64`, `kilo` (Linux ELF) for `linux-x64`. Mismatching binary and target will produce a broken extension.
+
+**After a successful build, commit the regenerated SDK files:**
+
+The `bun run package` step regenerates `packages/sdk/js/src/gen/` files from the current OpenAPI spec. These are tracked in git and must be committed after every build that produces changes:
+
+```bash
+git add packages/sdk/js/src/gen/
+git commit -m "sdk: regenerate after upstream sync"
+```
 
 ## Products
 
