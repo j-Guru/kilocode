@@ -943,6 +943,10 @@ export const dict = {
   "session.status.retrying": "Tentando novamente (tentativa {{ attempt }})… {{ message }}",
   "session.status.working": "Trabalhando…",
 
+  "ui.sessionTurn.cancel": "Cancelar",
+  "ui.sessionTurn.status.thinking": "Pensando...",
+  "ui.sessionTurn.status.consideringNextSteps": "Considerando próximos passos...",
+
   "dialog.model.noProviders": "Nenhum provedor",
 
   "prompt.placeholder.connecting": "Conectando ao servidor...",
@@ -1069,6 +1073,14 @@ export const dict = {
   "settings.experimental.continueOnDeny.description": "Continuar o loop do agente quando uma permissão é negada",
   "settings.experimental.mcpTimeout.title": "Tempo limite MCP (ms)",
   "settings.experimental.mcpTimeout.description": "Tempo limite para solicitações do servidor MCP em milissegundos",
+  "settings.experimental.remote.title": "Controle Remote",
+  "settings.experimental.remote.description":
+    "Habilite o controle Remote de sessões via Kilo Cloud. Isso também afetará as CLIs nesta máquina.",
+  "settings.experimental.remote.current": "Estado atual:",
+  "settings.experimental.remote.startup": "Ativar automaticamente na inicialização:",
+  "settings.experimental.remote.active": "Ativo",
+  "settings.experimental.remote.inactive": "Inativo",
+  "settings.experimental.remote.hint": "Use /remote no chat para alternar",
   "settings.experimental.toolToggles": "Alternadores de ferramentas",
   "settings.agentBehaviour.defaultAgent.title": "Agente padrão",
   "settings.agentBehaviour.defaultAgent.description": "Agente a usar quando nenhum é especificado",
@@ -1132,6 +1144,16 @@ export const dict = {
   "settings.agentBehaviour.editMode.native":
     "Este é um modo embutido. Sua definição base não pode ser alterada, mas você pode configurar as sobrescritas abaixo.",
   "settings.agentBehaviour.editMode.promptOverride": "Substituição de prompt personalizado para este modo integrado",
+  "settings.agentBehaviour.badge.subagent": "subagente",
+  "settings.agentBehaviour.permissions.title": "Permissões Calculadas",
+  "settings.agentBehaviour.permissions.count": "{{count}} regras",
+  "settings.agentBehaviour.permissions.effective": "Efetiva (curinga):",
+  "settings.agentBehaviour.permissions.col.tool": "Ferramenta",
+  "settings.agentBehaviour.permissions.col.pattern": "Padrão",
+  "settings.agentBehaviour.permissions.col.action": "Ação",
+  "settings.agentBehaviour.permissions.copy": "Copiar permissões como JSON",
+  "settings.agentBehaviour.permissions.hint":
+    "As regras são avaliadas em ordem — a última regra correspondente vence. Este é o conjunto de regras resolvido do backend da CLI.",
   "settings.agentBehaviour.removeMode.title": "Remover modo",
   "settings.agentBehaviour.removeMode.confirm":
     'Remover o modo "{{name}}"? Isso desativará o modo atualizando sua configuração.',
@@ -1359,4 +1381,5 @@ export const dict = {
   "notifications.action.next": "Próximo",
   "notifications.action.close": "Fechar",
   "notifications.action.tryModel": "Experimentar {{model}}",
+  "notifications.action.tryModelGeneric": "Experimentar modelo",
 }
