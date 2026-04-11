@@ -8,13 +8,14 @@ import type { ProviderAuthAuthorization, ProviderAuthMethod } from "@kilocode/sd
 export type ConnectionState = "connecting" | "connected" | "disconnected" | "error"
 
 // Session status (simplified from backend)
-export type SessionStatus = "idle" | "busy" | "retry"
+export type SessionStatus = "idle" | "busy" | "retry" | "offline"
 
 // Rich status info for retry countdown and future extensions
 export type SessionStatusInfo =
   | { type: "idle" }
   | { type: "busy" }
   | { type: "retry"; attempt: number; message: string; next: number }
+  | { type: "offline"; message: string }
 
 // Tool state for tool parts
 export type ToolState =
@@ -1118,6 +1119,7 @@ export interface AgentManagerSendInitialMessage {
   providerID?: string
   modelID?: string
   agent?: string
+  variant?: string
   files?: Array<{ mime: string; url: string }>
 }
 
@@ -2004,6 +2006,7 @@ export interface CreateMultiVersionRequest {
   providerID?: string
   modelID?: string
   agent?: string
+  variant?: string
   files?: FileAttachment[]
   baseBranch?: string
   branchName?: string

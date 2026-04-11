@@ -14,8 +14,8 @@
     "prepare": "husky",
     "random": "echo 'Random script'",
     "hello": "echo 'Hello World!'",
-    "test": "echo 'do not run tests from root' && exit 1",
-    "extension": "bun --cwd packages/kilo-vscode script/launch.ts"
+    "extension": "bun --cwd packages/kilo-vscode script/launch.ts",
+    "test": "echo 'do not run tests from root' && exit 1"
   },
   "workspaces": {
     "packages": [
@@ -42,6 +42,7 @@
       "dompurify": "3.3.3",
       "drizzle-kit": "1.0.0-beta.16-ea816b6",
       "drizzle-orm": "1.0.0-beta.16-ea816b6",
+      "effect": "4.0.0-beta.31",
       "ai": "5.0.124",
       "hono": "4.12.12",
       "hono-openapi": "1.1.2",
@@ -122,6 +123,6 @@
     "@openrouter/ai-sdk-provider@1.5.4": "patches/@openrouter%2Fai-sdk-provider@1.5.4.patch",
     "ghostty-web@0.3.0": "patches/ghostty-web@0.3.0.patch"
   },
-  "version": "7.2.3",
+  "version": "7.2.4",
   "peerDependencies": {}
 }

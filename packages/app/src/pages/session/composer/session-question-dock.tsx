@@ -44,7 +44,7 @@ export const SessionQuestionDock: Component<{
 
   const summary = createMemo(() => {
     const n = Math.min(store.tab + 1, total())
-    return `${n} of ${total()} questions`
+    return language.t("session.question.progress", { current: n, total: total() })
   })
 
   const last = createMemo(() => store.tab >= total() - 1)
@@ -169,7 +169,9 @@ export const SessionQuestionDock: Component<{
   const pick = (answer: string, custom: boolean = false) => {
     // kilocode_change start - find option to check for mode
     // Custom answers won't match a predefined option, so mode switching is intentionally skipped
-    const option = options().find((o) => o.label === answer)
+    const option = options().find((o) => o.label === answer) as
+      | (ReturnType<typeof options>[number] & { mode?: string })
+      | undefined
     // kilocode_change end
 
     setStore("editing", false)

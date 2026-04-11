@@ -37,6 +37,7 @@ const TSX_FILES = [
 const TSX_FILE = TSX_FILES[0]!
 const PROVIDER_FILE = path.join(ROOT, "src/agent-manager/AgentManagerProvider.ts")
 const DIFF_CONTROLLER_FILE = path.join(ROOT, "src/agent-manager/worktree-diff-controller.ts")
+const IMPORTER_FILE = path.join(ROOT, "src/agent-manager/worktree-importer.ts")
 const SETUP_SCRIPT_RUNNER_FILE = path.join(ROOT, "src/agent-manager/SetupScriptRunner.ts")
 
 function readAllCss(): string {
@@ -177,6 +178,10 @@ describe("Agent Manager Provider — onMessage routing", () => {
     return fs.readFileSync(DIFF_CONTROLLER_FILE, "utf-8")
   }
 
+  function importer(): string {
+    return fs.readFileSync(IMPORTER_FILE, "utf-8")
+  }
+
   // -- onMessage dispatches all expected message types -----------------------
 
   it("provider routing handles all documented agentManager.* message types", () => {
@@ -220,6 +225,7 @@ describe("Agent Manager Provider — onMessage routing", () => {
     const text = body("onMessage")
     expect(text).toContain("onWorktreeMessage")
     expect(text).toContain("onSessionMessage")
+    expect(text).toContain("onImportMessage")
     expect(text).toContain("onDiffMessage")
     expect(text).not.toContain("agentManager.requestState")
   })
@@ -313,20 +319,15 @@ describe("Agent Manager Provider — onMessage routing", () => {
    * call pushEmptyState() instead — otherwise the webview stays stuck on
    * loading skeletons forever.
    */
-  it("requestState handler calls pushEmptyState when state is falsy", () => {
-    const text = body("onStateMessage")
-    const start = text.indexOf('"agentManager.requestState"')
-    expect(start, "requestState branch must exist").toBeGreaterThan(-1)
-    const snippet = text.slice(start, start + 700)
-    expect(snippet, "must call pushEmptyState when state is absent").toContain("pushEmptyState")
-    expect(snippet, "must guard on this.state being falsy").toMatch(/!this\.state/)
+  it("requestState handler calls pushEmptyState when this.state is falsy", () => {
+    const text = body("onRequestState")
+    expect(text, "must call pushEmptyState when state is absent").toContain("pushEmptyState")
+    expect(text, "must guard on this.state being falsy").toMatch(/!this\.state/)
   })
 
-  it("requestState handler calls pushState when state is truthy", () => {
-    const text = body("onStateMessage")
-    const start = text.indexOf('"agentManager.requestState"')
-    const snippet = text.slice(start, start + 700)
-    expect(snippet, "must call pushState for the normal path").toContain("this.pushState()")
+  it("requestState handler calls pushState when this.state is truthy", () => {
+    const text = body("onRequestState")
+    expect(text, "must call pushState for the normal path").toContain("this.pushState()")
   })
 
   it("worktree diff behavior lives in the cohesive diff controller", () => {
@@ -338,6 +339,16 @@ describe("Agent Manager Provider — onMessage routing", () => {
     expect(text).toContain("diffSummary")
     expect(text).toContain("shouldStopDiffPolling")
     expect(providerText).toContain("this.diffs")
+  })
+
+  it("worktree import behavior lives in the cohesive importer", () => {
+    const text = importer()
+    const providerText = body("onImportMessage")
+    expect(text).toContain("class WorktreeImporter")
+    expect(text).toContain("createFromPR")
+    expect(text).toContain("listExternalWorktrees")
+    expect(text).toContain("createWorktree")
+    expect(providerText).toContain("this.importer")
   })
 })
 
@@ -563,7 +574,7 @@ const VSCODE_ALLOWED: Record<string, { note: string }> = {
 const MAX_LINES: Record<string, { maxLines: number; note: string }> = {
   "AgentManagerProvider.ts": {
     maxLines: 2000,
-    note: "worktree diff orchestration lives in WorktreeDiffController; lower this after the next cohesive extraction",
+    note: "diff and import workflows are extracted into cohesive domain services; extract more orchestration next",
   },
 }
 

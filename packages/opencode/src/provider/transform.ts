@@ -51,14 +51,9 @@ export namespace ProviderTransform {
     model: Provider.Model,
     options: Record<string, unknown>,
   ): ModelMessage[] {
-    // kilocode_change start - also filter for Bedrock Claude models
-    // Anthropic and Bedrock Claude reject messages with empty content - filter out
-    // empty string messages and remove empty text/reasoning parts from array content
-    if (
-      model.api.npm === "@ai-sdk/anthropic" ||
-      (model.api.npm === "@ai-sdk/amazon-bedrock" && (model.api.id.includes("claude") || model.id.includes("claude")))
-    ) {
-      // kilocode_change end
+    // Anthropic rejects messages with empty content - filter out empty string messages
+    // and remove empty text/reasoning parts from array content
+    if (model.api.npm === "@ai-sdk/anthropic" || model.api.npm === "@ai-sdk/amazon-bedrock") {
       msgs = msgs
         .map((msg) => {
           if (typeof msg.content === "string") {
@@ -734,9 +729,21 @@ export namespace ProviderTransform {
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/perplexity
         return {}
 
-      case "@mymediset/sap-ai-provider":
       case "@jerome-benoit/sap-ai-provider-v2":
         if (model.api.id.includes("anthropic")) {
+          if (isAnthropicAdaptive) {
+            return Object.fromEntries(
+              adaptiveEfforts.map((effort) => [
+                effort,
+                {
+                  thinking: {
+                    type: "adaptive",
+                  },
+                  effort,
+                },
+              ]),
+            )
+          }
           return {
             high: {
               thinking: {
@@ -752,7 +759,26 @@ export namespace ProviderTransform {
             },
           }
         }
-        return Object.fromEntries(WIDELY_SUPPORTED_EFFORTS.map((effort) => [effort, { reasoningEffort: effort }]))
+        if (model.api.id.includes("gemini") && id.includes("2.5")) {
+          return {
+            high: {
+              thinkingConfig: {
+                includeThoughts: true,
+                thinkingBudget: 16000,
+              },
+            },
+            max: {
+              thinkingConfig: {
+                includeThoughts: true,
+                thinkingBudget: 24576,
+              },
+            },
+          }
+        }
+        if (model.api.id.includes("gpt") || /\bo[1-9]/.test(model.api.id)) {
+          return Object.fromEntries(WIDELY_SUPPORTED_EFFORTS.map((effort) => [effort, { reasoningEffort: effort }]))
+        }
+        return {}
     }
     return {}
   }

@@ -29,7 +29,7 @@ storybook-static
 /result
 refs
 Session.vim
-opencode.json
+/opencode.json
 a.out
 target
 .scripts
@@ -58,3 +58,5 @@ tsconfig.tsbuildinfo
 
 # Local dev scripts
 update-new-kilo.sh
+# Kilo
+.kilo/plans/*
