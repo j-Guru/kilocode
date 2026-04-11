@@ -1,0 +1,16 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "mcp": {
+    "github-kilo": {
+      "type": "local",
+      "command": [
+        "github-mcp-server.exe",
+        "stdio"
+      ],
+      "enabled": true,
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{env:GITHUB_KILO_PAT}"
+      }
+    }
+  }
+}
