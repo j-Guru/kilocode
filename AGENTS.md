@@ -83,20 +83,36 @@ Always use the current-platform `--single` workflow for local builds.
 
 This is the build process:
 
-**Step 1 — Clean everything:**
+> **Note on `bun` path**: If `bun` is not on your `PATH`, use the full path: `/c/Users/Admin/.bun/bin/bun.exe` on Windows. All `bun` commands below may need this substitution.
+
+**Step 1 — Ensure dependencies are installed:**
+
+Run from the **repo root** (bun workspaces require a single root install — do NOT run per-package):
+
+```bash
+bun install
+```
+
+This is only needed if `node_modules` is missing or incomplete. It is safe to skip if already done.
+
+**Step 2 — Clean everything:**
 
 ```bash
 cd packages/kilo-vscode
 rm -rf bin/ dist/ out/ && rm -f *.vsix
 ```
 
-**Step 2 — Build the CLI binary for the current platform:**
+**Step 3 — Build the CLI binary from source:**
+
+The binary MUST be built from our local source code (not downloaded from upstream releases) so that all project-specific fixes (e.g. Vertex AI) are included.
+
+Run from the **repo root**:
 
 ```bash
 ./packages/opencode/script/build.ts --single
 ```
 
-Then copy the resulting binary from `packages/opencode/dist/@kilocode/cli-<platform>/bin/` into `packages/kilo-vscode/bin/`.
+This produces the current-platform binary under `packages/opencode/dist/@kilocode/cli-{platform}/bin/`.
 
 Use `--baseline` only when you explicitly need the baseline variant for the current platform:
 
@@ -104,16 +120,18 @@ Use `--baseline` only when you explicitly need the baseline variant for the curr
 ./packages/opencode/script/build.ts --single --baseline
 ```
 
-**Step 3 — Compile the extension:**
+**Step 4 — Compile the extension:**
 
 ```bash
 cd packages/kilo-vscode
 bun run package
 ```
 
-This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. It reuses the binary placed in `bin/` in the previous step.
+This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. The `prepare:cli-binary` step (`script/local-bin.ts`) automatically detects the built binary in `packages/opencode/dist/` and copies it into `bin/` — no manual copy needed.
 
-**Step 4 — Package the VSIX for the current platform:**
+> **Note**: `local-bin.ts` detects if the CLI source has changed since the last build (via git hash). If it has, it will delete `bin/kilo[.exe]` and `packages/opencode/dist/` and attempt a rebuild. Since it calls `bun` by name (requires `bun` on PATH), always pre-build in Step 3 using the full bun path to avoid this failure path.
+
+**Step 5 — Package the VSIX:**
 
 ```bash
 bunx vsce package --no-dependencies --skip-license --target win32-x64
@@ -125,6 +143,8 @@ Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
 
 **Common mistakes to avoid**:
 
+- Do NOT download CLI binaries from upstream `Kilo-Org/kilocode` releases — they won't contain our project-specific fixes. Always build from source.
+- Do NOT run `bun install` from a sub-package directory — it won't correctly resolve workspace packages and will attempt to install all 2500+ packages unnecessarily. Always run from repo root.
 - Do NOT run `bun run build` — that script does not exist in `packages/kilo-vscode/`.
 - Do NOT use `bun run extension` to produce a `.vsix` — that launches VS Code in dev mode, not packaging.
 - Do NOT skip the clean step — `bun run package` does not clean and will reuse stale output. The `rm -f *.vsix` is also required to remove old version `.vsix` files left from previous builds.
@@ -132,6 +152,15 @@ Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
 - Do NOT omit `--skip-license` — it is required by the official build and avoids packaging errors.
 - Do NOT omit `--target` — without it, `vsce` produces a universal (non-platform-targeted) VSIX that bundles all binaries currently in `bin/` and may not install correctly on Windows.
 - The binary in `bin/` **must match the target platform** — e.g. `kilo.exe` for `win32-x64`, `kilo` (Linux ELF) for `linux-x64`. Mismatching binary and target will produce a broken extension.
+
+**After a successful build, commit the regenerated SDK files:**
+
+The `bun run package` step regenerates `packages/sdk/js/src/gen/` files from the current OpenAPI spec. These are tracked in git and must be committed after every build that produces changes:
+
+```bash
+git add packages/sdk/js/src/gen/
+git commit -m "sdk: regenerate after upstream sync"
+```
 
 ## Products
 
