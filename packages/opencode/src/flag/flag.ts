@@ -1,4 +1,6 @@
 // kilocode_change - renamed all OPENCODE_ env vars to KILO_
+import { Config } from "effect"
+
 function truthy(key: string) {
   const value = process.env[key]?.toLowerCase()
   return value === "true" || value === "1"
@@ -17,6 +19,7 @@ export namespace Flag {
   export declare const KILO_CONFIG_DIR: string | undefined
   export const KILO_CONFIG_CONTENT = process.env["KILO_CONFIG_CONTENT"]
   export const KILO_DISABLE_AUTOUPDATE = truthy("KILO_DISABLE_AUTOUPDATE")
+  export const KILO_ALWAYS_NOTIFY_UPDATE = truthy("KILO_ALWAYS_NOTIFY_UPDATE")
   export const KILO_DISABLE_PRUNE = truthy("KILO_DISABLE_PRUNE")
   export const KILO_DISABLE_TERMINAL_TITLE = truthy("KILO_DISABLE_TERMINAL_TITLE")
   export const KILO_PERMISSION = process.env["KILO_PERMISSION"]
@@ -38,8 +41,12 @@ export namespace Flag {
 
   // Experimental
   export const KILO_EXPERIMENTAL = truthy("KILO_EXPERIMENTAL")
-  export const KILO_EXPERIMENTAL_FILEWATCHER = truthy("KILO_EXPERIMENTAL_FILEWATCHER")
-  export const KILO_EXPERIMENTAL_DISABLE_FILEWATCHER = truthy("KILO_EXPERIMENTAL_DISABLE_FILEWATCHER")
+  export const KILO_EXPERIMENTAL_FILEWATCHER = Config.boolean("KILO_EXPERIMENTAL_FILEWATCHER").pipe(
+    Config.withDefault(false),
+  )
+  export const KILO_EXPERIMENTAL_DISABLE_FILEWATCHER = Config.boolean(
+    "KILO_EXPERIMENTAL_DISABLE_FILEWATCHER",
+  ).pipe(Config.withDefault(false))
   export const KILO_EXPERIMENTAL_ICON_DISCOVERY = KILO_EXPERIMENTAL || truthy("KILO_EXPERIMENTAL_ICON_DISCOVERY")
 
   const copy = process.env["KILO_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"]
@@ -51,7 +58,9 @@ export namespace Flag {
   export const KILO_EXPERIMENTAL_OXFMT = KILO_EXPERIMENTAL || truthy("KILO_EXPERIMENTAL_OXFMT")
   export const KILO_EXPERIMENTAL_LSP_TY = truthy("KILO_EXPERIMENTAL_LSP_TY")
   export const KILO_EXPERIMENTAL_LSP_TOOL = KILO_EXPERIMENTAL || truthy("KILO_EXPERIMENTAL_LSP_TOOL")
-  export const KILO_DISABLE_FILETIME_CHECK = truthy("KILO_DISABLE_FILETIME_CHECK")
+  export const KILO_DISABLE_FILETIME_CHECK = Config.boolean("KILO_DISABLE_FILETIME_CHECK").pipe(
+    Config.withDefault(false),
+  )
   export const KILO_EXPERIMENTAL_PLAN_MODE = KILO_EXPERIMENTAL || truthy("KILO_EXPERIMENTAL_PLAN_MODE")
   export const KILO_EXPERIMENTAL_WORKSPACES = KILO_EXPERIMENTAL || truthy("KILO_EXPERIMENTAL_WORKSPACES")
   export const KILO_EXPERIMENTAL_MARKDOWN = !falsy("KILO_EXPERIMENTAL_MARKDOWN")

@@ -1,0 +1,839 @@
+# Upstream Merge Conflict Report
+
+Generated: 2026-04-11T10:15:49.045Z
+
+## Summary
+
+- **Upstream Version**: 1.3.0
+- **Upstream Commit**: `eb3bfffa`
+- **Base Branch**: main
+- **Merge Branch**: johnnyamancio/kilo-opencode-v1.3.0
+- **Total Files Changed**: 396
+
+## Files by Recommendation
+
+### Skip (Auto-Remove)
+
+- `packages/console/core/sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+- `packages/console/function/sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+- `packages/console/resource/sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+- `packages/enterprise/sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+- `packages/function/sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+- `sst-env.d.ts` (code)
+  - File should be skipped (does not exist in Kilo fork)
+
+### i18n Transform (Auto-Apply Kilo Branding)
+
+- `packages/app/src/i18n/ar.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/br.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/bs.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/da.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/de.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/en.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/es.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/fr.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/ja.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/ko.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/no.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/pl.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/ru.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/th.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/tr.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/zh.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+- `packages/app/src/i18n/zht.ts` (i18n)
+  - i18n file: take upstream translations and apply Kilo branding
+
+### Take Upstream + Kilo Branding (Auto)
+
+- `packages/app/e2e/app/home.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/prompt/prompt-multiline.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/prompt/prompt-slash-terminal.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/session/session-model-persistence.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/session/session-review.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/settings/settings-keybinds.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/terminal/terminal-init.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/e2e/terminal/terminal-tabs.spec.ts` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/dialog-custom-provider.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/dialog-edit-project.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/dialog-select-mcp.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/dialog-select-server.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/session/session-header.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/session/session-sortable-terminal-tab.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/status-popover.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/terminal.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/components/titlebar.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/command.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/global-sync.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/local.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/platform.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/prompt.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/context/terminal.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/directory-layout.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/error.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/layout.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/layout/sidebar-project.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/layout/sidebar-workspace.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/session/file-tabs.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/session/message-timeline.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/app/src/pages/session/terminal-panel.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+- `packages/ui/src/components/line-comment.tsx` (code)
+  - Branding-only file: take upstream and apply Kilo branding transforms
+
+### Package.json Transform (Auto)
+
+- `package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/app/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/console/app/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/console/core/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/console/function/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/console/mail/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/desktop-electron/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/desktop/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/enterprise/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/function/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/opencode/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/plugin/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/sdk/js/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/slack/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/ui/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/util/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `packages/web/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+- `sdks/vscode/package.json` (package)
+  - Package.json: take upstream, transform names, inject Kilo deps, preserve version
+
+### Script Transform (Auto)
+
+- `packages/console/core/script/lookup-user.ts` (script)
+  - Script file: take upstream and transform GitHub references
+- `packages/opencode/script/build-node.ts` (script)
+  - Script file: take upstream and transform GitHub references
+
+### Extension Transform (Auto)
+
+- `packages/extensions/zed/extension.toml` (extension)
+  - Extension file: take upstream and apply Kilo branding
+
+### Web/Docs Transform (Auto)
+
+- `packages/web/src/content/docs/agents.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ar/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ar/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ar/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/bs/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/bs/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/bs/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/config.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/da/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/da/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/da/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/de/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/de/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/de/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/es/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/es/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/es/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/fr/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/fr/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/fr/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/it/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/it/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/it/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/it/zen.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ja/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ja/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ja/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ko/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ko/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ko/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/nb/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/nb/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/nb/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pl/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pl/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pl/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pt-br/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pt-br/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/pt-br/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ru/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ru/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/ru/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/th/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/th/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/th/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/tr/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/tr/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/tr/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zen.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-cn/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-cn/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-cn/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-tw/cli.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-tw/go.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+- `packages/web/src/content/docs/zh-tw/providers.mdx` (web)
+  - Web/docs file: take upstream and apply Kilo branding
+
+### Keep Kilo Version (Ours)
+
+- `.opencode/agent/translator.md` (markdown)
+  - Markdown files are typically Kilo-specific documentation
+- `packages/app/e2e/AGENTS.md` (markdown)
+  - File is Kilo-specific and should not be overwritten
+- `packages/opencode/AGENTS.md` (markdown)
+  - File is Kilo-specific and should not be overwritten
+- `packages/opencode/specs/effect-migration.md` (markdown)
+  - Markdown files are typically Kilo-specific documentation
+- `packages/sdk/openapi.json` (config)
+  - File is Kilo-specific and should not be overwritten
+
+### Manual Review Required
+
+- `.github/VOUCHED.td` (other)
+  - File needs manual review
+- `.github/actions/setup-bun/action.yml` (config)
+  - Config files may have Kilo-specific settings
+- `.github/workflows/test.yml` (config)
+  - Config files may have Kilo-specific settings
+- `.opencode/.gitignore` (other)
+  - File needs manual review
+- `.opencode/tool/github-pr-search.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `.opencode/tool/github-pr-search.txt` (other)
+  - File needs manual review
+- `.opencode/tool/github-triage.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `.opencode/tool/github-triage.txt` (other)
+  - File needs manual review
+- `bun.lock` (other)
+  - File needs manual review
+- `infra/console.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `nix/hashes.json` (config)
+  - Config files may have Kilo-specific settings
+- `packages/app/e2e/actions.ts` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/e2e/fixtures.ts` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/e2e/projects/projects-switch.spec.ts` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/e2e/projects/workspace-new-session.spec.ts` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/e2e/projects/workspaces.spec.ts` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/src/app.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/components/dialog-connect-provider.tsx` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/src/components/dialog-custom-provider-form.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/components/dialog-custom-provider.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/components/prompt-input.tsx` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/src/components/prompt-input/files.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/constants/file-picker.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/context/global-sync/child-store.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/pages/layout/helpers.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/pages/layout/helpers.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/pages/session.tsx` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/src/pages/session/composer/session-question-dock.tsx` (code)
+  - File has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/app/src/testing/prompt.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/testing/terminal.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/app/src/utils/persist.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/component/icon.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/component/modal.css` (other)
+  - File needs manual review
+- `packages/console/app/src/i18n/ar.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/br.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/da.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/de.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/en.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/es.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/fr.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/it.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/ja.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/ko.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/no.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/pl.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/ru.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/th.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/tr.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/zh.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/i18n/zht.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/lib/salesforce.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/api/enterprise.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/enterprise/index.css` (other)
+  - File needs manual review
+- `packages/console/app/src/routes/enterprise/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/go/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/stripe/webhook.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/workspace/[id]/billing/billing-section.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/workspace/[id]/billing/payment-section.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/workspace/[id]/go/lite-section.module.css` (other)
+  - File needs manual review
+- `packages/console/app/src/routes/workspace/[id]/go/lite-section.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/workspace/[id]/model-section.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/handler.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/provider/anthropic.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/provider/google.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/provider/openai-compatible.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/provider/openai.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/provider/provider.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/app/src/routes/zen/util/trialLimiter.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/core/src/billing.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/core/src/lite.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/core/src/model.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/console/core/src/schema/billing.sql.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/desktop-electron/src/main/ipc.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/desktop-electron/src/preload/types.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/desktop-electron/src/renderer/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/desktop-electron/src/renderer/updater.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/desktop/src/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/git` (other)
+  - File needs manual review
+- `packages/opencode/script/build.ts` (script)
+  - Script file has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/opencode/script/seed-e2e.ts` (script)
+  - Script file has kilocode_change markers — auto-transform skipped, needs manual review
+- `packages/opencode/src/account/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/account/repo.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/account/schema.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/account/service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/agent/agent.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/auth/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/auth/service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/bus/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/account.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/debug/agent.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/models.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/pr.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/providers.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/run.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/app.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/component/dialog-provider.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/component/dialog-workspace-list.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/component/prompt/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/component/prompt/part.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/routes/session/dialog-fork-from-timeline.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/routes/session/dialog-message.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/routes/session/index.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/ui/dialog-confirm.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/ui/dialog.tsx` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/util/editor.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/tui/worker.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/cmd/upgrade.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/cli/upgrade.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/command/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/config/config.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/control-plane/workspace.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/effect/instance-context.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/effect/instance-registry.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/effect/instance-state.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/effect/run-service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/effect/runtime.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/file/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/file/time.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/file/watcher.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/filesystem/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/flag/flag.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/format/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/global/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/ide/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/installation/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/lsp/client.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/lsp/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/lsp/launch.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/lsp/server.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/mcp/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/node.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/permission/evaluate.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/permission/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/permission/next.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/permission/service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/plugin/codex.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/plugin/copilot.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/plugin/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/project/bootstrap.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/project/instance.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/project/vcs.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/auth-service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/auth.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/error.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/provider.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/schema.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/provider/transform.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/pty/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/question/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/question/service.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/scheduler/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/event.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/global.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/permission.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/project.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/provider.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/pty.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/routes/session.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/server/server.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/compaction.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/llm.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/message-v2.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/processor.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/prompt.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/prompt/anthropic-20250930.txt` (other)
+  - File needs manual review
+- `packages/opencode/src/session/prompt/codex.txt` (other)
+  - File needs manual review
+- `packages/opencode/src/session/prompt/default.txt` (other)
+  - File needs manual review
+- `packages/opencode/src/session/session.sql.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/status.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/summary.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/session/system.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/share/share-next.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/skill/discovery.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/skill/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/skill/skill.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/snapshot/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/storage/db.bun.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/storage/db.node.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/storage/db.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/bash.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/edit.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/read.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/registry.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/task.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/tool.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/truncate.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/truncation-dir.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/truncation.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/tool/write.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/effect-zod.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/eventloop.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/fn.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/instance-state.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/process.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/src/util/which.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/account/repo.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/account/service.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/agent/agent.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/cli/cmd/tui/prompt-part.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/config/config.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/effect/instance-state.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/effect/run-service.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/file/index.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/file/time.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/file/watcher.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/filesystem/filesystem.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/fixture/effect.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/fixture/instance.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/format/format.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/installation/installation.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/lib/effect.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/lib/filesystem.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/lsp/launch.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/permission-task.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/permission/next.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/plugin/auth-override.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/preload.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/project/vcs.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/provider/amazon-bedrock.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/provider/auth.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/provider/gitlab-duo.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/provider/provider.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/provider/transform.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/pty/pty-session.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/question/question.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/scheduler.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/server/project-init-git.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/session/llm.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/session/message-v2.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/session/system.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/share/share-next.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/skill/discovery.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/skill/skill.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/snapshot/snapshot.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/storage/db.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/bash.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/edit.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/external-directory.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/fixtures/models-api.json` (config)
+  - Config files may have Kilo-specific settings
+- `packages/opencode/test/tool/read.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/registry.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/skill.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/task.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/truncation.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/tool/write.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/util/instance-state.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/opencode/test/util/process.test.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/plugin/src/index.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/sdk/js/src/v2/gen/sdk.gen.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/sdk/js/src/v2/gen/types.gen.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/ui/src/components/line-comment-styles.ts` (code)
+  - Code files need manual review for kilocode_change markers
+- `packages/ui/src/components/message-part.css` (other)
+  - File needs manual review
+- `packages/ui/src/theme/themes/oc-2.json` (config)
+  - Config files may have Kilo-specific settings
+- `patches/@ai-sdk%2Fxai@2.0.51.patch` (other)
+  - File needs manual review
+- `patches/solid-js@1.9.10.patch` (other)
+  - File needs manual review
+
+## Recommendations
+
+- 6 files will be skipped (auto-removed)
+- 17 i18n files will be auto-transformed
+- 5 files will keep Kilo's version
+- 257 files require manual review

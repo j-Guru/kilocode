@@ -1,7 +1,6 @@
 /// <reference path="../env.d.ts" />
 // import { Octokit } from "@octokit/rest"
 import { tool } from "@kilocode/plugin"
-import DESCRIPTION from "./github-triage.txt"
 
 function getIssueNumber(): number {
   const issue = parseInt(process.env.ISSUE_NUMBER ?? "", 10)
@@ -26,7 +25,12 @@ async function githubFetch(endpoint: string, options: RequestInit = {}) {
 }
 
 export default tool({
-  description: DESCRIPTION,
+  description: `Use this tool to assign and/or label a GitHub issue.
+
+Choose labels and assignee using the current triage policy and ownership rules.
+Pick the most fitting labels for the issue and assign one owner.
+
+If unsure, choose the team/section with the most overlap with the issue and assign a member from that team at random.`,
   args: {
     assignee: tool.schema
       .enum(["thdxr", "adamdotdevin", "rekram1-node", "fwang", "jayair", "kommander"])

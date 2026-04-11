@@ -57,7 +57,7 @@ export const UpgradeCommand = {
     if (err) {
       spinner.stop("Upgrade failed", 1)
       if (err instanceof Installation.UpgradeFailedError) {
-        prompts.log.error(err.data.stderr) // kilocode_change - removed choco special case
+        prompts.log.error(err.stderr) // kilocode_change - removed choco special case
       } else if (err instanceof Error) prompts.log.error(err.message)
       prompts.outro("Done")
       return

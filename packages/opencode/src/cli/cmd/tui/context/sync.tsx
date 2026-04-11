@@ -30,7 +30,6 @@ import { batch, onMount } from "solid-js"
 import { Log } from "@/util/log"
 import type { Path } from "@kilocode/sdk"
 import type { Workspace } from "@kilocode/sdk/v2"
-import { useToast } from "../ui/toast" // kilocode_change
 
 export const { use: useSync, provider: SyncProvider } = createSimpleContext({
   name: "Sync",

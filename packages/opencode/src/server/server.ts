@@ -1,5 +1,3 @@
-import { BusEvent } from "@/bus/bus-event"
-import { Bus } from "@/bus"
 import { Log } from "../util/log"
 import { describeRoute, generateSpecs, validator, resolver, openAPIRouteHandler } from "hono-openapi"
 import { Hono } from "hono"
@@ -16,7 +14,7 @@ import { TuiRoutes } from "./routes/tui"
 import { Instance } from "../project/instance"
 import { Vcs } from "../project/vcs"
 import { Agent } from "../agent/agent"
-import { Skill } from "../skill/skill"
+import { Skill } from "../skill"
 import { Auth } from "../auth"
 import { ModelCache } from "../provider/model-cache" // kilocode_change
 import { Flag } from "../flag/flag"
@@ -40,6 +38,7 @@ import { Database } from "../storage/db" // kilocode_change
 import { Session } from "../session" // kilocode_change
 import { Identifier } from "../id/id" // kilocode_change
 import { SessionTable, MessageTable, PartTable } from "../session/session.sql" // kilocode_change
+import { EventRoutes } from "./routes/event"
 import { InstanceBootstrap } from "../project/bootstrap"
 import { NotFoundError } from "../storage/db"
 import type { ContentfulStatusCode } from "hono/utils/http-status"
@@ -79,6 +78,7 @@ export namespace Server {
             let status: ContentfulStatusCode
             if (err instanceof NotFoundError) status = 404
             else if (err instanceof Provider.ModelNotFoundError) status = 400
+            else if (err.name === "ProviderAuthValidationFailed") status = 400
             else if (err.name.startsWith("Worktree")) status = 400
             else status = 500
             return c.json(err.toObject(), { status })
@@ -173,7 +173,7 @@ export namespace Server {
               providerID: ProviderID.zod,
             }),
           ),
-          validator("json", Auth.Info),
+          validator("json", Auth.Info.zod),
           async (c) => {
             const providerID = c.req.valid("param").providerID
             const info = c.req.valid("json")

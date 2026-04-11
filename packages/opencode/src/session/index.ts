@@ -29,7 +29,7 @@ import { Filesystem } from "../util/filesystem" // kilocode_change: normalize di
 
 import type { Provider } from "@/provider/provider"
 import { ModelID, ProviderID } from "@/provider/schema"
-import { PermissionNext } from "@/permission/next"
+import { Permission } from "@/permission"
 import { Global } from "@/global"
 import type { LanguageModelV2Usage } from "@ai-sdk/provider"
 import { iife } from "@/util/iife"
@@ -179,7 +179,7 @@ export namespace Session {
         compacting: z.number().optional(),
         archived: z.number().optional(),
       }),
-      permission: PermissionNext.Ruleset.optional(),
+      permission: Permission.Ruleset.optional(),
       revert: z
         .object({
           messageID: MessageID.zod,
@@ -365,7 +365,7 @@ export namespace Session {
     parentID?: SessionID
     workspaceID?: WorkspaceID
     directory: string
-    permission?: PermissionNext.Ruleset
+    permission?: Permission.Ruleset
   }) {
     const result: Info = {
       id: SessionID.descending(input.id),
@@ -488,7 +488,7 @@ export namespace Session {
   export const setPermission = fn(
     z.object({
       sessionID: SessionID.zod,
-      permission: PermissionNext.Ruleset,
+      permission: Permission.Ruleset,
     }),
     async (input) => {
       return Database.use((db) => {

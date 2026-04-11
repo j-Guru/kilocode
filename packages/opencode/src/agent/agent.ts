@@ -5,7 +5,7 @@ import { ModelID, ProviderID } from "../provider/schema"
 import { generateObject, streamObject, type ModelMessage } from "ai"
 import { SystemPrompt } from "../session/system"
 import { Instance } from "../project/instance"
-import { Truncate } from "../tool/truncation"
+import { Truncate } from "../tool/truncate"
 import { Auth } from "../auth"
 import { ProviderTransform } from "../provider/transform"
 
@@ -18,7 +18,7 @@ import PROMPT_ORCHESTRATOR from "./prompt/orchestrator.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
 
-import { PermissionNext } from "@/permission/next"
+import { Permission } from "@/permission"
 import { NamedError } from "@opencode-ai/util/error" // kilocode_change
 import { Glob } from "../util/glob" // kilocode_change
 import { mergeDeep, pipe, sortBy, values } from "remeda"
@@ -42,7 +42,7 @@ export namespace Agent {
       topP: z.number().optional(),
       temperature: z.number().optional(),
       color: z.string().optional(),
-      permission: PermissionNext.Ruleset,
+      permission: Permission.Ruleset,
       model: z
         .object({
           modelID: ModelID.zod,
@@ -184,7 +184,7 @@ export namespace Agent {
     }
     // kilocode_change end
 
-    const defaults = PermissionNext.fromConfig({
+    const defaults = Permission.fromConfig({
       "*": "allow",
       bash, // kilocode_change
       doom_loop: "ask",
@@ -204,7 +204,7 @@ export namespace Agent {
         "*.env.example": "allow",
       },
     })
-    const user = PermissionNext.fromConfig(cfg.permission ?? {})
+    const user = Permission.fromConfig(cfg.permission ?? {})
 
     const result: Record<string, Info> = {
       // kilocode_change start
@@ -213,9 +213,9 @@ export namespace Agent {
         description: "The default agent. Executes tools based on configured permissions.",
         // kilocode_change end
         options: {},
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             question: "allow",
             plan_enter: "allow",
           }),
@@ -228,9 +228,9 @@ export namespace Agent {
         name: "plan",
         description: "Plan mode. Only allows editing plan files; asks before editing anything else.",
         options: {},
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             question: "allow",
             plan_exit: "allow",
             bash: readOnlyBash, // kilocode_change: read-only bash for plan mode (mirrors ask agent)
@@ -256,9 +256,9 @@ export namespace Agent {
         description: "Diagnose and fix software issues with systematic debugging methodology.",
         prompt: PROMPT_DEBUG,
         options: {},
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             question: "allow",
             plan_enter: "allow",
           }),
@@ -272,9 +272,9 @@ export namespace Agent {
         description: "Coordinate complex tasks by delegating to specialized agents in parallel.",
         prompt: PROMPT_ORCHESTRATOR,
         options: {},
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
             read: "allow",
             grep: "allow",
@@ -295,7 +295,7 @@ export namespace Agent {
           }),
           user,
           // kilocode_change start - enforce bash deny after user so user config cannot re-enable shell
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             bash: "deny",
           }),
           // kilocode_change end
@@ -309,10 +309,10 @@ export namespace Agent {
         description: "Get answers and explanations without making changes to the codebase.",
         prompt: PROMPT_ASK,
         options: {},
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
           user, // kilocode_change: user before ask-specific so ask's deny+allowlist wins
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
             bash: readOnlyBash,
             read: {
@@ -343,9 +343,9 @@ export namespace Agent {
       general: {
         name: "general",
         description: `General-purpose agent for researching complex questions and executing multi-step tasks. Use this agent to execute multiple units of work in parallel.`,
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             todoread: "deny",
             todowrite: "deny",
           }),
@@ -357,9 +357,9 @@ export namespace Agent {
       },
       explore: {
         name: "explore",
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
             grep: "allow",
             glob: "allow",
@@ -392,9 +392,9 @@ export namespace Agent {
         native: true,
         hidden: true,
         prompt: PROMPT_COMPACTION,
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
           }),
           user,
@@ -408,9 +408,9 @@ export namespace Agent {
         native: true,
         hidden: true,
         temperature: 0.5,
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
           }),
           user,
@@ -423,9 +423,9 @@ export namespace Agent {
         options: {},
         native: true,
         hidden: true,
-        permission: PermissionNext.merge(
+        permission: Permission.merge(
           defaults,
-          PermissionNext.fromConfig({
+          Permission.fromConfig({
             "*": "deny",
           }),
           user,
@@ -447,7 +447,7 @@ export namespace Agent {
         item = result[effectiveKey] = {
           name: effectiveKey,
           mode: "all",
-          permission: PermissionNext.merge(defaults, user),
+          permission: Permission.merge(defaults, user),
           options: {},
           native: false,
         }
@@ -470,7 +470,7 @@ export namespace Agent {
         item.displayName = item.options.displayName
       }
       // kilocode_change end
-      item.permission = PermissionNext.merge(item.permission, PermissionNext.fromConfig(value.permission ?? {}))
+      item.permission = Permission.merge(item.permission, Permission.fromConfig(value.permission ?? {}))
     }
 
     // Ensure Truncate.GLOB is allowed unless explicitly configured
@@ -483,9 +483,9 @@ export namespace Agent {
       })
       if (explicit) continue
 
-      result[name].permission = PermissionNext.merge(
+      result[name].permission = Permission.merge(
         result[name].permission,
-        PermissionNext.fromConfig({ external_directory: { [Truncate.GLOB]: "allow" } }),
+        Permission.fromConfig({ external_directory: { [Truncate.GLOB]: "allow" } }),
       )
     }
 
@@ -504,7 +504,10 @@ export namespace Agent {
     return pipe(
       await state(),
       values(),
-      sortBy([(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "code"), "desc"]), // kilocode_change - renamed from "build" to "code"
+      sortBy(
+        [(x) => (cfg.default_agent ? x.name === cfg.default_agent : x.name === "code"), "desc"], // kilocode_change - renamed from "build" to "code"
+        [(x) => x.name, "asc"],
+      ),
     )
   }
 
@@ -571,11 +574,11 @@ export namespace Agent {
       }),
     } satisfies Parameters<typeof generateObject>[0]
 
+    // TODO: clean this up so provider specific logic doesnt bleed over
     if (defaultModel.providerID === "openai" && (await Auth.get(defaultModel.providerID))?.type === "oauth") {
       const result = streamObject({
         ...params,
         providerOptions: ProviderTransform.providerOptions(model, {
-          instructions: SystemPrompt.instructions(),
           store: false,
         }),
         onError: () => {},
