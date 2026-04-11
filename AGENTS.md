@@ -67,6 +67,7 @@ Failing to use `--no-pager` will cause git commands to hang waiting for user inp
 - **Dev**: `bun run dev` (runs from root) or `bun run --cwd packages/opencode --conditions=browser src/index.ts`
 - **Dev with params**: `bun dev -- help`
 - **Extension**: `bun run extension` (build + launch VS Code with the extension in dev mode). Pass `--no-build` to skip the build.
+- **Local CLI binary**: `./packages/opencode/script/build.ts --single` builds only the current OS/arch binary into `packages/opencode/dist/`
 - **Typecheck**: `bun turbo typecheck` (uses `tsgo`, not `tsc`)
 - **Test**: `bun test` from `packages/opencode/` (NOT from root -- root blocks tests)
 - **Single test**: `bun test test/tool/tool.test.ts` from `packages/opencode/`
@@ -78,32 +79,9 @@ Failing to use `--no-pager` will cause git commands to hang waiting for user inp
 
 ### Building the VSIX (VS Code Extension Package)
 
-The authoritative build script is `packages/kilo-vscode/script/build.ts` — this is what CI uses. It cleans all output directories, rebuilds everything, and produces per-platform `.vsix` files.
+Always use the current-platform `--single` workflow for local builds.
 
-#### CI / full multi-platform build
-
-Requires all CLI platform binaries to be present under `packages/opencode/dist/` (produced by `packages/opencode/script/build.ts`). Run from `packages/kilo-vscode/`:
-
-```bash
-bun script/build.ts
-```
-
-This script:
-
-1. **Cleans** `bin/`, `dist/`, and `out/` directories first
-2. Rebuilds the SDK (`packages/sdk/js/`)
-3. Typechecks and lints
-4. Compiles JS via esbuild in production mode
-5. For each platform target, copies the matching CLI binary into `bin/` and runs:
-   ```bash
-   vsce package --no-dependencies --skip-license --target {platform} -o out/kilo-vscode-{platform}.vsix
-   ```
-
-Output: `packages/kilo-vscode/out/kilo-vscode-{platform}.vsix` for each target platform.
-
-#### Local platform-targeted build (recommended)
-
-This is the correct way to build a VSIX for a specific platform locally. The process is:
+This is the build process:
 
 **Step 1 — Clean everything:**
 
@@ -112,20 +90,18 @@ cd packages/kilo-vscode
 rm -rf bin/ dist/ out/ && rm -f *.vsix
 ```
 
-**Step 2 — Get the CLI binary for the target platform.**
-
-The binary must come from the matching GitHub release asset (e.g. `v7.1.21`). Download and extract into `bin/`:
-
-- **Windows x64**: download `kilo-windows-x64.zip`, extract `kilo.exe` → `bin/kilo.exe`
-- **Linux x64**: download `kilo-linux-x64.tar.gz`, extract `kilo` → `bin/kilo`
-- **macOS arm64**: download `kilo-darwin-arm64.zip`, extract `kilo` → `bin/kilo`
-
-Example for Windows x64:
+**Step 2 — Build the CLI binary for the current platform:**
 
 ```bash
-curl -L "https://github.com/Kilo-Org/kilocode/releases/download/v{version}/kilo-windows-x64.zip" -o /tmp/kilo-windows-x64.zip
-mkdir -p packages/kilo-vscode/bin
-unzip -j /tmp/kilo-windows-x64.zip "kilo.exe" -d packages/kilo-vscode/bin/
+./packages/opencode/script/build.ts --single
+```
+
+Then copy the resulting binary from `packages/opencode/dist/@kilocode/cli-<platform>/bin/` into `packages/kilo-vscode/bin/`.
+
+Use `--baseline` only when you explicitly need the baseline variant for the current platform:
+
+```bash
+./packages/opencode/script/build.ts --single --baseline
 ```
 
 **Step 3 — Compile the extension:**
@@ -137,13 +113,13 @@ bun run package
 
 This rebuilds the SDK, typechecks, lints, and compiles JS via esbuild in production mode. It reuses the binary placed in `bin/` in the previous step.
 
-**Step 4 — Package the VSIX:**
+**Step 4 — Package the VSIX for the current platform:**
 
 ```bash
 bunx vsce package --no-dependencies --skip-license --target win32-x64
 ```
 
-Replace `win32-x64` with the appropriate target: `linux-x64`, `darwin-arm64`, `darwin-x64`, `linux-arm64`, `alpine-x64`, `win32-arm64`, etc.
+Replace `win32-x64` with the current platform target: `linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `alpine-x64`, `win32-x64`, `win32-arm64`, etc.
 
 Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
 
@@ -152,6 +128,7 @@ Output: `packages/kilo-vscode/kilo-code-{target}-{version}.vsix`
 - Do NOT run `bun run build` — that script does not exist in `packages/kilo-vscode/`.
 - Do NOT use `bun run extension` to produce a `.vsix` — that launches VS Code in dev mode, not packaging.
 - Do NOT skip the clean step — `bun run package` does not clean and will reuse stale output. The `rm -f *.vsix` is also required to remove old version `.vsix` files left from previous builds.
+- Do NOT use multi-platform build instructions for routine work — always use `./packages/opencode/script/build.ts --single`.
 - Do NOT omit `--skip-license` — it is required by the official build and avoids packaging errors.
 - Do NOT omit `--target` — without it, `vsce` produces a universal (non-platform-targeted) VSIX that bundles all binaries currently in `bin/` and may not install correctly on Windows.
 - The binary in `bin/` **must match the target platform** — e.g. `kilo.exe` for `win32-x64`, `kilo` (Linux ELF) for `linux-x64`. Mismatching binary and target will produce a broken extension.
