@@ -1,5 +1,6 @@
-plans/
+node_modules
+plans
 bun.lock
 package-lock.json
 package.json
-package-lock.json
+.gitignore
