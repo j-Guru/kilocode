@@ -4,6 +4,8 @@ import path from "path"
 
 const rootPkgPath = path.resolve(import.meta.dir, "../../../package.json")
 const rootPkg = await Bun.file(rootPkgPath).json()
+const vscodePkgPath = path.resolve(import.meta.dir, "../../../packages/kilo-vscode/package.json")
+const vscodePkg = await Bun.file(vscodePkgPath).json()
 const expectedBunVersion = rootPkg.packageManager?.split("@")[1]
 
 if (!expectedBunVersion) {
@@ -87,6 +89,14 @@ function bumpVersion(current: string, type: string) {
   if (type === "minor") return `${version.major}.${version.minor + 1}.0`
   return `${version.major}.${version.minor}.${version.patch + 1}`
 }
+
+function previewVersion(channel: string) {
+  if (channel && typeof vscodePkg.version === "string") {
+    return vscodePkg.version
+  }
+  if (typeof rootPkg.version === "string") return rootPkg.version
+  return "0.0.0"
+}
 // kilocode_change end
 
 const VERSION = await (async () => {
@@ -98,7 +108,7 @@ const VERSION = await (async () => {
       return bumpVersion(current, env.KILO_BUMP.toLowerCase())
     }
     // kilocode_change end
-    return `0.0.0-${CHANNEL}-${new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "")}`
+    return previewVersion(CHANNEL)
   }
   const version = await fetchHighest() // kilocode_change
   return bumpVersion(version, env.KILO_BUMP?.toLowerCase() ?? "patch") // kilocode_change
