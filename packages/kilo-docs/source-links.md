@@ -6,6 +6,8 @@
 - <https://api.apertis.ai/v1>
   <!-- packages/opencode/src/provider/model-cache.ts -->
   <!-- packages/opencode/src/provider/models.ts -->
+- <https://api.githubcopilot.com>
+  <!-- packages/opencode/src/plugin/github-copilot/copilot.ts -->
 - <https://api.kilo.ai>
   <!-- packages/opencode/src/cli/cmd/github.ts -->
 - <https://app.kilo.ai>
@@ -63,9 +65,6 @@
   <!-- packages/opencode/src/provider/transform.ts -->
 - <https://github.com/oven-sh/bun/issues/16682>
   <!-- packages/opencode/src/provider/provider.ts -->
-- <https://github.com/oven-sh/bun/issues/19936>
-  <!-- packages/opencode/src/bun/index.ts -->
-  <!-- packages/opencode/src/config/config.ts -->
 - <https://github.com/vercel/ai/blob/2dc67e0ef538307f21368db32d5a12345d98831b/packages/ai/src/logger/log-warnings.ts#L85>
   <!-- packages/opencode/src/server/server.ts -->
 - <https://gitlab.com>
@@ -104,6 +103,7 @@
   <!-- packages/opencode/src/config/config.ts -->
 - <https://opencode.ai/>
   <!-- packages/opencode/src/cli/cmd/generate.ts -->
+  <!-- packages/opencode/src/provider/provider.ts -->
 - <https://opencode.ai/auth>
   <!-- packages/opencode/src/cli/cmd/providers.ts -->
 - <https://opencode.ai/docs/agents>
@@ -113,7 +113,7 @@
 - <https://opencode.ai/docs/providers/#cloudflare-ai-gateway>
   <!-- packages/opencode/src/cli/cmd/providers.ts -->
 - <https://opencode.ai/tui.json>
-  <!-- packages/opencode/src/config/migrate-tui-config.ts -->
+  <!-- packages/opencode/src/config/tui-migrate.ts -->
 - <https://opencode.ai/zen>
   <!-- packages/kilo-vscode/webview-ui/src/i18n/en.ts -->
 - <https://openrouter.ai/docs/use-cases/usage-accounting>
@@ -165,6 +165,6 @@
 - <https://www.morphllm.com/>
   <!-- packages/opencode/src/tool/warpgrep.ts -->
 - <https://www.rfc-editor.org/rfc/rfc8628#section-3.5>
-  <!-- packages/opencode/src/plugin/copilot.ts -->
+  <!-- packages/opencode/src/plugin/github-copilot/copilot.ts -->
 - <https://zod.dev/v4/changelog?id=zfunction>
   <!-- packages/opencode/src/command/index.ts -->
