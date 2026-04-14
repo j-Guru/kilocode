@@ -63,8 +63,11 @@ export const ChatView: Component<ChatViewProps> = (props) => {
   const standaloneQuestions = createMemo(() => familyQuestions().filter((q) => !q.tool))
   const suggestionRequest = () => familySuggestions()[0]
   const permissionRequest = () => familyPermissions().find((p) => p.sessionID === id()) ?? familyPermissions()[0]
-  const blocked = () => familyPermissions().length > 0 || familyQuestions().length > 0
-  const dock = () => !props.readonly || !!permissionRequest()
+  const blocked = () =>
+    familyPermissions().length > 0 ||
+    familyQuestions().length > 0 ||
+    familySuggestions().some((s) => s.blocking !== false)
+  const dock = () => !props.readonly || !!permissionRequest() || !!suggestionRequest()
 
   // When a bottom-dock permission disappears while the session is busy,
   // the scroll container grows taller. Dispatch a custom event so MessageList can
