@@ -1329,7 +1329,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.experimental.console.get({\n  ...\n})"
+            "source": "import { createKiloClient } from \"@kilocode/sdk\n\nconst client = createKiloClient()\nawait client.experimental.console.get({\n  ...\n})"
           }
         ]
       }
@@ -1400,7 +1400,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.experimental.console.listOrgs({\n  ...\n})"
+            "source": "import { createKiloClient } from \"@kilocode/sdk\n\nconst client = createKiloClient()\nawait client.experimental.console.listOrgs({\n  ...\n})"
           }
         ]
       }
@@ -1425,7 +1425,7 @@
           }
         ],
         "summary": "Switch active Console org",
-        "description": "Persist a new active Console account/org selection for the current local OpenCode state.",
+        "description": "Persist a new active Console account/org selection for the current local Kilo state.",
         "responses": {
           "200": {
             "description": "Switch success",
@@ -1459,7 +1459,7 @@
         "x-codeSamples": [
           {
             "lang": "js",
-            "source": "import { createOpencodeClient } from \"@opencode-ai/sdk\n\nconst client = createOpencodeClient()\nawait client.experimental.console.switchOrg({\n  ...\n})"
+            "source": "import { createKiloClient } from \"@kilocode/sdk\n\nconst client = createKiloClient()\nawait client.experimental.console.switchOrg({\n  ...\n})"
           }
         ]
       }
@@ -2029,7 +2029,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileDiff"
+                    "$ref": "#/components/schemas/SnapshotFileDiff"
                   }
                 }
               }
@@ -3345,7 +3345,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileDiff"
+                    "$ref": "#/components/schemas/SnapshotFileDiff"
                   }
                 }
               }
@@ -7523,7 +7523,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/FileDiff"
+                    "$ref": "#/components/schemas/VcsFileDiff"
                   }
                 }
               }
@@ -11372,16 +11372,13 @@
         },
         "required": ["type", "properties"]
       },
-      "FileDiff": {
+      "SnapshotFileDiff": {
         "type": "object",
         "properties": {
           "file": {
             "type": "string"
           },
-          "before": {
-            "type": "string"
-          },
-          "after": {
+          "patch": {
             "type": "string"
           },
           "additions": {
@@ -11395,7 +11392,7 @@
             "enum": ["added", "deleted", "modified"]
           }
         },
-        "required": ["file", "before", "after", "additions", "deletions"]
+        "required": ["file", "patch", "additions", "deletions"]
       },
       "Event.session.diff": {
         "type": "object",
@@ -11414,7 +11411,7 @@
               "diff": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/FileDiff"
+                  "$ref": "#/components/schemas/SnapshotFileDiff"
                 }
               }
             },
@@ -11948,7 +11945,7 @@
               "diffs": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/FileDiff"
+                  "$ref": "#/components/schemas/SnapshotFileDiff"
                 }
               }
             },
@@ -11965,6 +11962,9 @@
               },
               "modelID": {
                 "type": "string"
+              },
+              "variant": {
+                "type": "string"
               }
             },
             "required": ["providerID", "modelID"]
@@ -11980,9 +11980,6 @@
             "additionalProperties": {
               "type": "boolean"
             }
-          },
-          "variant": {
-            "type": "string"
           },
           "editorContext": {
             "type": "object",
@@ -15475,10 +15472,7 @@
           "file": {
             "type": "string"
           },
-          "before": {
-            "type": "string"
-          },
-          "after": {
+          "patch": {
             "type": "string"
           },
           "additions": {
@@ -15504,17 +15498,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "file",
-          "before",
-          "after",
-          "additions",
-          "deletions",
-          "tracked",
-          "generatedLike",
-          "summarized",
-          "stamp"
-        ]
+        "required": ["file", "patch", "additions", "deletions", "tracked", "generatedLike", "summarized", "stamp"]
       },
       "ProjectSummary": {
         "type": "object",
@@ -16226,6 +16210,28 @@
             "type": "string"
           }
         }
+      },
+      "VcsFileDiff": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "string"
+          },
+          "patch": {
+            "type": "string"
+          },
+          "additions": {
+            "type": "number"
+          },
+          "deletions": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["added", "deleted", "modified"]
+          }
+        },
+        "required": ["file", "patch", "additions", "deletions"]
       },
       "Command": {
         "type": "object",

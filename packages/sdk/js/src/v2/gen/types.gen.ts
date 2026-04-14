@@ -996,7 +996,12 @@ export type Session = {
     additions: number
     deletions: number
     files: number
-    diffs?: Array<SnapshotFileDiff>
+    diffs?: Array<{
+      file: string
+      additions: number
+      deletions: number
+      status?: "added" | "deleted" | "modified"
+    }>
   }
   share?: {
     url: string
@@ -1165,7 +1170,12 @@ export type SyncEventSessionUpdated = {
         additions: number
         deletions: number
         files: number
-        diffs?: Array<SnapshotFileDiff>
+        diffs?: Array<{
+          file: string
+          additions: number
+          deletions: number
+          status?: "added" | "deleted" | "modified"
+        }>
       } | null
       share?: {
         url: string | null
@@ -1896,8 +1906,7 @@ export type WorktreeResetInput = {
 
 export type WorktreeDiffItem = {
   file: string
-  before: string
-  after: string
+  patch: string
   additions: number
   deletions: number
   status?: "added" | "deleted" | "modified"
@@ -1924,7 +1933,12 @@ export type GlobalSession = {
     additions: number
     deletions: number
     files: number
-    diffs?: Array<SnapshotFileDiff>
+    diffs?: Array<{
+      file: string
+      additions: number
+      deletions: number
+      status?: "added" | "deleted" | "modified"
+    }>
   }
   share?: {
     url: string
@@ -3161,7 +3175,7 @@ export type WorktreeDiffResponses = {
   /**
    * File diffs
    */
-  200: Array<FileDiff>
+  200: Array<SnapshotFileDiff>
 }
 
 export type WorktreeDiffResponse = WorktreeDiffResponses[keyof WorktreeDiffResponses]
