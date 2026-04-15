@@ -5,18 +5,24 @@ import { NamedError } from "@opencode-ai/util/error"
 import { APICallError, convertToModelMessages, LoadAPIKeyError, type ModelMessage, type UIMessage } from "ai"
 import { LSP } from "../lsp"
 import { Snapshot } from "@/snapshot"
-import { fn } from "@/util/fn"
+import { SyncEvent } from "../sync"
 import { Database, NotFoundError, and, desc, eq, inArray, lt, or } from "@/storage/db"
 import { MessageTable, PartTable, SessionTable } from "./session.sql"
-import { ProviderTransform } from "@/provider/transform"
-import { STATUS_CODES } from "http"
-import { Storage } from "@/storage/storage"
 import { ProviderError } from "@/provider/error"
 import { iife } from "@/util/iife"
+import { errorMessage } from "@/util/error"
 import type { SystemError } from "bun"
 import type { Provider } from "@/provider/provider"
 import { ModelID, ProviderID } from "@/provider/schema"
+import { Effect } from "effect"
 import { SessionNetwork } from "./network" // kilocode_change
+
+/** Error shape thrown by Bun's fetch() when gzip/br decompression fails mid-stream */
+interface FetchDecompressionError extends Error {
+  code: "ZlibError"
+  errno: number
+  path: string
+}
 
 export namespace MessageV2 {
   export function isMedia(mime: string) {
@@ -366,10 +372,10 @@ export namespace MessageV2 {
     model: z.object({
       providerID: ProviderID.zod,
       modelID: ModelID.zod,
+      variant: z.string().optional(),
     }),
     system: z.string().optional(),
     tools: z.record(z.string(), z.boolean()).optional(),
-    variant: z.string().optional(),
     // kilocode_change start
     editorContext: z
       .object({
@@ -460,25 +466,34 @@ export namespace MessageV2 {
   export type Info = z.infer<typeof Info>
 
   export const Event = {
-    Updated: BusEvent.define(
-      "message.updated",
-      z.object({
+    Updated: SyncEvent.define({
+      type: "message.updated",
+      version: 1,
+      aggregate: "sessionID",
+      schema: z.object({
+        sessionID: SessionID.zod,
         info: Info,
       }),
-    ),
-    Removed: BusEvent.define(
-      "message.removed",
-      z.object({
+    }),
+    Removed: SyncEvent.define({
+      type: "message.removed",
+      version: 1,
+      aggregate: "sessionID",
+      schema: z.object({
         sessionID: SessionID.zod,
         messageID: MessageID.zod,
       }),
-    ),
-    PartUpdated: BusEvent.define(
-      "message.part.updated",
-      z.object({
+    }),
+    PartUpdated: SyncEvent.define({
+      type: "message.part.updated",
+      version: 1,
+      aggregate: "sessionID",
+      schema: z.object({
+        sessionID: SessionID.zod,
         part: Part,
+        time: z.number(),
       }),
-    ),
+    }),
     PartDelta: BusEvent.define(
       "message.part.delta",
       z.object({
@@ -489,14 +504,16 @@ export namespace MessageV2 {
         delta: z.string(),
       }),
     ),
-    PartRemoved: BusEvent.define(
-      "message.part.removed",
-      z.object({
+    PartRemoved: SyncEvent.define({
+      type: "message.part.removed",
+      version: 1,
+      aggregate: "sessionID",
+      schema: z.object({
         sessionID: SessionID.zod,
         messageID: MessageID.zod,
         partID: PartID.zod,
       }),
-    ),
+    }),
   }
 
   export const WithParts = z.object({
@@ -543,21 +560,18 @@ export namespace MessageV2 {
 
   export function stripMessageMetadata(info: Info): Info {
     // kilocode_change - exported for testing
-    // Strip summary.diffs before/after from user messages (can be 20+ MB)
+    // Strip oversized summary.diffs patches from user messages to limit SSE payload.
+    // Small patches are preserved so the UI can render inline diffs.
     if (info.role !== "user") return info
     const user = info as User
     if (!user.summary?.diffs?.length) return info
-    const has = user.summary.diffs.some((d: Snapshot.FileDiff) => d.before || d.after)
-    if (!has) return info
+    const oversized = (d: Snapshot.FileDiff) => d.patch && Buffer.byteLength(d.patch) > Snapshot.MAX_DIFF_SIZE
+    if (!user.summary.diffs.some(oversized)) return info
     return {
       ...user,
       summary: {
         ...user.summary,
-        diffs: user.summary.diffs.map(({ before, after, ...rest }: Snapshot.FileDiff) => ({
-          ...rest,
-          before: "",
-          after: "",
-        })),
+        diffs: user.summary.diffs.map((d: Snapshot.FileDiff) => (oversized(d) ? { ...d, patch: "" } : d)),
       },
     } as Info
   }
@@ -601,7 +615,7 @@ export namespace MessageV2 {
       and(eq(MessageTable.time_created, row.time), lt(MessageTable.id, row.id)),
     )
 
-  async function hydrate(rows: (typeof MessageTable.$inferSelect)[]) {
+  function hydrate(rows: (typeof MessageTable.$inferSelect)[]) {
     const ids = rows.map((row) => row.id)
     const partByMessage = new Map<string, MessageV2.Part[]>()
     if (ids.length > 0) {
@@ -627,11 +641,17 @@ export namespace MessageV2 {
     }))
   }
 
-  export function toModelMessages(
+  function providerMeta(metadata: Record<string, any> | undefined) {
+    if (!metadata) return undefined
+    const { providerExecuted: _, ...rest } = metadata
+    return Object.keys(rest).length > 0 ? rest : undefined
+  }
+
+  export const toModelMessagesEffect = Effect.fnUntraced(function* (
     input: WithParts[],
     model: Provider.Model,
     options?: { stripMedia?: boolean },
-  ): ModelMessage[] {
+  ) {
     const result: UIMessage[] = []
     const toolNames = new Set<string>()
     // Track media from tool results that need to be injected as user messages
@@ -655,7 +675,8 @@ export namespace MessageV2 {
       return false
     })()
 
-    const toModelOutput = (output: unknown) => {
+    const toModelOutput = (options: { toolCallId: string; input: unknown; output: unknown }) => {
+      const output = options.output
       if (typeof output === "string") {
         return { type: "text", value: output }
       }
@@ -794,18 +815,34 @@ export namespace MessageV2 {
                 toolCallId: part.callID,
                 input: part.state.input,
                 output,
-                ...(differentModel ? {} : { callProviderMetadata: part.metadata }),
+                ...(part.metadata?.providerExecuted ? { providerExecuted: true } : {}),
+                ...(differentModel ? {} : { callProviderMetadata: providerMeta(part.metadata) }),
               })
             }
-            if (part.state.status === "error")
-              assistantMessage.parts.push({
-                type: ("tool-" + part.tool) as `tool-${string}`,
-                state: "output-error",
-                toolCallId: part.callID,
-                input: part.state.input,
-                errorText: part.state.error,
-                ...(differentModel ? {} : { callProviderMetadata: part.metadata }),
-              })
+            if (part.state.status === "error") {
+              const output = part.state.metadata?.interrupted === true ? part.state.metadata.output : undefined
+              if (typeof output === "string") {
+                assistantMessage.parts.push({
+                  type: ("tool-" + part.tool) as `tool-${string}`,
+                  state: "output-available",
+                  toolCallId: part.callID,
+                  input: part.state.input,
+                  output,
+                  ...(part.metadata?.providerExecuted ? { providerExecuted: true } : {}),
+                  ...(differentModel ? {} : { callProviderMetadata: providerMeta(part.metadata) }),
+                })
+              } else {
+                assistantMessage.parts.push({
+                  type: ("tool-" + part.tool) as `tool-${string}`,
+                  state: "output-error",
+                  toolCallId: part.callID,
+                  input: part.state.input,
+                  errorText: part.state.error,
+                  ...(part.metadata?.providerExecuted ? { providerExecuted: true } : {}),
+                  ...(differentModel ? {} : { callProviderMetadata: providerMeta(part.metadata) }),
+                })
+              }
+            }
             // Handle pending/running tool calls to prevent dangling tool_use blocks
             // Anthropic/Claude APIs require every tool_use to have a corresponding tool_result
             if (part.state.status === "pending" || part.state.status === "running")
@@ -815,7 +852,8 @@ export namespace MessageV2 {
                 toolCallId: part.callID,
                 input: part.state.input,
                 errorText: "[Tool execution was interrupted]",
-                ...(differentModel ? {} : { callProviderMetadata: part.metadata }),
+                ...(part.metadata?.providerExecuted ? { providerExecuted: true } : {}),
+                ...(differentModel ? {} : { callProviderMetadata: providerMeta(part.metadata) }),
               })
           }
           if (part.type === "reasoning") {
@@ -853,64 +891,67 @@ export namespace MessageV2 {
 
     const tools = Object.fromEntries(Array.from(toolNames).map((toolName) => [toolName, { toModelOutput }]))
 
-    return convertToModelMessages(
-      result.filter((msg) => msg.parts.some((part) => part.type !== "step-start")),
-      {
-        //@ts-expect-error (convertToModelMessages expects a ToolSet but only actually needs tools[name]?.toModelOutput)
-        tools,
-      },
+    return yield* Effect.promise(() =>
+      convertToModelMessages(
+        result.filter((msg) => msg.parts.some((part) => part.type !== "step-start")),
+        {
+          //@ts-expect-error (convertToModelMessages expects a ToolSet but only actually needs tools[name]?.toModelOutput)
+          tools,
+        },
+      ),
     )
+  })
+
+  export function toModelMessages(
+    input: WithParts[],
+    model: Provider.Model,
+    options?: { stripMedia?: boolean },
+  ): Promise<ModelMessage[]> {
+    return Effect.runPromise(toModelMessagesEffect(input, model, options))
   }
 
-  export const page = fn(
-    z.object({
-      sessionID: SessionID.zod,
-      limit: z.number().int().positive(),
-      before: z.string().optional(),
-    }),
-    async (input) => {
-      const before = input.before ? cursor.decode(input.before) : undefined
-      const where = before
-        ? and(eq(MessageTable.session_id, input.sessionID), older(before))
-        : eq(MessageTable.session_id, input.sessionID)
-      const rows = Database.use((db) =>
-        db
-          .select()
-          .from(MessageTable)
-          .where(where)
-          .orderBy(desc(MessageTable.time_created), desc(MessageTable.id))
-          .limit(input.limit + 1)
-          .all(),
+  export function page(input: { sessionID: SessionID; limit: number; before?: string }) {
+    const before = input.before ? cursor.decode(input.before) : undefined
+    const where = before
+      ? and(eq(MessageTable.session_id, input.sessionID), older(before))
+      : eq(MessageTable.session_id, input.sessionID)
+    const rows = Database.use((db) =>
+      db
+        .select()
+        .from(MessageTable)
+        .where(where)
+        .orderBy(desc(MessageTable.time_created), desc(MessageTable.id))
+        .limit(input.limit + 1)
+        .all(),
+    )
+    if (rows.length === 0) {
+      const row = Database.use((db) =>
+        db.select({ id: SessionTable.id }).from(SessionTable).where(eq(SessionTable.id, input.sessionID)).get(),
       )
-      if (rows.length === 0) {
-        const row = Database.use((db) =>
-          db.select({ id: SessionTable.id }).from(SessionTable).where(eq(SessionTable.id, input.sessionID)).get(),
-        )
-        if (!row) throw new NotFoundError({ message: `Session not found: ${input.sessionID}` })
-        return {
-          items: [] as MessageV2.WithParts[],
-          more: false,
-        }
-      }
-
-      const more = rows.length > input.limit
-      const page = more ? rows.slice(0, input.limit) : rows
-      const items = await hydrate(page)
-      items.reverse()
-      const tail = page.at(-1)
+      if (!row) throw new NotFoundError({ message: `Session not found: ${input.sessionID}` })
       return {
-        items,
-        more,
-        cursor: more && tail ? cursor.encode({ id: tail.id, time: tail.time_created }) : undefined,
+        items: [] as MessageV2.WithParts[],
+        more: false,
       }
-    },
-  )
+    }
 
-  export const stream = fn(SessionID.zod, async function* (sessionID) {
+    const more = rows.length > input.limit
+    const slice = more ? rows.slice(0, input.limit) : rows
+    const items = hydrate(slice)
+    items.reverse()
+    const tail = slice.at(-1)
+    return {
+      items,
+      more,
+      cursor: more && tail ? cursor.encode({ id: tail.id, time: tail.time_created }) : undefined,
+    }
+  }
+
+  export function* stream(sessionID: SessionID) {
     const size = 50
     let before: string | undefined
     while (true) {
-      const next = await page({ sessionID, limit: size, before })
+      const next = page({ sessionID, limit: size, before })
       if (next.items.length === 0) break
       for (let i = next.items.length - 1; i >= 0; i--) {
         yield next.items[i]
@@ -918,40 +959,44 @@ export namespace MessageV2 {
       if (!next.more || !next.cursor) break
       before = next.cursor
     }
-  })
+  }
 
-  export const parts = fn(MessageID.zod, async (message_id) => {
+  export function parts(message_id: MessageID) {
     const rows = Database.use((db) =>
       db.select().from(PartTable).where(eq(PartTable.message_id, message_id)).orderBy(PartTable.id).all(),
     )
-    return rows.map((row) => part(row)) // kilocode_change - stripping applied inside part() helper
-  })
+    return rows.map(
+      (row) =>
+        // kilocode_change - apply stripping to parts fetched individually as well to cover all read paths
+        stripPartMetadata({
+          ...row.data,
+          id: row.id,
+          sessionID: row.session_id,
+          messageID: row.message_id,
+        } as MessageV2.Part),
+      // kilocode_change end
+    )
+  }
 
-  export const get = fn(
-    z.object({
-      sessionID: SessionID.zod,
-      messageID: MessageID.zod,
-    }),
-    async (input): Promise<WithParts> => {
-      const row = Database.use((db) =>
-        db
-          .select()
-          .from(MessageTable)
-          .where(and(eq(MessageTable.id, input.messageID), eq(MessageTable.session_id, input.sessionID)))
-          .get(),
-      )
-      if (!row) throw new NotFoundError({ message: `Message not found: ${input.messageID}` })
-      return {
-        info: info(row),
-        parts: await parts(input.messageID),
-      }
-    },
-  )
+  export function get(input: { sessionID: SessionID; messageID: MessageID }): WithParts {
+    const row = Database.use((db) =>
+      db
+        .select()
+        .from(MessageTable)
+        .where(and(eq(MessageTable.id, input.messageID), eq(MessageTable.session_id, input.sessionID)))
+        .get(),
+    )
+    if (!row) throw new NotFoundError({ message: `Message not found: ${input.messageID}` })
+    return {
+      info: info(row),
+      parts: parts(input.messageID),
+    }
+  }
 
-  export async function filterCompacted(stream: AsyncIterable<MessageV2.WithParts>) {
+  export function filterCompacted(msgs: Iterable<MessageV2.WithParts>) {
     const result = [] as MessageV2.WithParts[]
     const completed = new Set<string>()
-    for await (const msg of stream) {
+    for (const msg of msgs) {
       result.push(msg)
       if (
         msg.info.role === "user" &&
@@ -966,7 +1011,14 @@ export namespace MessageV2 {
     return result
   }
 
-  export function fromError(e: unknown, ctx: { providerID: ProviderID }): NonNullable<Assistant["error"]> {
+  export const filterCompactedEffect = Effect.fnUntraced(function* (sessionID: SessionID) {
+    return filterCompacted(stream(sessionID))
+  })
+
+  export function fromError(
+    e: unknown,
+    ctx: { providerID: ProviderID; aborted?: boolean },
+  ): NonNullable<Assistant["error"]> {
     switch (true) {
       case e instanceof DOMException && e.name === "AbortError":
         return new MessageV2.AbortedError(
@@ -998,6 +1050,21 @@ export namespace MessageV2 {
           },
           { cause: e },
         ).toObject()
+      case e instanceof Error && (e as FetchDecompressionError).code === "ZlibError":
+        if (ctx.aborted) {
+          return new MessageV2.AbortedError({ message: e.message }, { cause: e }).toObject()
+        }
+        return new MessageV2.APIError(
+          {
+            message: "Response decompression failed",
+            isRetryable: true,
+            metadata: {
+              code: (e as FetchDecompressionError).code,
+              message: e.message,
+            },
+          },
+          { cause: e },
+        ).toObject()
       case APICallError.isInstance(e):
         const parsed = ProviderError.parseAPICallError({
           providerID: ctx.providerID,
@@ -1025,7 +1092,7 @@ export namespace MessageV2 {
           { cause: e },
         ).toObject()
       case e instanceof Error:
-        return new NamedError.Unknown({ message: e instanceof Error ? e.message : String(e) }, { cause: e }).toObject()
+        return new NamedError.Unknown({ message: errorMessage(e) }, { cause: e }).toObject()
       default:
         try {
           const parsed = ProviderError.parseStreamError(e)

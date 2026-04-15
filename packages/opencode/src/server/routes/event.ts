@@ -4,13 +4,11 @@ import { streamSSE } from "hono/streaming"
 import { Log } from "@/util/log"
 import { BusEvent } from "@/bus/bus-event"
 import { Bus } from "@/bus"
-import { lazy } from "../../util/lazy"
 import { AsyncQueue } from "../../util/queue"
-import { Instance } from "@/project/instance"
 
 const log = Log.create({ service: "server" })
 
-export const EventRoutes = lazy(() =>
+export const EventRoutes = () =>
   new Hono().get(
     "/event",
     describeRoute({
@@ -30,6 +28,7 @@ export const EventRoutes = lazy(() =>
     }),
     async (c) => {
       log.info("event connected")
+      c.header("Cache-Control", "no-cache, no-transform")
       c.header("X-Accel-Buffering", "no")
       c.header("X-Content-Type-Options", "nosniff")
       return streamSSE(c, async (stream) => {
@@ -53,13 +52,6 @@ export const EventRoutes = lazy(() =>
           )
         }, 10_000)
 
-        const unsub = Bus.subscribeAll((event) => {
-          q.push(JSON.stringify(event))
-          if (event.type === Bus.InstanceDisposed.type) {
-            stop()
-          }
-        })
-
         const stop = () => {
           if (done) return
           done = true
@@ -69,17 +61,36 @@ export const EventRoutes = lazy(() =>
           log.info("event disconnected")
         }
 
+        const unsub = Bus.subscribeAll((event) => {
+          q.push(JSON.stringify(event))
+          if (event.type === Bus.InstanceDisposed.type) {
+            stop()
+          }
+        })
+
         stream.onAbort(stop)
 
+        // kilocode_change start
+        // On Windows, stream.onAbort() may never fire after a client disconnects
+        // (delayed TCP RST detection via IOCP). Without this try/catch, the
+        // GlobalBus listener, heartbeat interval, and AsyncQueue stay alive
+        // indefinitely for each dead connection — leaking memory on every
+        // SSE reconnect. Catching write errors lets us clean up eagerly.
         try {
           for await (const data of q) {
             if (data === null) return
-            await stream.writeSSE({ data })
+            try {
+              await stream.writeSSE({ data })
+            } catch {
+              log.info("event write failed, cleaning up dead stream")
+              stop()
+              return
+            }
           }
         } finally {
           stop()
         }
+        // kilocode_change end
       })
     },
-  ),
-)
+  )

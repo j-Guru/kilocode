@@ -47,7 +47,7 @@ test("code agent has correct default properties", async () => {
       expect(code?.mode).toBe("primary")
       expect(code?.native).toBe(true)
       expect(evalPerm(code, "edit")).toBe("allow")
-      expect(evalPerm(code, "bash")).toBe("allow")
+      expect(evalPerm(code, "bash")).toBe("ask")
     },
   })
 })
@@ -103,26 +103,26 @@ test("ask agent denies edit/write/bash even when user config adds a specific edi
       // safe tools still work
       expect(evalPerm(ask, "read")).toBe("allow")
       expect(evalPerm(ask, "grep")).toBe("allow")
-      // disabled() must also reflect the deny (tools hidden from LLM)
+      // disabled() hides tools entirely from LLM — bash is NOT disabled because it has specific allow rules
       const disabled = Permission.disabled(["edit", "write", "bash"], ask!.permission)
       expect(disabled.has("edit")).toBe(true)
       expect(disabled.has("write")).toBe(true)
-      expect(disabled.has("bash")).toBe(true)
+      expect(disabled.has("bash")).toBe(false)
     },
   })
 })
 // kilocode_change end
 
 // kilocode_change start
-test("plan agent denies edits except .kilo/plans/* and .opencode/plans/*", async () => {
+test("plan agent asks before edits except .kilo/plans/* and .opencode/plans/*", async () => {
   await using tmp = await tmpdir()
   await Instance.provide({
     directory: tmp.path,
     fn: async () => {
       const plan = await Agent.get("plan")
       expect(plan).toBeDefined()
-      // Wildcard is denied
-      expect(evalPerm(plan, "edit")).toBe("deny")
+      // Wildcard requires permission
+      expect(evalPerm(plan, "edit")).toBe("ask")
       // kilocode_change start
       // .kilo/plans/ is the primary allowed path
       expect(Permission.evaluate("edit", ".kilo/plans/foo.md", plan!.permission).action).toBe("allow")
@@ -144,7 +144,6 @@ test("explore agent denies edit and write", async () => {
       expect(explore?.mode).toBe("subagent")
       expect(evalPerm(explore, "edit")).toBe("deny")
       expect(evalPerm(explore, "write")).toBe("deny")
-      expect(evalPerm(explore, "todoread")).toBe("deny")
       expect(evalPerm(explore, "todowrite")).toBe("deny")
     },
   })
@@ -173,7 +172,6 @@ test("general agent denies todo tools", async () => {
       expect(general).toBeDefined()
       expect(general?.mode).toBe("subagent")
       expect(general?.hidden).toBeUndefined()
-      expect(evalPerm(general, "todoread")).toBe("deny")
       expect(evalPerm(general, "todowrite")).toBe("deny")
     },
   })

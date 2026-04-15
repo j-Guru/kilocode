@@ -15,13 +15,14 @@ import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
 import { Permission } from "@/permission"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
-import { Global } from "@/global"
-import path from "path"
+import { Global } from "@/global" // kilocode_change
+import { KilocodePaths } from "@/kilocode/paths" // kilocode_change
+import path from "path" // kilocode_change
 import { Plugin } from "@/plugin"
 import { Skill } from "../skill"
 import { Effect, ServiceMap, Layer } from "effect"
 import { InstanceState } from "@/effect/instance-state"
-import { makeRunPromise } from "@/effect/run-service"
+import { makeRuntime } from "@/effect/run-service"
 import * as KiloAgent from "@/kilocode/agent" // kilocode_change
 
 export namespace Agent {
@@ -75,14 +76,23 @@ export namespace Agent {
   export const layer = Layer.effect(
     Service,
     Effect.gen(function* () {
-      const config = () => Effect.promise(() => Config.get())
+      const config = yield* Config.Service
       const auth = yield* Auth.Service
+      const skill = yield* Skill.Service
+      const provider = yield* Provider.Service
 
       const state = yield* InstanceState.make<State>(
         Effect.fn("Agent.state")(function* (ctx) {
-          const cfg = yield* config()
-          const skillDirs = yield* Effect.promise(() => Skill.dirs())
-          const whitelistedDirs = [Truncate.GLOB, ...skillDirs.map((dir) => path.join(dir, "*"))]
+          const cfg = yield* config.get()
+          const skillDirs = yield* skill.dirs()
+          // kilocode_change start - include global config dirs so agents can read them without prompting
+          const whitelistedDirs = [
+            Truncate.GLOB,
+            ...skillDirs.map((dir) => path.join(dir, "*")),
+            path.join(Global.Path.config, "*"),
+            ...KilocodePaths.globalDirs().map((dir) => path.join(dir, "*")),
+          ]
+          // kilocode_change end
 
           const baseDefaults = Permission.fromConfig({
             // kilocode_change: renamed from defaults
@@ -157,7 +167,6 @@ export namespace Agent {
               permission: Permission.merge(
                 defaults,
                 Permission.fromConfig({
-                  todoread: "deny",
                   todowrite: "deny",
                 }),
                 user,
@@ -299,7 +308,7 @@ export namespace Agent {
           })
 
           const list = Effect.fnUntraced(function* () {
-            const cfg = yield* config()
+            const cfg = yield* config.get()
             return pipe(
               agents,
               values(),
@@ -311,7 +320,7 @@ export namespace Agent {
           })
 
           const defaultAgent = Effect.fnUntraced(function* () {
-            const c = yield* config()
+            const c = yield* config.get()
             if (c.default_agent) {
               const effective = KiloAgent.resolveKey(c.default_agent) // kilocode_change - treat "build" as "code"
               const agent = agents[effective] // kilocode_change
@@ -320,6 +329,10 @@ export namespace Agent {
               if (agent.hidden === true) throw new Error(`default agent "${c.default_agent}" is hidden`)
               return agent.name
             }
+            // kilocode_change start - prefer "code" as default agent (key order changes after rename from "build")
+            const code = agents.code
+            if (code && code.mode !== "subagent" && code.hidden !== true) return code.name
+            // kilocode_change end
             const visible = Object.values(agents).find((a) => a.mode !== "subagent" && a.hidden !== true)
             if (!visible) throw new Error("no primary visible agent found")
             return visible.name
@@ -347,10 +360,10 @@ export namespace Agent {
           description: string
           model?: { providerID: ProviderID; modelID: ModelID }
         }) {
-          const cfg = yield* config()
-          const model = input.model ?? (yield* Effect.promise(() => Provider.defaultModel()))
-          const resolved = yield* Effect.promise(() => Provider.getModel(model.providerID, model.modelID))
-          const language = yield* Effect.promise(() => Provider.getLanguage(resolved))
+          const cfg = yield* config.get()
+          const model = input.model ?? (yield* provider.defaultModel())
+          const resolved = yield* provider.getModel(model.providerID, model.modelID)
+          const language = yield* provider.getLanguage(resolved)
 
           const system = [PROMPT_GENERATE]
           yield* Effect.promise(() =>
@@ -358,18 +371,24 @@ export namespace Agent {
           )
           const existing = yield* InstanceState.useEffect(state, (s) => s.list())
 
+          // TODO: clean this up so provider specific logic doesnt bleed over
+          const authInfo = yield* auth.get(model.providerID).pipe(Effect.orDie)
+          const isOpenaiOauth = model.providerID === "openai" && authInfo?.type === "oauth"
+
           const params = {
             // kilocode_change start - enable telemetry with custom PostHog tracer
             experimental_telemetry: KiloAgent.telemetryOptions(cfg),
             // kilocode_change end
             temperature: 0.3,
             messages: [
-              ...system.map(
-                (item): ModelMessage => ({
-                  role: "system",
-                  content: item,
-                }),
-              ),
+              ...(isOpenaiOauth
+                ? []
+                : system.map(
+                    (item): ModelMessage => ({
+                      role: "system",
+                      content: item,
+                    }),
+                  )),
               {
                 role: "user",
                 content: `Create an agent configuration based on this request: \"${input.description}\".\n\nIMPORTANT: The following identifiers already exist and must NOT be used: ${existing.map((i) => i.name).join(", ")}\n  Return ONLY the JSON object, no other text, do not wrap in backticks`,
@@ -383,13 +402,12 @@ export namespace Agent {
             }),
           } satisfies Parameters<typeof generateObject>[0]
 
-          // TODO: clean this up so provider specific logic doesnt bleed over
-          const authInfo = yield* auth.get(model.providerID).pipe(Effect.orDie)
-          if (model.providerID === "openai" && authInfo?.type === "oauth") {
+          if (isOpenaiOauth) {
             return yield* Effect.promise(async () => {
               const result = streamObject({
                 ...params,
                 providerOptions: ProviderTransform.providerOptions(resolved, {
+                  instructions: system.join("\n"),
                   store: false,
                 }),
                 onError: () => {},
@@ -407,9 +425,16 @@ export namespace Agent {
     }),
   )
 
-  export const defaultLayer = layer.pipe(Layer.provide(Auth.layer))
+  export const defaultLayer = Layer.suspend(() =>
+    layer.pipe(
+      Layer.provide(Provider.defaultLayer),
+      Layer.provide(Auth.defaultLayer),
+      Layer.provide(Config.defaultLayer),
+      Layer.provide(Skill.defaultLayer),
+    ),
+  )
 
-  const runPromise = makeRunPromise(Service, defaultLayer)
+  const { runPromise } = makeRuntime(Service, defaultLayer)
 
   export async function get(agent: string) {
     return runPromise((svc) => svc.get(agent))

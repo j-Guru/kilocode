@@ -11,22 +11,30 @@ function falsy(key: string) {
 }
 
 export namespace Flag {
+  export const OTEL_EXPORTER_OTLP_ENDPOINT = process.env["OTEL_EXPORTER_OTLP_ENDPOINT"]
+  export const OTEL_EXPORTER_OTLP_HEADERS = process.env["OTEL_EXPORTER_OTLP_HEADERS"]
+
   export const KILO_AUTO_SHARE = truthy("KILO_AUTO_SHARE")
+  export const KILO_AUTO_HEAP_SNAPSHOT = truthy("KILO_AUTO_HEAP_SNAPSHOT")
   export const KILO_GIT_BASH_PATH = process.env["KILO_GIT_BASH_PATH"]
   export const KILO_CONFIG = process.env["KILO_CONFIG"]
+  export declare const KILO_PURE: boolean
   export declare const KILO_TUI_CONFIG: string | undefined
   export declare const KILO_CONFIG_DIR: string | undefined
+  export declare const KILO_PLUGIN_META_FILE: string | undefined
   export const KILO_CONFIG_CONTENT = process.env["KILO_CONFIG_CONTENT"]
   export const KILO_DISABLE_AUTOUPDATE = truthy("KILO_DISABLE_AUTOUPDATE")
   export const KILO_ALWAYS_NOTIFY_UPDATE = truthy("KILO_ALWAYS_NOTIFY_UPDATE")
   export const KILO_DISABLE_PRUNE = truthy("KILO_DISABLE_PRUNE")
   export const KILO_DISABLE_TERMINAL_TITLE = truthy("KILO_DISABLE_TERMINAL_TITLE")
+  export const KILO_SHOW_TTFD = truthy("KILO_SHOW_TTFD")
   export const KILO_PERMISSION = process.env["KILO_PERMISSION"]
   export const KILO_DISABLE_DEFAULT_PLUGINS = truthy("KILO_DISABLE_DEFAULT_PLUGINS")
   export const KILO_DISABLE_LSP_DOWNLOAD = truthy("KILO_DISABLE_LSP_DOWNLOAD")
   export const KILO_ENABLE_EXPERIMENTAL_MODELS = truthy("KILO_ENABLE_EXPERIMENTAL_MODELS")
   export const KILO_DISABLE_AUTOCOMPACT = truthy("KILO_DISABLE_AUTOCOMPACT")
   export const KILO_DISABLE_MODELS_FETCH = truthy("KILO_DISABLE_MODELS_FETCH")
+  export const KILO_DISABLE_MOUSE = truthy("KILO_DISABLE_MOUSE")
   export const KILO_DISABLE_CLAUDE_CODE = truthy("KILO_DISABLE_CLAUDE_CODE")
   export const KILO_DISABLE_CLAUDE_CODE_PROMPT = KILO_DISABLE_CLAUDE_CODE || truthy("KILO_DISABLE_CLAUDE_CODE_PROMPT")
   export const KILO_DISABLE_CLAUDE_CODE_SKILLS = KILO_DISABLE_CLAUDE_CODE || truthy("KILO_DISABLE_CLAUDE_CODE_SKILLS")
@@ -65,6 +73,7 @@ export namespace Flag {
   export const KILO_EXPERIMENTAL_MARKDOWN = !falsy("KILO_EXPERIMENTAL_MARKDOWN")
   export const KILO_MODELS_URL = process.env["KILO_MODELS_URL"]
   export const KILO_MODELS_PATH = process.env["KILO_MODELS_PATH"]
+  export const KILO_DISABLE_EMBEDDED_WEB_UI = truthy("KILO_DISABLE_EMBEDDED_WEB_UI")
   export const KILO_DB = process.env["KILO_DB"]
   export const KILO_DISABLE_CHANNEL_DB = truthy("KILO_DISABLE_CHANNEL_DB")
   export const KILO_SKIP_MIGRATIONS = truthy("KILO_SKIP_MIGRATIONS")
@@ -77,8 +86,22 @@ export namespace Flag {
     return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined
   }
 
-  export const KILO_SESSION_RETRY_LIMIT = number("KILO_SESSION_RETRY_LIMIT")
+  export declare const KILO_SESSION_RETRY_LIMIT: number | undefined // kilocode_change — dynamic getter below
 }
+
+// kilocode_change start — Dynamic getter for KILO_SESSION_RETRY_LIMIT
+// Must be evaluated at access time so tests can set the env var at runtime
+Object.defineProperty(Flag, "KILO_SESSION_RETRY_LIMIT", {
+  get() {
+    const value = process.env["KILO_SESSION_RETRY_LIMIT"]
+    if (!value) return undefined
+    const parsed = Number(value)
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined
+  },
+  enumerable: true,
+  configurable: false,
+})
+// kilocode_change end
 
 // Dynamic getter for KILO_DISABLE_PROJECT_CONFIG
 // This must be evaluated at access time, not module load time,
@@ -108,6 +131,28 @@ Object.defineProperty(Flag, "KILO_TUI_CONFIG", {
 Object.defineProperty(Flag, "KILO_CONFIG_DIR", {
   get() {
     return process.env["KILO_CONFIG_DIR"]
+  },
+  enumerable: true,
+  configurable: false,
+})
+
+// Dynamic getter for KILO_PURE
+// This must be evaluated at access time, not module load time,
+// because the CLI can set this flag at runtime
+Object.defineProperty(Flag, "KILO_PURE", {
+  get() {
+    return truthy("KILO_PURE")
+  },
+  enumerable: true,
+  configurable: false,
+})
+
+// Dynamic getter for KILO_PLUGIN_META_FILE
+// This must be evaluated at access time, not module load time,
+// because tests and external tooling may set this env var at runtime
+Object.defineProperty(Flag, "KILO_PLUGIN_META_FILE", {
+  get() {
+    return process.env["KILO_PLUGIN_META_FILE"]
   },
   enumerable: true,
   configurable: false,

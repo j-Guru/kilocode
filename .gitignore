@@ -16,7 +16,6 @@ node_modules
 # use vscode workspaces with peacock to have many vscodes with the same repo:
 *.code-workspace
 .codex
-.omx/
 *~
 playground
 tmp
@@ -37,26 +36,18 @@ target
 
 # Local dev files
 opencode-dev
+UPCOMING_CHANGELOG.md
 logs/
 *.bun-build
-
-# Build artifacts and binaries
-bin/
-bin-unpacked/
-*.vsix
-/src
-
-# Log files
-firebase-debug.log
-
-# Vendored dependencies (use submodule if needed)
-deps/
 
 # Telemetry ID
 telemetry-id
 tsconfig.tsbuildinfo
 
-# Local dev scripts
-update-new-kilo.sh
 # Kilo
 .kilo/plans/*
+.kilo/plans/*upstream-merge-report-*.md
+
+# Test Artifacts
+packages/app/.artifacts/
+packages/opencode/.artifacts/

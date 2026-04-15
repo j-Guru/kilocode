@@ -2,6 +2,8 @@ import { Bus } from "@/bus"
 import { BusEvent } from "@/bus/bus-event"
 import { Provider } from "@/provider/provider"
 import { Session } from "@/session"
+import { SessionSummary } from "@/session/summary"
+import { KiloSession } from "@/kilocode/session"
 import { SessionID } from "@/session/schema"
 import { ModelID, ProviderID } from "@/provider/schema"
 import { MessageV2 } from "@/session/message-v2"
@@ -161,14 +163,17 @@ export namespace KiloSessions {
     })
 
     Bus.subscribe(Session.Event.Updated, async (evt) => {
-      await ingest.sync(evt.properties.info.id, [
+      const sessionID = evt.properties.sessionID // kilocode_change
+      const session = await Session.get(sessionID).catch(() => null) // kilocode_change
+      if (!session) return
+      await ingest.sync(sessionID, [
         {
           type: "kilo_meta",
-          data: await meta(evt.properties.info.id),
+          data: await meta(sessionID),
         },
         {
           type: "session",
-          data: evt.properties.info,
+          data: session,
         },
       ])
     })
@@ -529,7 +534,7 @@ export namespace KiloSessions {
     log.info("full sync", { sessionId })
 
     const session = await Session.get(SessionID.make(sessionId))
-    const diffs = await Session.diff(SessionID.make(sessionId))
+    const diffs = await SessionSummary.diff({ sessionID: SessionID.make(sessionId) })
     const messages = await Array.fromAsync(MessageV2.stream(SessionID.make(sessionId)))
     messages.reverse()
     const models = await Promise.all(
@@ -604,7 +609,7 @@ export namespace KiloSessions {
   }
 
   async function meta(sessionId?: string) {
-    const override = sessionId ? Session.getPlatformOverride(sessionId) : undefined
+    const override = sessionId ? KiloSession.getPlatformOverride(sessionId) : undefined
     const platform = override || process.env["KILO_PLATFORM"] || "cli"
     const orgId = await getOrgId()
     const gitBranch = await Vcs.branch().catch(() => undefined)

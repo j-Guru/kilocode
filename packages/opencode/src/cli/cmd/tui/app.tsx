@@ -1,15 +1,30 @@
-import { render, useKeyboard, useRenderer, useTerminalDimensions } from "@opentui/solid"
+import { render, TimeToFirstDraw, useKeyboard, useRenderer, useTerminalDimensions } from "@opentui/solid"
 import { Clipboard } from "@tui/util/clipboard"
 import { Selection } from "@tui/util/selection"
-import { MouseButton, TextAttributes } from "@opentui/core"
+import { createCliRenderer, MouseButton, TextAttributes, type CliRendererConfig } from "@opentui/core" // kilocode_change
 import { RouteProvider, useRoute } from "@tui/context/route"
-import { Switch, Match, createEffect, untrack, ErrorBoundary, createSignal, onMount, batch, Show, on } from "solid-js"
-import { win32DisableProcessedInput, win32FlushInputBuffer, win32InstallCtrlCGuard } from "./win32"
+import {
+  Switch,
+  Match,
+  createEffect,
+  createMemo,
+  ErrorBoundary,
+  createSignal,
+  onMount,
+  batch,
+  Show,
+  on,
+  onCleanup,
+} from "solid-js"
+import { win32DisableProcessedInput, win32FlushInputBuffer, win32InstallCtrlCGuard } from "./win32" // kilocode_change
 import { Flag } from "@/flag/flag"
 import semver from "semver"
 import { DialogProvider, useDialog } from "@tui/ui/dialog"
 import { DialogProvider as DialogProviderList } from "@tui/component/dialog-provider"
+import { Installation } from "@/installation" // kilocode_change
+import { PluginRouteMissing } from "@tui/component/plugin-route-missing"
 import { SDKProvider, useSDK } from "@tui/context/sdk"
+import { StartupLoading } from "@tui/component/startup-loading"
 import { SyncProvider, useSync } from "@tui/context/sync"
 import { LocalProvider, useLocal } from "@tui/context/local"
 import { DialogModel, useConnected } from "@tui/component/dialog-model"
@@ -21,7 +36,8 @@ import { CommandProvider, useCommandDialog } from "@tui/component/dialog-command
 import { DialogAgent } from "@tui/component/dialog-agent"
 import { DialogSessionList } from "@tui/component/dialog-session-list"
 import { DialogWorkspaceList } from "@tui/component/dialog-workspace-list"
-import { KeybindProvider } from "@tui/context/keybind"
+import { DialogConsoleOrg } from "@tui/component/dialog-console-org"
+import { KeybindProvider, useKeybind } from "@tui/context/keybind"
 import { ThemeProvider, useTheme } from "@tui/context/theme"
 import { Home } from "@tui/routes/home"
 import { Session } from "@tui/routes/session"
@@ -29,7 +45,6 @@ import { PromptHistoryProvider } from "./component/prompt/history"
 import { FrecencyProvider } from "./component/prompt/frecency"
 import { PromptStashProvider } from "./component/prompt/stash"
 import { DialogAlert } from "./ui/dialog-alert"
-import { isKiloError, showKiloErrorToast } from "@/kilocode/kilo-errors" // kilocode_change
 import { DialogConfirm } from "./ui/dialog-confirm"
 import { ToastProvider, useToast } from "./ui/toast"
 import { ExitProvider, useExit } from "./context/exit"
@@ -43,21 +58,12 @@ import { ArgsProvider, useArgs, type Args } from "./context/args"
 import open from "open"
 import { writeHeapSnapshot } from "v8"
 import { PromptRefProvider, usePromptRef } from "./context/prompt"
-import { registerKiloCommands } from "@/kilocode/kilo-commands" // kilocode_change
-import { KiloClawView } from "@/kilocode/claw/view" // kilocode_change
-import { initializeTUIDependencies } from "@kilocode/kilo-gateway/tui" // kilocode_change
-import { TuiConfigProvider } from "./context/tui-config"
+import * as KiloApp from "@/kilocode/cli/cmd/tui/app" // kilocode_change
+import { TuiConfigProvider, useTuiConfig } from "./context/tui-config"
 import { TuiConfig } from "@/config/tui"
-
-// kilocode_change start
-function isAllowEverything(permission: unknown): boolean {
-  if (typeof permission !== "object" || permission === null) return false
-  const wildcard = (permission as Record<string, unknown>)["*"]
-  if (typeof wildcard === "string") return wildcard === "allow"
-  if (typeof wildcard === "object" && wildcard !== null) return (wildcard as Record<string, unknown>)["*"] === "allow"
-  return false
-}
-// kilocode_change end
+import { createTuiApi, TuiPluginRuntime, type RouteMap } from "./plugin"
+import { FormatError, FormatUnknownError } from "@/cli/error"
+import { resetTerminalState } from "@tui/util/terminal" // kilocode_change
 
 async function getTerminalBackgroundColor(): Promise<"dark" | "light"> {
   // can't set raw mode if not a TTY
@@ -120,7 +126,47 @@ async function getTerminalBackgroundColor(): Promise<"dark" | "light"> {
 }
 
 import type { EventSource } from "./context/sdk"
-import { Installation } from "@/installation"
+import { DialogVariant } from "./component/dialog-variant"
+
+function rendererConfig(_config: TuiConfig.Info): CliRendererConfig {
+  const mouseEnabled = !Flag.KILO_DISABLE_MOUSE && (_config.mouse ?? true)
+
+  return {
+    externalOutputMode: "passthrough",
+    targetFps: 60,
+    gatherStats: false,
+    exitOnCtrlC: false,
+    useKittyKeyboard: {},
+    autoFocus: false,
+    openConsoleOnError: false,
+    useMouse: mouseEnabled,
+    consoleOptions: {
+      keyBindings: [{ name: "y", ctrl: true, action: "copy-selection" }],
+      onCopySelection: (text) => {
+        Clipboard.copy(text).catch((error) => {
+          console.error(`Failed to copy console selection to clipboard: ${error}`)
+        })
+      },
+    },
+  }
+}
+
+function errorMessage(error: unknown) {
+  const formatted = FormatError(error)
+  if (formatted !== undefined) return formatted
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof error.data === "object" &&
+    error.data !== null &&
+    "message" in error.data &&
+    typeof error.data.message === "string"
+  ) {
+    return error.data.message
+  }
+  return FormatUnknownError(error)
+}
 
 export function tui(input: {
   url: string
@@ -148,95 +194,123 @@ export function tui(input: {
       resolve()
     }
 
-    render(
-      () => {
-        return (
-          <ErrorBoundary
-            fallback={(error, reset) => <ErrorComponent error={error} reset={reset} onExit={onExit} mode={mode} />}
-          >
-            <ArgsProvider {...input.args}>
-              <ExitProvider onExit={onExit}>
-                <KVProvider>
-                  <ToastProvider>
-                    <RouteProvider>
-                      <TuiConfigProvider config={input.config}>
-                        <SDKProvider
-                          url={input.url}
-                          directory={input.directory}
-                          fetch={input.fetch}
-                          headers={input.headers}
-                          events={input.events}
-                        >
-                          <SyncProvider>
-                            <ThemeProvider mode={mode}>
-                              <LocalProvider>
-                                <KeybindProvider>
-                                  <PromptStashProvider>
-                                    <DialogProvider>
-                                      <CommandProvider>
-                                        <FrecencyProvider>
-                                          <PromptHistoryProvider>
-                                            <PromptRefProvider>
-                                              <App onSnapshot={input.onSnapshot} />
-                                            </PromptRefProvider>
-                                          </PromptHistoryProvider>
-                                        </FrecencyProvider>
-                                      </CommandProvider>
-                                    </DialogProvider>
-                                  </PromptStashProvider>
-                                </KeybindProvider>
-                              </LocalProvider>
-                            </ThemeProvider>
-                          </SyncProvider>
-                        </SDKProvider>
-                      </TuiConfigProvider>
-                    </RouteProvider>
-                  </ToastProvider>
-                </KVProvider>
-              </ExitProvider>
-            </ArgsProvider>
-          </ErrorBoundary>
-        )
-      },
-      {
-        targetFps: 60,
-        gatherStats: false,
-        exitOnCtrlC: false,
-        useKittyKeyboard: {},
-        autoFocus: false,
-        openConsoleOnError: false,
-        consoleOptions: {
-          keyBindings: [{ name: "y", ctrl: true, action: "copy-selection" }],
-          onCopySelection: (text) => {
-            Clipboard.copy(text).catch((error) => {
-              console.error(`Failed to copy console selection to clipboard: ${error}`)
-            })
-          },
-        },
-      },
-    )
+    const onBeforeExit = async () => {
+      await TuiPluginRuntime.dispose()
+    }
+
+    // kilocode_change - safety net: ensure mouse tracking is disabled regardless of exit path
+    process.on("exit", resetTerminalState) // kilocode_change
+
+    const renderer = await createCliRenderer(rendererConfig(input.config))
+
+    await render(() => {
+      return (
+        <ErrorBoundary
+          // kilocode_change start
+          fallback={(error, reset) => (
+            <ErrorComponent error={error} reset={reset} onBeforeExit={onBeforeExit} onExit={onExit} mode={mode} />
+          )}
+          // kilocode_change end
+        >
+          <ArgsProvider {...input.args}>
+            <ExitProvider onBeforeExit={onBeforeExit} onExit={onExit}>
+              <KVProvider>
+                <ToastProvider>
+                  <RouteProvider>
+                    <TuiConfigProvider config={input.config}>
+                      <SDKProvider
+                        url={input.url}
+                        directory={input.directory}
+                        fetch={input.fetch}
+                        headers={input.headers}
+                        events={input.events}
+                      >
+                        <SyncProvider>
+                          <ThemeProvider mode={mode}>
+                            <LocalProvider>
+                              <KeybindProvider>
+                                <PromptStashProvider>
+                                  <DialogProvider>
+                                    <CommandProvider>
+                                      <FrecencyProvider>
+                                        <PromptHistoryProvider>
+                                          <PromptRefProvider>
+                                            <App onSnapshot={input.onSnapshot} />
+                                          </PromptRefProvider>
+                                        </PromptHistoryProvider>
+                                      </FrecencyProvider>
+                                    </CommandProvider>
+                                  </DialogProvider>
+                                </PromptStashProvider>
+                              </KeybindProvider>
+                            </LocalProvider>
+                          </ThemeProvider>
+                        </SyncProvider>
+                      </SDKProvider>
+                    </TuiConfigProvider>
+                  </RouteProvider>
+                </ToastProvider>
+              </KVProvider>
+            </ExitProvider>
+          </ArgsProvider>
+        </ErrorBoundary>
+      )
+    }, renderer)
   })
 }
 
 function App(props: { onSnapshot?: () => Promise<string[]> }) {
+  const tuiConfig = useTuiConfig()
   const route = useRoute()
   const dimensions = useTerminalDimensions()
   const renderer = useRenderer()
-  renderer.disableStdoutInterception()
   const dialog = useDialog()
   const local = useLocal()
   const kv = useKV()
   const command = useCommandDialog()
+  const keybind = useKeybind()
   const sdk = useSDK()
   const toast = useToast()
-  const { theme, mode, setMode, locked, lock, unlock } = useTheme()
+  const themeState = useTheme()
+  const { theme, mode, setMode, locked, lock, unlock } = themeState
   const sync = useSync()
   const exit = useExit()
   const promptRef = usePromptRef()
+  const routes: RouteMap = new Map()
+  const [routeRev, setRouteRev] = createSignal(0)
+  const routeView = (name: string) => {
+    routeRev()
+    return routes.get(name)?.at(-1)?.render
+  }
+
+  const api = createTuiApi({
+    command,
+    tuiConfig,
+    dialog,
+    keybind,
+    kv,
+    route,
+    routes,
+    bump: () => setRouteRev((x) => x + 1),
+    sdk,
+    sync,
+    theme: themeState,
+    toast,
+    renderer,
+  })
+  const [ready, setReady] = createSignal(false)
+  TuiPluginRuntime.init(api)
+    .catch((error) => {
+      console.error("Failed to load TUI plugins", error)
+    })
+    .finally(() => {
+      setReady(true)
+    })
 
   useKeyboard((evt) => {
     if (!Flag.KILO_EXPERIMENTAL_DISABLE_COPY_ON_SELECT) return
-    if (!renderer.getSelection()) return
+    const sel = renderer.getSelection()
+    if (!sel) return
 
     // Windows Terminal-like behavior:
     // - Ctrl+C copies and dismisses selection
@@ -260,6 +334,11 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       return
     }
 
+    const focus = renderer.currentFocusedRenderable
+    if (focus?.hasSelection() && sel.selectedRenderables.includes(focus)) {
+      return
+    }
+
     renderer.clearSelection()
   })
 
@@ -275,51 +354,38 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
   }
   const [terminalTitleEnabled, setTerminalTitleEnabled] = createSignal(kv.get("terminal_title_enabled", true))
 
-  // kilocode_change start — notify server which session the user is viewing (for live session indicators)
-  createEffect(() => {
-    const sessionID = route.data.type === "session" ? route.data.sessionID : undefined
-    sdk.client.session.viewed({ focused: sessionID ? [sessionID] : [] }).catch(() => {})
-  })
-  // kilocode_change end
-
-  // kilocode_change start — evict per-session data from store when navigating away
-  createEffect(
-    on(
-      () => (route.data.type === "session" ? route.data.sessionID : undefined),
-      (current, prev) => {
-        if (prev && prev !== current) sync.session.evict(prev)
-      },
-    ),
-  )
-  // kilocode_change end
+  KiloApp.useSessionEffects({ route, sdk, sync }) // kilocode_change
 
   // Update terminal window title based on current route and session
   createEffect(() => {
     if (!terminalTitleEnabled() || Flag.KILO_DISABLE_TERMINAL_TITLE) return
 
-    const titleDefault = "Kilo CLI" // kilocode_change
+    const titleDefault = KiloApp.APP_TITLE // kilocode_change
 
     if (route.data.type === "home") {
-      renderer.setTerminalTitle(titleDefault) // kilocode_change
+      renderer.setTerminalTitle(titleDefault)
       return
     }
 
     if (route.data.type === "session") {
       const session = sync.session.get(route.data.sessionID)
       if (!session || SessionApi.isDefaultTitle(session.title)) {
-        renderer.setTerminalTitle(titleDefault) // kilocode_change
+        renderer.setTerminalTitle(titleDefault)
         return
       }
 
-      // Truncate title to 40 chars max
       const title = session.title.length > 40 ? session.title.slice(0, 37) + "..." : session.title
-      renderer.setTerminalTitle(`${titleDefault} | ${title}`) // kilocode_change
+      renderer.setTerminalTitle(`${titleDefault} | ${title}`)
+      return
+    }
+
+    if (route.data.type === "plugin") {
+      renderer.setTerminalTitle(`${titleDefault} | ${route.data.id}`)
     }
 
     // kilocode_change start
-    if (route.data.type === "kiloclaw") {
-      renderer.setTerminalTitle(`${titleDefault} | KiloClaw`)
-    }
+    const kiloTitle = KiloApp.getTerminalTitle(route, titleDefault)
+    if (kiloTitle) renderer.setTerminalTitle(kiloTitle)
     // kilocode_change end
   })
 
@@ -544,9 +610,21 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       value: "variant.cycle",
       keybind: "variant_cycle",
       category: "Agent",
-      hidden: true,
       onSelect: () => {
         local.model.variant.cycle()
+      },
+    },
+    {
+      title: "Switch model variant",
+      value: "variant.list",
+      keybind: "variant_list",
+      category: "Agent",
+      hidden: local.model.variant.list().length === 0,
+      slash: {
+        name: "variants",
+      },
+      onSelect: () => {
+        dialog.replace(() => <DialogVariant />)
       },
     },
     {
@@ -571,6 +649,23 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       category: "Provider",
     },
+    ...(sync.data.console_state.switchableOrgCount > 1
+      ? [
+          {
+            title: "Switch org",
+            value: "console.org.switch",
+            suggested: Boolean(sync.data.console_state.activeOrgName),
+            slash: {
+              name: "org",
+              aliases: ["orgs", "switch-org"],
+            },
+            onSelect: () => {
+              dialog.replace(() => <DialogConsoleOrg />)
+            },
+            category: "Provider",
+          },
+        ]
+      : []),
     {
       title: "View status",
       keybind: "status_view",
@@ -596,7 +691,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       category: "System",
     },
     {
-      title: "Toggle Theme Mode",
+      title: "Toggle theme mode",
       value: "theme.switch_mode",
       onSelect: (dialog) => {
         setMode(mode() === "dark" ? "light" : "dark")
@@ -605,7 +700,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       category: "System",
     },
     {
-      title: locked() ? "Unlock Theme Mode" : "Lock Theme Mode",
+      title: locked() ? "Unlock theme mode" : "Lock theme mode",
       value: "theme.mode.lock",
       onSelect: (dialog) => {
         if (locked()) unlock()
@@ -629,7 +724,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       title: "Open docs",
       value: "docs.open",
       onSelect: () => {
-        open("https://kilo.ai/docs").catch(() => {}) // kilocode_change
+        open(KiloApp.DOCS_URL).catch(() => {}) // kilocode_change
         dialog.clear()
       },
       category: "System",
@@ -682,6 +777,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       keybind: "terminal_suspend",
       category: "System",
       hidden: true,
+      enabled: tuiConfig.keybinds?.terminal_suspend !== "none",
       onSelect: () => {
         process.once("SIGCONT", () => {
           renderer.resume()
@@ -735,48 +831,10 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
         dialog.clear()
       },
     },
-    // kilocode_change start
-    {
-      get title() {
-        return isAllowEverything(sync.data.config.permission) ? "Disable auto-approve mode" : "Enable auto-approve mode"
-      },
-      value: "permission.allow_everything",
-      category: "System",
-      onSelect: async (dialog) => {
-        const enabled = isAllowEverything(sync.data.config.permission)
-        const result = await sdk.client.permission.allowEverything({ enable: !enabled })
-        if (result.error) {
-          toast.show({
-            variant: "error",
-            message: `Failed to ${!enabled ? "enable" : "disable"} auto-approve mode`,
-          })
-          return
-        }
-        dialog.clear()
-      },
-    },
-    // kilocode_change end
   ])
 
-  // kilocode_change start - Initialize TUI dependencies for kilo-gateway
-  initializeTUIDependencies({
-    useCommandDialog: useCommandDialog,
-    useSync: useSync,
-    useDialog: useDialog,
-    useToast: useToast,
-    useTheme: useTheme,
-    useSDK: useSDK,
-    DialogAlert: DialogAlert,
-    DialogSelect: DialogSelect,
-    Link: Link,
-    Clipboard: Clipboard,
-    useKeyboard: useKeyboard,
-    TextAttributes: TextAttributes,
-  })
-  registerKiloCommands(useSDK)
-  // kilocode_change end
+  KiloApp.init() // kilocode_change
 
-  // kilocode_change - Delete OpenRouter Alert
   sdk.event.on(TuiEvent.CommandExecute.type, (evt) => {
     command.trigger(evt.properties.command)
   })
@@ -797,7 +855,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     })
   })
 
-  sdk.event.on(SessionApi.Event.Deleted.type, (evt) => {
+  sdk.event.on("session.deleted", (evt) => {
     if (route.data.type === "session" && route.data.sessionID === evt.properties.info.id) {
       route.navigate({ type: "home" })
       toast.show({
@@ -807,26 +865,12 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     }
   })
 
-  sdk.event.on(SessionApi.Event.Error.type, (evt) => {
+  sdk.event.on("session.error", (evt) => {
     const error = evt.properties.error
     if (error && typeof error === "object" && error.name === "MessageAbortedError") return
-    // kilocode_change start - Show warning toast for Kilo errors instead of generic error toast
-    if (error && typeof error === "object" && isKiloError(error)) {
-      showKiloErrorToast(error, toast)
-      return
-    }
-    // kilocode_change end
-    const message = (() => {
-      if (!error) return "An error occurred"
+    if (KiloApp.handleSessionError(error, toast)) return // kilocode_change
 
-      if (typeof error === "object") {
-        const data = error.data
-        if ("message" in data && typeof data.message === "string") {
-          return data.message
-        }
-      }
-      return String(error)
-    })()
+    const message = errorMessage(error)
 
     toast.show({
       variant: "error",
@@ -876,10 +920,18 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
     await DialogAlert.show(
       dialog,
       "Update Complete",
-      `Successfully updated to Kilo v${result.data.version}. Please restart the application.`, // kilocode_change
+      `Successfully updated to ${KiloApp.APP_NAME} v${result.data.version}. Please restart the application.`, // kilocode_change
     )
 
     exit()
+  })
+
+  const plugin = createMemo(() => {
+    if (!ready()) return
+    if (route.data.type !== "plugin") return
+    const render = routeView(route.data.id)
+    if (!render) return <PluginRouteMissing id={route.data.id} onHome={() => route.navigate({ type: "home" })} />
+    return render({ params: route.data.data })
   })
 
   return (
@@ -897,44 +949,85 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       }}
       onMouseUp={Flag.KILO_EXPERIMENTAL_DISABLE_COPY_ON_SELECT ? undefined : () => Selection.copy(renderer, toast)}
     >
-      <Switch>
-        <Match when={route.data.type === "home"}>
-          <Home />
-        </Match>
-        <Match when={route.data.type === "session"}>
-          <Session />
-        </Match>
-        {/* kilocode_change start */}
-        <Match when={route.data.type === "kiloclaw"}>
-          <KiloClawView />
-        </Match>
-        {/* kilocode_change end */}
-      </Switch>
+      <Show when={Flag.KILO_SHOW_TTFD}>
+        <TimeToFirstDraw />
+      </Show>
+      <Show when={ready()}>
+        <Switch>
+          <Match when={route.data.type === "home"}>
+            <Home />
+          </Match>
+          <Match when={route.data.type === "session"}>
+            <Session />
+          </Match>
+          {/* kilocode_change start */}
+          <Match when={route.data.type === "kiloclaw"}>
+            <KiloApp.KiloClawView />
+          </Match>
+          {/* kilocode_change end */}
+        </Switch>
+      </Show>
+      {plugin()}
+      <TuiPluginRuntime.Slot name="app" />
+      {/* kilocode_change start */}
+      <StartupLoading ready={ready} />
     </box>
   )
 }
+// kilocode_change end
 
+// kilocode_change start — guard against missing renderer context in ErrorBoundary fallback
+function tryUseRenderer() {
+  try {
+    return useRenderer()
+  } catch {
+    return undefined
+  }
+}
+
+function tryUseTerminalDimensions() {
+  try {
+    return useTerminalDimensions()
+  } catch {
+    return undefined
+  }
+}
+// kilocode_change end
+
+// kilocode_change start — inlined ErrorComponent with safe renderer/keyboard guards
 function ErrorComponent(props: {
   error: Error
   reset: () => void
+  onBeforeExit?: () => Promise<void>
   onExit: () => Promise<void>
   mode?: "dark" | "light"
 }) {
-  const term = useTerminalDimensions()
-  const renderer = useRenderer()
+  const term = tryUseTerminalDimensions()
+  const renderer = tryUseRenderer()
+
+  const height = () => term?.().height ?? process.stdout.rows ?? 24
 
   const handleExit = async () => {
-    renderer.setTerminalTitle("")
-    renderer.destroy()
+    await props.onBeforeExit?.()
+    renderer?.setTerminalTitle("")
+    renderer?.destroy()
     win32FlushInputBuffer()
+    // kilocode_change - reset terminal state to disable mouse tracking on exit
+    resetTerminalState()
     await props.onExit()
   }
 
-  useKeyboard((evt) => {
-    if (evt.ctrl && evt.name === "c") {
-      handleExit()
-    }
-  })
+  try {
+    useKeyboard((evt) => {
+      if (evt.ctrl && evt.name === "c") {
+        handleExit()
+      }
+    })
+  } catch {
+    // Keyboard handler unavailable — renderer context may be missing.
+    // Ctrl+C will still work via the default signal handler.
+  }
+
   const [copied, setCopied] = createSignal(false)
 
   const issueURL = new URL("https://github.com/Kilo-Org/kilocode/issues/new?template=bug-report.yml")
@@ -989,10 +1082,11 @@ function ErrorComponent(props: {
           <text fg={colors.bg}>Exit</text>
         </box>
       </box>
-      <scrollbox height={Math.floor(term().height * 0.7)}>
+      <scrollbox height={Math.floor(height() * 0.7)}>
         <text fg={colors.muted}>{props.error.stack}</text>
       </scrollbox>
       <text fg={colors.text}>{props.error.message}</text>
     </box>
   )
 }
+// kilocode_change end

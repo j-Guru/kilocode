@@ -1,8 +1,7 @@
-import { NodeFileSystem, NodePath } from "@effect/platform-node"
 import { Effect, Layer, Schema, ServiceMap, Stream } from "effect"
 import { FetchHttpClient, HttpClient, HttpClientRequest, HttpClientResponse } from "effect/unstable/http"
 import * as CrossSpawnSpawner from "@/effect/cross-spawn-spawner"
-import { makeRunPromise } from "@/effect/run-service"
+import { makeRuntime } from "@/effect/run-service"
 import { withTransientReadRetry } from "@/util/effect-http-client"
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process"
 import path from "path"
@@ -10,12 +9,7 @@ import z from "zod"
 import { BusEvent } from "@/bus/bus-event"
 import { Flag } from "../flag/flag"
 import { Log } from "../util/log"
-
-// kilocode_change - renamed build-time globals
-declare global {
-  const KILO_VERSION: string
-  const KILO_CHANNEL: string
-}
+import { CHANNEL as channel, VERSION as version } from "./meta"
 
 import semver from "semver"
 
@@ -62,8 +56,8 @@ export namespace Installation {
     })
   export type Info = z.infer<typeof Info>
 
-  export const VERSION = typeof KILO_VERSION === "string" ? KILO_VERSION : "local" // kilocode_change
-  export const CHANNEL = typeof KILO_CHANNEL === "string" ? KILO_CHANNEL : "local" // kilocode_change
+  export const VERSION = version
+  export const CHANNEL = channel
   export const USER_AGENT = `kilo/${CHANNEL}/${VERSION}/${Flag.KILO_CLIENT}` // kilocode_change
 
   export function isPreview() {
@@ -348,16 +342,10 @@ export namespace Installation {
 
   export const defaultLayer = layer.pipe(
     Layer.provide(FetchHttpClient.layer),
-    Layer.provide(CrossSpawnSpawner.layer),
-    Layer.provide(NodeFileSystem.layer),
-    Layer.provide(NodePath.layer),
+    Layer.provide(CrossSpawnSpawner.defaultLayer),
   )
 
-  const runPromise = makeRunPromise(Service, defaultLayer)
-
-  export async function info(): Promise<Info> {
-    return runPromise((svc) => svc.info())
-  }
+  const { runPromise } = makeRuntime(Service, defaultLayer)
 
   export async function method(): Promise<Method> {
     return runPromise((svc) => svc.method())
