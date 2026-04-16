@@ -4,6 +4,7 @@
 // The webview has no direct network access.
 
 import { createContext, createSignal, onMount, onCleanup, useContext, type JSX } from "solid-js"
+import { showToast } from "@kilocode/kilo-ui/toast"
 import type { ClawStatus, ChatMessage, KiloClawOutMessage } from "../lib/types"
 
 type VSCodeAPI = {
@@ -27,7 +28,6 @@ type ClawCtx = {
   messages: () => ChatMessage[]
   online: () => boolean
   connected: () => boolean
-  error: () => string | null
   send: (text: string) => void
   openExternal: (url: string) => void
 }
@@ -41,7 +41,6 @@ export function ClawProvider(props: { children: JSX.Element }) {
   const [messages, setMessages] = createSignal<ChatMessage[]>([])
   const [online, setOnline] = createSignal(false)
   const [connected, setConnected] = createSignal(false)
-  const [error, setError] = createSignal<string | null>(null)
 
   const handler = (event: MessageEvent) => {
     const msg = event.data as KiloClawOutMessage
@@ -87,9 +86,7 @@ export function ClawProvider(props: { children: JSX.Element }) {
         setLocale(msg.locale)
         break
       case "kiloclaw.error":
-        setError(msg.error)
-        // Auto-clear after 5s
-        setTimeout(() => setError(null), 5000)
+        showToast({ title: msg.error, variant: "error", duration: 5000 })
         break
     }
   }
@@ -109,7 +106,6 @@ export function ClawProvider(props: { children: JSX.Element }) {
     messages,
     online,
     connected,
-    error,
     send: (text: string) => vscode.postMessage({ type: "kiloclaw.send", text }),
     openExternal: (url: string) => vscode.postMessage({ type: "kiloclaw.openExternal", url }),
   }

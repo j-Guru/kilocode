@@ -1,6 +1,8 @@
 // Individual chat message bubble
 
 import { Show, createMemo } from "solid-js"
+import { Markdown } from "@kilocode/kilo-ui/markdown"
+import { TextShimmer } from "@kilocode/kilo-ui/text-shimmer"
 import type { ChatMessage } from "../lib/types"
 import { useKiloClawLanguage } from "../context/language"
 
@@ -22,8 +24,10 @@ export function MessageBubble(props: { message: ChatMessage }) {
         <span class="kiloclaw-msg-time">{formatTime(props.message.created)}</span>
       </div>
       <div class="kiloclaw-msg-body">
-        <Show when={!empty()} fallback={<span class="kiloclaw-msg-thinking">{t("kiloClaw.message.thinking")}</span>}>
-          {props.message.text}
+        <Show when={!empty()} fallback={<TextShimmer text={t("kiloClaw.message.thinking")} />}>
+          <Show when={props.message.bot} fallback={<span>{props.message.text}</span>}>
+            <Markdown text={props.message.text} />
+          </Show>
         </Show>
       </div>
     </div>

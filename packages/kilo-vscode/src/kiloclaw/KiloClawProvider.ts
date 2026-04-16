@@ -155,27 +155,8 @@ export class KiloClawProvider implements vscode.Disposable {
     try {
       this.post({ type: "kiloclaw.state", state: { phase: "loading", locale: this.locale } })
 
-      // Ensure the CLI backend is running before trying to get the client.
-      // On VS Code restart the backend hasn't started yet — connect() starts
-      // it lazily (no-op if already connected).
-      if (this.connection.getConnectionState() !== "connected") {
-        try {
-          const dir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? homedir()
-          await this.connection.connect(dir)
-        } catch (err) {
-          // Connection failed now — wait for another provider to bring it up.
-          console.debug("[Kilo New] KiloClaw connect deferred:", (err as Error)?.message ?? err)
-          deferred = true
-          this.waitForConnection()
-          return
-        }
-      }
-
-      let client
-      try {
-        client = this.connection.getClient()
-      } catch (err) {
-        console.debug("[Kilo New] KiloClaw getClient deferred:", (err as Error)?.message ?? err)
+      const client = await this.resolveClient()
+      if (!client) {
         deferred = true
         this.waitForConnection()
         return
@@ -240,6 +221,28 @@ export class KiloClawProvider implements vscode.Disposable {
       this.startPolling()
     } finally {
       if (!deferred) this.initializing = false
+    }
+  }
+
+  /**
+   * Ensure the CLI backend is running and return its SDK client.
+   * Returns `null` when the backend isn't available yet (caller should defer).
+   */
+  private async resolveClient() {
+    if (this.connection.getConnectionState() !== "connected") {
+      try {
+        const dir = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? homedir()
+        await this.connection.connect(dir)
+      } catch (err) {
+        console.debug("[Kilo New] KiloClaw connect deferred:", (err as Error)?.message ?? err)
+        return null
+      }
+    }
+    try {
+      return this.connection.getClient()
+    } catch (err) {
+      console.debug("[Kilo New] KiloClaw getClient deferred:", (err as Error)?.message ?? err)
+      return null
     }
   }
 

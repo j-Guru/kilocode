@@ -1,6 +1,7 @@
 // KiloClaw chat panel — message list + input
 
 import { createSignal, createEffect, For, Show, createMemo, onMount } from "solid-js"
+import { Button } from "@kilocode/kilo-ui/button"
 import { useClaw } from "../context/claw"
 import { useKiloClawLanguage } from "../context/language"
 import { MessageBubble } from "./MessageBubble"
@@ -96,9 +97,9 @@ export function ChatPanel() {
           onKeyDown={onKeyDown}
           rows={1}
         />
-        <button class="kiloclaw-send-btn" disabled={disabled() || !text().trim()} onClick={submit}>
+        <Button variant="primary" disabled={disabled() || !text().trim()} onClick={submit}>
           {t("kiloClaw.chat.send")}
-        </button>
+        </Button>
       </div>
     </div>
   )

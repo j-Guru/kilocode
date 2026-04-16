@@ -1,7 +1,10 @@
 // KiloClaw root component
 
-import { Show, Switch, Match } from "solid-js"
+import { Switch, Match } from "solid-js"
 import { ThemeProvider } from "@kilocode/kilo-ui/theme"
+import { MarkedProvider } from "@kilocode/kilo-ui/context/marked"
+import { Spinner } from "@kilocode/kilo-ui/spinner"
+import { Toast } from "@kilocode/kilo-ui/toast"
 import { ClawProvider, useClaw } from "./context/claw"
 import { KiloClawLanguageProvider, useKiloClawLanguage } from "./context/language"
 import { ChatPanel } from "./components/ChatPanel"
@@ -19,7 +22,7 @@ function Content() {
         <Match when={claw.phase() === "loading"}>
           <div class="kiloclaw-center">
             <div class="kiloclaw-loading">
-              <div class="kiloclaw-spinner" />
+              <Spinner />
               <span>{t("kiloClaw.loading")}</span>
             </div>
           </div>
@@ -37,9 +40,7 @@ function Content() {
           </div>
         </Match>
       </Switch>
-      <Show when={claw.error()}>
-        <div class="kiloclaw-toast">{claw.error()}</div>
-      </Show>
+      <Toast.Region />
     </div>
   )
 }
@@ -49,7 +50,9 @@ export function KiloClawApp() {
     <ThemeProvider>
       <ClawProvider>
         <LanguageBridge>
-          <Content />
+          <MarkedProvider>
+            <Content />
+          </MarkedProvider>
         </LanguageBridge>
       </ClawProvider>
     </ThemeProvider>
