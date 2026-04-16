@@ -1504,6 +1504,9 @@ export const SessionProvider: ParentComponent = (props) => {
     const sid = currentSessionID()
     const suggestion = scopedSuggestions(sid)[0]
     if (suggestion) dismissSuggestion(suggestion.id)
+    for (const q of scopedQuestions(sid)) {
+      rejectQuestion(q.id)
+    }
     if (sid) addOptimistic(sid, messageID, text, files)
 
     const agent = selectedAgentName() !== defaultAgent() ? selectedAgentName() : undefined
@@ -1559,6 +1562,9 @@ export const SessionProvider: ParentComponent = (props) => {
     const sid = currentSessionID()
     const suggestion = scopedSuggestions(sid)[0]
     if (suggestion) dismissSuggestion(suggestion.id)
+    for (const q of scopedQuestions(sid)) {
+      rejectQuestion(q.id)
+    }
 
     if (sid) addOptimistic(sid, messageID, `/${command} ${args}`.trim(), files)
 

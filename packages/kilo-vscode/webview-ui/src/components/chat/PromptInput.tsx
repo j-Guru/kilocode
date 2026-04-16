@@ -52,6 +52,8 @@ interface PromptInputProps {
   blocked?: () => boolean
   /** When true, session is busy only because a suggestion is pending — treat as idle for input */
   suggesting?: () => boolean
+  /** When true, session is busy only because a question is pending — treat as idle for input */
+  questioning?: () => boolean
   boxId?: string
   pendingSessionID?: string
 }
@@ -270,7 +272,7 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
   window.addEventListener("compactSession", onCompact)
   onCleanup(() => window.removeEventListener("compactSession", onCompact))
 
-  const isBusy = () => session.status() !== "idle" && !props.suggesting?.()
+  const isBusy = () => session.status() !== "idle" && !props.suggesting?.() && !props.questioning?.()
   const isDisabled = () => !server.isConnected()
   const hasInput = () => text().trim().length > 0 || imageAttach.images().length > 0 || reviewComments().length > 0
   const canSend = () => hasInput() && !isDisabled() && !terminal.pending() && !props.blocked?.()
