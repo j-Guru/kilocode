@@ -126,12 +126,13 @@ install -m 755 \
 
 If the user says `new version`, `we have new version`, `new version was released`, or similar, treat it as an upstream sync request.
 
-1. Update `kilo-new-upstream` from upstream `Kilo-Org/kilocode` `main`
-2. Merge updated `kilo-new-upstream` into `main-vertex-new`
-3. Resolve conflicts with priority given to project-specific behavior, especially Vertex AI fixes
-4. If conflict intent is unclear, stop and ask the user
-5. Build the local VS Code plugin
-6. On success, reply exactly: `New VS Code plugin (version x.y.z) is READY TO TEST!`
+1. Check whether `main-vertex-new` has uncommitted files. If yes, stop and ask the user to commit them first.
+2. Update `kilo-new-upstream` from upstream `Kilo-Org/kilocode` `main`
+3. Merge updated `kilo-new-upstream` into `main-vertex-new`
+4. Resolve conflicts with priority given to project-specific behavior, especially Vertex AI fixes
+5. If conflict intent is unclear, stop and ask the user
+6. Build the local VS Code plugin
+7. On success, reply exactly: `New VS Code plugin (version x.y.z) is READY TO TEST!`
 
 ## Git rules
 
