@@ -125,6 +125,7 @@ export interface Message {
   summary?: { title?: string; body?: string; diffs?: unknown[] } | boolean
   cost?: number
   tokens?: TokenUsage
+  finish?: string
 }
 
 // File diff info (matches Snapshot.FileDiff from CLI backend)
@@ -420,6 +421,10 @@ export interface ExperimentalConfig {
   mcp_timeout?: number
 }
 
+export interface CommitMessageConfig {
+  prompt?: string
+}
+
 export interface Config {
   permission?: PermissionConfig
   model?: string | null
@@ -441,6 +446,7 @@ export interface Config {
   formatter?: false | Record<string, unknown>
   lsp?: false | Record<string, unknown>
   compaction?: CompactionConfig
+  commit_message?: CommitMessageConfig
   tools?: Record<string, boolean>
   layout?: "auto" | "stretch"
   experimental?: ExperimentalConfig
@@ -1588,6 +1594,7 @@ export interface SendMessageRequest {
 export interface AbortRequest {
   type: "abort"
   sessionID: string
+  queuedMessageIDs?: string[]
 }
 
 export interface RevertSessionRequest {

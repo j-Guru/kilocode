@@ -1690,6 +1690,15 @@ export type Config = {
      */
     url?: string
   }
+  /**
+   * Configuration for AI-generated commit messages
+   */
+  commit_message?: {
+    /**
+     * Custom system prompt for AI commit message generation. When set, replaces the default conventional commits prompt entirely.
+     */
+    prompt?: string
+  }
   compaction?: {
     /**
      * Enable automatic compaction when context is full (default: true)
@@ -6184,6 +6193,34 @@ export type KilocodeSessionImportPartResponses = {
 
 export type KilocodeSessionImportPartResponse =
   KilocodeSessionImportPartResponses[keyof KilocodeSessionImportPartResponses]
+
+export type KilocodeHeapSnapshotData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/kilocode/heap/snapshot"
+}
+
+export type KilocodeHeapSnapshotErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type KilocodeHeapSnapshotError = KilocodeHeapSnapshotErrors[keyof KilocodeHeapSnapshotErrors]
+
+export type KilocodeHeapSnapshotResponses = {
+  /**
+   * Heap snapshot file path
+   */
+  200: string
+}
+
+export type KilocodeHeapSnapshotResponse = KilocodeHeapSnapshotResponses[keyof KilocodeHeapSnapshotResponses]
 
 export type KilocodeRemoveSkillData = {
   body?: {
