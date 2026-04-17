@@ -24,6 +24,8 @@ type SessionMode = "worktree" | "local"
 export type ApplyDiffStatus = "checking" | "applying" | "success" | "conflict" | "error"
 
 export type WorktreeDiffEntry = SnapshotFileDiff & {
+  before?: string
+  after?: string
   tracked?: boolean
   generatedLike?: boolean
   summarized?: boolean
