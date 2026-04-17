@@ -1,5 +1,49 @@
 # kilo-code
 
+## 7.2.14
+
+### Minor Changes
+
+- [#8976](https://github.com/Kilo-Org/kilocode/pull/8976) [`4ef6bbf`](https://github.com/Kilo-Org/kilocode/commit/4ef6bbff5093dc68a607f1f268e6ab662781922e) - Support browsing and resuming sessions from Agent Manager with `/sessions`.
+
+- [#9023](https://github.com/Kilo-Org/kilocode/pull/9023) [`5301258`](https://github.com/Kilo-Org/kilocode/commit/530125828e891d3c50fe8d783201b65e3c4db8e4) - Support mentioning folders in the prompt with @ references, including top-level folder file contents.
+
+### Patch Changes
+
+- [#9121](https://github.com/Kilo-Org/kilocode/pull/9121) [`c8fd421`](https://github.com/Kilo-Org/kilocode/commit/c8fd4218236afb7d9f525ca667ddf53734c47d4a) - Fix the sidebar "Show Changes" diff viewer: the file tree now renders correctly (previously the file rows were cramped onto a single line due to missing styles), and per-file revert buttons are available, matching the Agent Manager.
+
+- [#9046](https://github.com/Kilo-Org/kilocode/pull/9046) [`671129d`](https://github.com/Kilo-Org/kilocode/commit/671129d4d70587352f963f9f409d6c24e9e86436) - Fix a native memory leak on Windows where `kilo serve` would grow to several GB of RAM within minutes of opening the Agent Manager. Git diff polling now runs directly in the extension host instead of routing through the CLI subprocess, and the diff detail view caps per-file reads at 20 MB to prevent memory spikes when opening very large files.
+
+- [#9118](https://github.com/Kilo-Org/kilocode/pull/9118) [`343455b`](https://github.com/Kilo-Org/kilocode/commit/343455b87895a0551760b5710b1ffe58fae21efd) - Respect per-agent model selections when an agent has a `model` configured in `kilo.jsonc`. Switching the model for such an agent now sticks across agent switches and CLI restarts. To pick up a newly edited agent default, re-select the model once (or clear `~/.local/share/kilo/storage/model.json`).
+
+- [#9067](https://github.com/Kilo-Org/kilocode/pull/9067) [`959a8b4`](https://github.com/Kilo-Org/kilocode/commit/959a8b498de6efd28756683162296dd40eb9b454) - Fix "assistant prefill" errors when a user queues a prompt while the previous turn is still streaming. The queued message no longer lands in the middle of the prior turn's history, so the next request always ends with the user prompt.
+
+- [#9123](https://github.com/Kilo-Org/kilocode/pull/9123) [`9749cc1`](https://github.com/Kilo-Org/kilocode/commit/9749cc178d999f96669cc815709a7cdf3129aefd) - Show MCP tool call inputs alongside outputs in chat, with JSON syntax highlighting for both.
+
+- [#8911](https://github.com/Kilo-Org/kilocode/pull/8911) [`eac2dba`](https://github.com/Kilo-Org/kilocode/commit/eac2dbafa009adedeb4b44016956f2c6cd96b715) - Make switching between sessions in Agent Manager near-instant. Long sessions no longer freeze the UI when selected, and the chat view self-heals if it missed any messages while the session was in the background.
+
+- [`f270639`](https://github.com/Kilo-Org/kilocode/commit/f27063987765bba2443f559629bc8c05fad996df) - Show an inline error in the Settings save bar when the configuration fails to save (for example, due to an invalid value) so the user can correct the config and retry instead of losing their unsaved changes silently.
+
+- Updated dependencies [[`eac2dba`](https://github.com/Kilo-Org/kilocode/commit/eac2dbafa009adedeb4b44016956f2c6cd96b715)]:
+  - @opencode-ai/ui@7.2.13
+  - @kilocode/kilo-ui@7.2.13
+
+## 7.2.12
+
+### Minor Changes
+
+- [#9099](https://github.com/Kilo-Org/kilocode/pull/9099) [`49b283e`](https://github.com/Kilo-Org/kilocode/commit/49b283e72a7307a1398c38c0862214faa043c128) - Add a "Contribute on GitHub" call-to-action in the Marketplace view so users can easily propose a new skill, mode, or MCP server. The CTA appears as a subtle footer below the card grid and inside the empty search-results state, linking to the `kilo-marketplace` repository.
+
+### Patch Changes
+
+- [#9066](https://github.com/Kilo-Org/kilocode/pull/9066) [`79ba643`](https://github.com/Kilo-Org/kilocode/commit/79ba643cba201971a9779e454fe66769019a7a5a) - Add `xhigh` reasoning effort option to custom provider model variants so users can access the highest tier on models that support it (gpt-5.2, gpt-5.3, gpt-5.4, gpt-5.1-codex-max, etc.).
+
+- [#9068](https://github.com/Kilo-Org/kilocode/pull/9068) [`e65c2d9`](https://github.com/Kilo-Org/kilocode/commit/e65c2d99c0d234d3dc1dff2e75e58e22bea8ce7f) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Hide Kilo Gateway models that do not support tool calling from the model list.
+
+- [#9040](https://github.com/Kilo-Org/kilocode/pull/9040) [`7d2f5a7`](https://github.com/Kilo-Org/kilocode/commit/7d2f5a7eced0b3599231f75656c0a27c68770d74) - Preserve local Agent Manager sessions after the panel reloads while still pruning stale worktree sessions.
+
+- [#9057](https://github.com/Kilo-Org/kilocode/pull/9057) [`1526a4b`](https://github.com/Kilo-Org/kilocode/commit/1526a4b8a890e01c0c890b4e17b595f35bfd745b) - Keep the active chat session responsive while other sessions stream in the background. Applies to both the sidebar and the Agent Manager.
+
 ## 7.2.11
 
 ### Minor Changes

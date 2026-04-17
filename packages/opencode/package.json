@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "version": "7.2.11",
+  "version": "7.2.14",
   "name": "@kilocode/cli",
   "type": "module",
   "license": "MIT",
@@ -113,7 +113,7 @@
     "@kilocode/sdk": "workspace:*",
     "@lydell/node-pty": "catalog:",
     "@modelcontextprotocol/sdk": "1.29.0",
-    "@morphllm/morphsdk": "0.2.148",
+    "@morphllm/morphsdk": "0.2.166",
     "@npmcli/arborist": "9.4.0",
     "@octokit/graphql": "9.0.2",
     "@octokit/rest": "catalog:",
