@@ -1,5 +1,11 @@
 # kilo-code
 
+## 5.13.0
+
+### Minor Changes
+
+- [#108](https://github.com/Kilo-Org/kilocode-legacy/pull/108) [`3c215d2`](https://github.com/Kilo-Org/kilocode-legacy/commit/3c215d2c9ef52cd6ad5bac6c09a405eae7f0a7c7) Thanks [@kilo-code-bot](https://github.com/apps/kilo-code-bot)! - Add Claude Opus 4.7 support and new Extra High output verbosity level
+
 ## 5.12.0
 
 ### Minor Changes
