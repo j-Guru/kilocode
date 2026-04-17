@@ -18,6 +18,7 @@ node_modules
 .codex
 *~
 playground
+/packages/kilo-vscode/*
 tmp
 dist
 ts-dist
