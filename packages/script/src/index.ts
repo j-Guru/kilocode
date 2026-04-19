@@ -138,7 +138,7 @@ const team = [
   "jeanduplessis",
   "jobrietbergen",
   "jrf0110",
-  "kevinvandijk",
+  "johnnyeric",
   "alex-alecu",
   "imanolmzd-svg",
   "kilocode-bot",
