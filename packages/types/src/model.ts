@@ -39,7 +39,7 @@ export const reasoningEffortSettingSchema = z.enum(reasoningEffortSettingValues)
  * Verbosity
  */
 
-export const verbosityLevels = ["low", "medium", "high", "max"] as const // kilocode_change
+export const verbosityLevels = ["low", "medium", "high", "xhigh", "max"] as const // kilocode_change
 
 export const verbosityLevelsSchema = z.enum(verbosityLevels)
 
