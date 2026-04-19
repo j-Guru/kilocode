@@ -66,6 +66,84 @@ export namespace ModelsDev {
       .optional(),
   })
 
+  // kilocode_change start
+  const glm51: Model = {
+    id: "glm-5.1",
+    name: "GLM-5.1",
+    family: "glm",
+    release_date: "2026-04-07",
+    attachment: false,
+    reasoning: true,
+    temperature: true,
+    tool_call: true,
+    interleaved: {
+      field: "reasoning_content",
+    },
+    cost: {
+      input: 1,
+      output: 3.2,
+      cache_read: 0.2,
+      cache_write: 0,
+    },
+    limit: {
+      context: 204800,
+      output: 131072,
+    },
+    modalities: {
+      input: ["text"],
+      output: ["text"],
+    },
+    options: {},
+  }
+
+  const glm5turbo: Model = {
+    id: "glm-5-turbo",
+    name: "GLM-5-Turbo",
+    family: "glm",
+    release_date: "2026-03-15",
+    attachment: false,
+    reasoning: true,
+    temperature: true,
+    tool_call: true,
+    interleaved: {
+      field: "reasoning_content",
+    },
+    cost: {
+      input: 1.2,
+      output: 4,
+      cache_read: 0.24,
+      cache_write: 0,
+    },
+    limit: {
+      context: 204800,
+      output: 131072,
+    },
+    modalities: {
+      input: ["text"],
+      output: ["text"],
+    },
+    options: {},
+  }
+
+  function ensureZaiGlm51(providers: Record<string, Provider>) {
+    const targets = ["zai", "zhipuai"]
+    for (const id of targets) {
+      const provider = providers[id]
+      if (!provider) continue
+      if (!provider.models["glm-5.1"]) {
+        provider.models["glm-5.1"] = {
+          ...glm51,
+        }
+      }
+      if (!provider.models["glm-5-turbo"]) {
+        provider.models["glm-5-turbo"] = {
+          ...glm5turbo,
+        }
+      }
+    }
+  }
+  // kilocode_change end
+
   export const Model = z.object({
     id: z.string(),
     name: z.string(),
@@ -185,6 +263,7 @@ export namespace ModelsDev {
     const result = await Data()
     // kilocode_change start
     const providers = result as Record<string, Provider>
+    ensureZaiGlm51(providers)
 
     if (providers["kilo"]) {
       delete providers["kilo"]

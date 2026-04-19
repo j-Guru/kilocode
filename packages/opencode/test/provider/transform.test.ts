@@ -2488,6 +2488,49 @@ describe("ProviderTransform.variants", () => {
   })
   // kilocode_change end
 
+  describe("ProviderTransform.sampling defaults", () => {
+    const createMockModel = (id: string): any => ({
+      id: `zai/${id}`,
+      providerID: "zai",
+      api: {
+        id,
+        url: "https://api.z.ai/api/paas/v4",
+        npm: "@ai-sdk/openai-compatible",
+      },
+      name: id,
+      capabilities: {
+        temperature: true,
+        reasoning: true,
+        attachment: false,
+        toolcall: true,
+        input: { text: true, audio: false, image: false, video: false, pdf: false },
+        output: { text: true, audio: false, image: false, video: false, pdf: false },
+        interleaved: true,
+      },
+      cost: {
+        input: 1,
+        output: 3.2,
+        cache: { read: 0.2, write: 0 },
+      },
+      limit: {
+        context: 204800,
+        output: 131072,
+      },
+      status: "active",
+      options: {},
+      headers: {},
+      release_date: "2026-04-07",
+    })
+
+    test("glm-5.1 uses Z.ai default temperature", () => {
+      expect(ProviderTransform.temperature(createMockModel("glm-5.1"))).toBe(1.0)
+    })
+
+    test("glm-5.1 uses Z.ai default top_p", () => {
+      expect(ProviderTransform.topP(createMockModel("glm-5.1"))).toBe(0.95)
+    })
+  })
+
   describe("@ai-sdk/cerebras", () => {
     test("returns WIDELY_SUPPORTED_EFFORTS with reasoningEffort", () => {
       const model = createMockModel({
