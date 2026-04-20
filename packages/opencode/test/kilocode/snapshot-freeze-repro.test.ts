@@ -12,13 +12,12 @@
 //   3. A concurrent setInterval keeps ticking — i.e. the event loop keeps
 //      breathing and ESC would be delivered.
 
-import { test, expect, afterAll, afterEach, mock } from "bun:test"
+import { test, expect, afterEach, mock } from "bun:test"
 import { $ } from "bun"
 import { Instance } from "../../src/project/instance"
 import { Server } from "../../src/server/server"
 import { Session } from "../../src/session"
 import { Snapshot } from "../../src/snapshot"
-import { DiffEngine } from "../../src/kilocode/snapshot/diff-engine"
 import { Filesystem } from "../../src/util/filesystem"
 import { Log } from "../../src/util/log"
 import { tmpdir } from "../fixture/fixture"
@@ -28,10 +27,6 @@ Log.init({ print: false })
 afterEach(async () => {
   mock.restore()
   await Instance.disposeAll()
-})
-
-afterAll(async () => {
-  await DiffEngine.shutdown()
 })
 
 test("pathological diffFull workload finishes quickly and does not block abort", async () => {

@@ -2,4 +2,4 @@
 "kilo-code": patch
 ---
 
-Prevent the CLI from freezing when a changed file has tens of thousands of lines. Large-file diffs now skip the full patch body but still report additions/deletions, and the diff computation no longer blocks ESC/interrupt or live updates.
+Prevent TUI freeze on turns that edit very large files by skipping patch generation for oversized file diffs. Additions and deletions are still reported so session summaries stay accurate.

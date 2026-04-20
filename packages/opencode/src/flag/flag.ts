@@ -79,11 +79,6 @@ export namespace Flag {
   export const KILO_SKIP_MIGRATIONS = truthy("KILO_SKIP_MIGRATIONS")
   export const KILO_STRICT_CONFIG_DEPS = truthy("KILO_STRICT_CONFIG_DEPS")
 
-  // kilocode_change start — diff engine rollback knobs
-  export const KILO_DIFF_WORKER = !falsy("KILO_DIFF_WORKER")
-  export const KILO_DIFF_CAPS = !falsy("KILO_DIFF_CAPS")
-  // kilocode_change end
-
   function number(key: string) {
     const value = process.env[key]
     if (!value) return undefined

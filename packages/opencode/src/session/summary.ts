@@ -7,7 +7,6 @@ import { Session } from "."
 import { MessageV2 } from "./message-v2"
 import { SessionID, MessageID } from "./schema"
 import { makeRuntime } from "@/effect/run-service" // kilocode_change
-import { SummaryDispatch } from "../kilocode/session/summary-dispatch" // kilocode_change
 
 export namespace SessionSummary {
   function unquoteGitPath(input: string) {
@@ -173,15 +172,8 @@ export namespace SessionSummary {
     messageID: MessageID.zod.optional(),
   })
 
-  // kilocode_change start - legacy promise helpers + tracked dispatcher for Kilo callsites
+  // kilocode_change start - legacy promise helpers for Kilo callsites
   const { runPromise } = makeRuntime(Service, defaultLayer)
   export const diff = (input: { sessionID: SessionID; messageID?: MessageID }) => runPromise((svc) => svc.diff(input))
-
-  const dispatch = SummaryDispatch.create<Interface>({
-    runPromise,
-    summarize: (svc, input) => svc.summarize(input),
-  })
-  export const summarize = dispatch.summarize
-  export const cancel = dispatch.cancel
   // kilocode_change end
 }

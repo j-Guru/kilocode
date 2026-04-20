@@ -131,10 +131,6 @@ export namespace SessionPrompt {
       const cancel = Effect.fn("SessionPrompt.cancel")(function* (sessionID: SessionID) {
         yield* elog.info("cancel", { sessionID })
         yield* KiloSessionPromptQueue.cancel(sessionID) // kilocode_change - drop queued follow-up loops on abort
-        // kilocode_change start — also interrupt an in-flight summary so a huge
-        // diff can never outlive the session it belongs to.
-        yield* Effect.promise(() => SessionSummary.cancel(sessionID)).pipe(Effect.ignore)
-        // kilocode_change end
         yield* state.cancel(sessionID)
       })
 

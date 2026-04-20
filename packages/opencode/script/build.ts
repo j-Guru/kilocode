@@ -195,7 +195,6 @@ for (const item of targets) {
   const rootPath = path.resolve(dir, "../../node_modules/@opentui/core/parser.worker.js")
   const parserWorker = fs.realpathSync(fs.existsSync(localPath) ? localPath : rootPath)
   const workerPath = "./src/cli/cmd/tui/worker.ts"
-  const diffWorkerPath = "./src/kilocode/snapshot/diff-worker.ts" // kilocode_change
   const rgPath = "./src/file/ripgrep.worker.ts"
 
   // Use platform-specific bunfs root path based on target OS
@@ -223,22 +222,18 @@ for (const item of targets) {
     files: {
       ...(embeddedFileMap ? { "opencode-web-ui.gen.ts": embeddedFileMap } : {}),
     },
-    // kilocode_change start — reflowed to keep the diff-worker entrypoint readable
     entrypoints: [
       "./src/index.ts",
       parserWorker,
       workerPath,
-      diffWorkerPath,
       rgPath,
       ...(embeddedFileMap ? ["opencode-web-ui.gen.ts"] : []),
     ],
-    // kilocode_change end
     define: {
       KILO_VERSION: `'${Script.version}'`,
       KILO_MIGRATIONS: JSON.stringify(migrations),
       OTUI_TREE_SITTER_WORKER_PATH: bunfsRoot + workerRelativePath,
       KILO_WORKER_PATH: workerPath,
-      KILO_DIFF_WORKER_PATH: diffWorkerPath, // kilocode_change
       KILO_RIPGREP_WORKER_PATH: rgPath,
       KILO_CHANNEL: `'${Script.channel}'`,
       KILO_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",

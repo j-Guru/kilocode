@@ -1,5 +1,6 @@
 import { Cause, Duration, Effect, Layer, Schedule, Semaphore, Context, Stream } from "effect"
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process"
+import { formatPatch, structuredPatch } from "diff"
 import path from "path"
 import z from "zod"
 import { makeRuntime } from "@/effect/run-service" // kilocode_change
@@ -9,7 +10,7 @@ import { AppFileSystem } from "@/filesystem"
 import { Config } from "../config/config"
 import { Log } from "../util/log"
 import * as KiloSnapshot from "../kilocode/snapshot" // kilocode_change
-import { DiffFull } from "../kilocode/snapshot/diff-full" // kilocode_change
+import { DiffEngine } from "../kilocode/snapshot/diff-engine" // kilocode_change
 
 export namespace Snapshot {
   export const Patch = z.object({
@@ -708,9 +709,37 @@ export namespace Snapshot {
                 }
 
                 const step = 100
-                // kilocode_change start - delegate to kilo helper (caps + worker)
-                result.push(...(yield* DiffFull.run({ rows, step, from, to, load, show })))
-                // kilocode_change end
+                const patch = (file: string, before: string, after: string) =>
+                  formatPatch(structuredPatch(file, file, before, after, "", "", { context: Number.MAX_SAFE_INTEGER }))
+
+                for (let i = 0; i < rows.length; i += step) {
+                  const run = rows.slice(i, i + step)
+                  const text = yield* load(run)
+
+                  for (const row of run) {
+                    const hit = text?.get(row.file) ?? { before: "", after: "" }
+                    const [before, after] = row.binary ? ["", ""] : text ? [hit.before, hit.after] : yield* show(row)
+                    // kilocode_change start — cap runaway inputs so Myers never blocks the event loop
+                    const skipped = row.binary ? undefined : DiffEngine.shouldSkip(before, after)
+                    if (skipped) {
+                      log.warn("diffFull.skipped", {
+                        file: row.file,
+                        reason: skipped,
+                        bytesBefore: before.length,
+                        bytesAfter: after.length,
+                      })
+                    }
+                    result.push({
+                      file: row.file,
+                      patch: row.binary || skipped ? "" : patch(row.file, before, after),
+                      additions: row.additions,
+                      deletions: row.deletions,
+                      status: row.status,
+                    })
+                    // kilocode_change end
+                  }
+                }
+
                 return result
               }),
             )

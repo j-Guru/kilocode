@@ -1,4 +1,5 @@
 import { Effect, Layer, Context, Stream } from "effect"
+import { formatPatch, structuredPatch } from "diff"
 import path from "path"
 import { Bus } from "@/bus"
 import { BusEvent } from "@/bus/bus-event"
@@ -10,7 +11,6 @@ import { Log } from "@/util/log"
 import { Instance } from "./instance"
 import { makeRuntime } from "@/effect/run-service" // kilocode_change
 import z from "zod"
-import { DiffEngine } from "@/kilocode/snapshot/diff-engine" // kilocode_change
 
 export namespace Vcs {
   const log = Log.create({ service: "vcs" })
@@ -49,8 +49,8 @@ export namespace Vcs {
     map: Map<string, { additions: number; deletions: number }>,
   ) {
     const base = ref ? yield* git.prefix(cwd) : ""
-    // kilocode_change start — route through DiffEngine for worker offload + size caps.
-    // Same freeze mode as SessionSummary if a changed file is huge.
+    const patch = (file: string, before: string, after: string) =>
+      formatPatch(structuredPatch(file, file, before, after, "", "", { context: Number.MAX_SAFE_INTEGER }))
     const next = yield* Effect.forEach(
       list,
       (item) =>
@@ -58,18 +58,9 @@ export namespace Vcs {
           const before = item.status === "added" || !ref ? "" : yield* git.show(cwd, ref, item.file, base)
           const after = item.status === "deleted" ? "" : yield* work(fs, cwd, item.file)
           const stat = map.get(item.file)
-          const out = yield* Effect.promise(() => DiffEngine.patchAsync(item.file, before, after))
-          if (out.skipped) {
-            log.warn("vcs.diff.skipped", {
-              file: item.file,
-              reason: out.skipped,
-              bytesBefore: before.length,
-              bytesAfter: after.length,
-            })
-          }
           return {
             file: item.file,
-            patch: out.patch,
+            patch: patch(item.file, before, after),
             additions: stat?.additions ?? (item.status === "added" ? count(after) : 0),
             deletions: stat?.deletions ?? (item.status === "deleted" ? count(before) : 0),
             status: item.status,
@@ -78,7 +69,6 @@ export namespace Vcs {
       { concurrency: 8 },
     )
     return next.toSorted((a, b) => a.file.localeCompare(b.file))
-    // kilocode_change end
   })
 
   const track = Effect.fnUntraced(function* (
