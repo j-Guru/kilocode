@@ -12,6 +12,9 @@ import DESCRIPTION from "./read.txt"
 import { Instance } from "../project/instance"
 import { assertExternalDirectoryEffect } from "./external-directory"
 import { Instruction } from "../session/instruction"
+// kilocode_change start
+import { readDirectoryFiles } from "../kilocode/tool/read-directory"
+// kilocode_change end
 
 const DEFAULT_READ_LIMIT = 2000
 const MAX_LINE_LENGTH = 2000
@@ -25,7 +28,7 @@ const parameters = z.object({
   limit: z.coerce.number().describe("The maximum number of lines to read (defaults to 2000)").optional(),
 })
 
-export const ReadTool = Tool.defineEffect(
+export const ReadTool = Tool.define(
   "read",
   Effect.gen(function* () {
     const fs = yield* AppFileSystem.Service
@@ -106,14 +109,12 @@ export const ReadTool = Tool.defineEffect(
         kind: stat?.type === "Directory" ? "directory" : "file",
       })
 
-      yield* Effect.promise(() =>
-        ctx.ask({
-          permission: "read",
-          patterns: [filepath],
-          always: ["*"],
-          metadata: {},
-        }),
-      )
+      yield* ctx.ask({
+        permission: "read",
+        patterns: [filepath],
+        always: ["*"],
+        metadata: {},
+      })
 
       if (!stat) return yield* miss(filepath)
 
@@ -124,6 +125,11 @@ export const ReadTool = Tool.defineEffect(
         const start = offset - 1
         const sliced = items.slice(start, start + limit)
         const truncated = start + sliced.length < items.length
+        // kilocode_change start
+        const expand = Boolean(ctx.extra?.["includeDirectoryFiles"])
+        const loaded = expand ? yield* readDirectoryFiles(fs, filepath, sliced) : []
+        const content = loaded.map((item) => item.content).join("\n\n")
+        // kilocode_change end
 
         return {
           title,
@@ -136,11 +142,16 @@ export const ReadTool = Tool.defineEffect(
               ? `\n(Showing ${sliced.length} of ${items.length} entries. Use 'offset' parameter to read beyond entry ${offset + sliced.length})`
               : `\n(${items.length} entries)`,
             `</entries>`,
+            // kilocode_change start
+            ...(content ? [`\n${content}`] : []),
+            // kilocode_change end
           ].join("\n"),
           metadata: {
             preview: sliced.slice(0, 20).join("\n"),
             truncated,
-            loaded: [] as string[],
+            // kilocode_change start
+            loaded: loaded.map((item) => item.filepath),
+            // kilocode_change end
           },
         }
       }
@@ -218,14 +229,14 @@ export const ReadTool = Tool.defineEffect(
     return {
       description: DESCRIPTION,
       parameters,
-      async execute(params: z.infer<typeof parameters>, ctx) {
-        return Effect.runPromise(run(params, ctx).pipe(Effect.orDie))
-      },
+      execute: (params: z.infer<typeof parameters>, ctx: Tool.Context) => run(params, ctx).pipe(Effect.orDie),
     }
   }),
 )
 
-async function lines(filepath: string, opts: { limit: number; offset: number }) {
+// kilocode_change start
+export async function lines(filepath: string, opts: { limit: number; offset: number }) {
+  // kilocode_change end
   const stream = createReadStream(filepath, { encoding: "utf8" })
   const rl = createInterface({
     input: stream,
@@ -269,7 +280,9 @@ async function lines(filepath: string, opts: { limit: number; offset: number }) 
   return { raw, count, cut, more, offset: opts.offset }
 }
 
-async function isBinaryFile(filepath: string, fileSize: number): Promise<boolean> {
+// kilocode_change start
+export async function isBinaryFile(filepath: string, fileSize: number): Promise<boolean> {
+  // kilocode_change end
   const ext = path.extname(filepath).toLowerCase()
   // binary check for common non-text extensions
   switch (ext) {

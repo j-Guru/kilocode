@@ -12,7 +12,12 @@ import { Icon } from "@kilocode/kilo-ui/icon"
 import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
 import type { QuestionRequest } from "../../types/messages"
-import { resolveOptimisticQuestionAgent, resolveSelectedQuestionMode, toggleAnswer } from "./question-dock-utils"
+import {
+  pickOutcome,
+  resolveOptimisticQuestionAgent,
+  resolveSelectedQuestionMode,
+  toggleAnswer,
+} from "./question-dock-utils"
 
 export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => {
   const session = useSession()
@@ -119,7 +124,14 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
     syncAgent(answers, kinds)
 
-    if (!single() && !multi()) {
+    const outcome = pickOutcome({ single: single(), multi: multi(), custom })
+    if (outcome.kind === "submit") {
+      // Mirror TUI behaviour: a single-question single-select option pick submits immediately.
+      // handleCustomSubmit covers the custom-input path via its own submit() call.
+      reply([[answer]])
+      return
+    }
+    if (outcome.kind === "advance") {
       setStore("tab", store.tab + 1)
     }
   }
@@ -247,13 +259,16 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
   // Keep keyboard navigation when the webview already has focus, but do not
   // steal focus from the editor, terminal, or other VS Code surfaces.
+  // preventScroll avoids the browser's focus-into-view behavior fighting
+  // createAutoScroll (and yanking the viewport back to the dock while the
+  // user has scrolled up to read earlier context).
   createEffect(() => {
     void store.tab
     if (store.collapsed || store.editing || confirm()) return
     requestAnimationFrame(() => {
       if (!document.hasFocus()) return
       const btn = root?.querySelector<HTMLButtonElement>("button[data-slot='question-option']:not(:disabled)")
-      btn?.focus()
+      btn?.focus({ preventScroll: true })
     })
   })
 
@@ -370,9 +385,11 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                   </span>
                   <span data-slot="question-option-main">
                     <span data-slot="option-label">{language.t("ui.messagePart.option.typeOwnAnswer")}</span>
-                    <span data-slot="option-description" data-placeholder={!input()}>
-                      {input() || language.t("ui.question.custom.placeholder")}
-                    </span>
+                    <Show when={!store.editing}>
+                      <span data-slot="option-description" data-placeholder={!input()}>
+                        {input() || language.t("ui.question.custom.placeholder")}
+                      </span>
+                    </Show>
                   </span>
                 </button>
                 <Show when={store.editing}>

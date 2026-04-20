@@ -352,8 +352,24 @@ export type WebviewMessage =
       }
     }
   | { type: "todoUpdated"; sessionID: string; items: unknown[] }
-  | { type: "questionRequest"; question: { id: string; sessionID: string; questions: unknown[]; tool?: unknown } }
+  | {
+      type: "questionRequest"
+      question: { id: string; sessionID: string; questions: unknown[]; blocking?: boolean; tool?: unknown }
+    }
   | { type: "questionResolved"; requestID: string }
+  | {
+      type: "suggestionRequest"
+      suggestion: {
+        id: string
+        sessionID: string
+        text: string
+        actions: unknown[]
+        blocking?: boolean
+        tool?: unknown
+      }
+    }
+  | { type: "suggestionResolved"; requestID: string }
+  | { type: "suggestionError"; requestID: string }
   | { type: "permissionResolved"; permissionID: string }
   | { type: "permissionError"; permissionID: string }
   | { type: "sessionCreated"; session: ReturnType<typeof sessionToWebview>; draftID?: string }
@@ -457,6 +473,7 @@ export function mapSSEEventToWebviewMessage(event: Event, sessionID: string | un
           id: event.properties.id,
           sessionID: event.properties.sessionID,
           questions: event.properties.questions,
+          blocking: event.properties.blocking,
           tool: event.properties.tool,
         },
       }
@@ -464,6 +481,24 @@ export function mapSSEEventToWebviewMessage(event: Event, sessionID: string | un
     case "question.rejected":
       return {
         type: "questionResolved",
+        requestID: event.properties.requestID,
+      }
+    case "suggestion.shown":
+      return {
+        type: "suggestionRequest",
+        suggestion: {
+          id: event.properties.id,
+          sessionID: event.properties.sessionID,
+          text: event.properties.text,
+          actions: event.properties.actions,
+          blocking: event.properties.blocking,
+          tool: event.properties.tool,
+        },
+      }
+    case "suggestion.accepted":
+    case "suggestion.dismissed":
+      return {
+        type: "suggestionResolved",
         requestID: event.properties.requestID,
       }
     case "session.error": {
@@ -529,12 +564,16 @@ export function mergeFileSearchResults(input: {
   open: Set<string>
   active?: string
 }): string[] {
-  const query = input.query.trim().toLowerCase()
+  const norm = (p: string) => p.replaceAll("\\", "/")
+  const query = norm(input.query).trim().toLowerCase()
+  const open = new Set([...input.open].map(norm))
+  const active = input.active ? norm(input.active) : undefined
+  const backend = input.backend.map(norm)
   const ok = (p: string) => !query || p.toLowerCase().includes(query)
   const tabs =
-    input.active && input.open.has(input.active) && ok(input.active)
-      ? [input.active, ...[...input.open].filter((p) => p !== input.active && ok(p))]
-      : [...input.open].filter(ok)
+    active && open.has(active) && ok(active)
+      ? [active, ...[...open].filter((p) => p !== active && ok(p))]
+      : [...open].filter(ok)
   const seen = new Set(tabs)
-  return [...tabs, ...input.backend.filter((p) => !seen.has(p))]
+  return [...tabs, ...backend.filter((p) => !seen.has(p))]
 }

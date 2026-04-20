@@ -75,6 +75,21 @@ export type EventGlobalConfigUpdated = {
   }
 }
 
+export type EventFileEdited = {
+  type: "file.edited"
+  properties: {
+    file: string
+  }
+}
+
+export type EventFileWatcherUpdated = {
+  type: "file.watcher.updated"
+  properties: {
+    file: string
+    event: "add" | "change" | "unlink"
+  }
+}
+
 export type EventLspClientDiagnostics = {
   type: "lsp.client.diagnostics"
   properties: {
@@ -345,38 +360,6 @@ export type EventSessionError = {
   }
 }
 
-export type EventFileEdited = {
-  type: "file.edited"
-  properties: {
-    file: string
-  }
-}
-
-export type EventFileWatcherUpdated = {
-  type: "file.watcher.updated"
-  properties: {
-    file: string
-    event: "add" | "change" | "unlink"
-  }
-}
-
-export type EventVcsBranchUpdated = {
-  type: "vcs.branch.updated"
-  properties: {
-    branch?: string
-  }
-}
-
-export type EventCommandExecuted = {
-  type: "command.executed"
-  properties: {
-    name: string
-    sessionID: string
-    arguments: string
-    messageID: string
-  }
-}
-
 export type QuestionOption = {
   /**
    * Display text (1-5 words, concise)
@@ -411,6 +394,11 @@ export type QuestionInfo = {
   custom?: boolean
 }
 
+export type QuestionTool = {
+  messageID: string
+  callID: string
+}
+
 export type QuestionRequest = {
   id: string
   sessionID: string
@@ -418,10 +406,11 @@ export type QuestionRequest = {
    * Questions to ask
    */
   questions: Array<QuestionInfo>
-  tool?: {
-    messageID: string
-    callID: string
-  }
+  /**
+   * Whether this question blocks prompt input (default: true)
+   */
+  blocking?: boolean
+  tool?: QuestionTool
 }
 
 export type EventQuestionAsked = {
@@ -431,21 +420,25 @@ export type EventQuestionAsked = {
 
 export type QuestionAnswer = Array<string>
 
+export type QuestionReplied = {
+  sessionID: string
+  requestID: string
+  answers: Array<QuestionAnswer>
+}
+
 export type EventQuestionReplied = {
   type: "question.replied"
-  properties: {
-    sessionID: string
-    requestID: string
-    answers: Array<QuestionAnswer>
-  }
+  properties: QuestionReplied
+}
+
+export type QuestionRejected = {
+  sessionID: string
+  requestID: string
 }
 
 export type EventQuestionRejected = {
   type: "question.rejected"
-  properties: {
-    sessionID: string
-    requestID: string
-  }
+  properties: QuestionRejected
 }
 
 export type Todo = {
@@ -505,10 +498,86 @@ export type EventSessionIdle = {
   }
 }
 
+export type SuggestionAction = {
+  /**
+   * Button or option label (1-5 words)
+   */
+  label: string
+  /**
+   * Brief explanation of what this action does
+   */
+  description?: string
+  /**
+   * Synthetic user prompt to inject when this action is accepted
+   */
+  prompt: string
+}
+
+export type SuggestionRequest = {
+  id: string
+  sessionID: string
+  /**
+   * Suggestion text shown to the user
+   */
+  text: string
+  /**
+   * Available actions the user can take
+   */
+  actions: Array<SuggestionAction>
+  /**
+   * Whether this suggestion blocks prompt input (default: true)
+   */
+  blocking?: boolean
+  tool?: {
+    messageID: string
+    callID: string
+  }
+}
+
+export type EventSuggestionShown = {
+  type: "suggestion.shown"
+  properties: SuggestionRequest
+}
+
+export type EventSuggestionAccepted = {
+  type: "suggestion.accepted"
+  properties: {
+    sessionID: string
+    requestID: string
+    index: number
+    action: SuggestionAction
+  }
+}
+
+export type EventSuggestionDismissed = {
+  type: "suggestion.dismissed"
+  properties: {
+    sessionID: string
+    requestID: string
+  }
+}
+
 export type EventSessionCompacted = {
   type: "session.compacted"
   properties: {
     sessionID: string
+  }
+}
+
+export type EventCommandExecuted = {
+  type: "command.executed"
+  properties: {
+    name: string
+    sessionID: string
+    arguments: string
+    messageID: string
+  }
+}
+
+export type EventVcsBranchUpdated = {
+  type: "vcs.branch.updated"
+  properties: {
+    branch?: string
   }
 }
 
@@ -520,15 +589,16 @@ export type EventKiloSessionsRemoteStatusChanged = {
   }
 }
 
-export type EventWorkspaceReady = {
-  type: "workspace.ready"
+export type EventWorktreeReady = {
+  type: "worktree.ready"
   properties: {
     name: string
+    branch: string
   }
 }
 
-export type EventWorkspaceFailed = {
-  type: "workspace.failed"
+export type EventWorktreeFailed = {
+  type: "worktree.failed"
   properties: {
     message: string
   }
@@ -573,18 +643,26 @@ export type EventPtyDeleted = {
   }
 }
 
-export type EventWorktreeReady = {
-  type: "worktree.ready"
+export type EventWorkspaceReady = {
+  type: "workspace.ready"
   properties: {
     name: string
-    branch: string
   }
 }
 
-export type EventWorktreeFailed = {
-  type: "worktree.failed"
+export type EventWorkspaceFailed = {
+  type: "workspace.failed"
   properties: {
     message: string
+  }
+}
+
+export type EventWorkspaceStatus = {
+  type: "workspace.status"
+  properties: {
+    workspaceID: string
+    status: "connected" | "connecting" | "disconnected" | "error"
+    error?: string
   }
 }
 
@@ -1047,69 +1125,12 @@ export type EventSessionDeleted = {
   }
 }
 
-export type Event =
-  | EventProjectUpdated
-  | EventServerInstanceDisposed
-  | EventInstallationUpdated
-  | EventInstallationUpdateAvailable
-  | EventServerConnected
-  | EventGlobalDisposed
-  | EventGlobalConfigUpdated
-  | EventLspClientDiagnostics
-  | EventLspUpdated
-  | EventTuiPromptAppend
-  | EventTuiCommandExecute
-  | EventTuiToastShow
-  | EventTuiSessionSelect
-  | EventMcpToolsChanged
-  | EventMcpBrowserOpenFailed
-  | EventSessionNetworkAsked
-  | EventSessionNetworkReplied
-  | EventSessionNetworkRejected
-  | EventSessionNetworkRestored
-  | EventMessagePartDelta
-  | EventSessionTurnOpen
-  | EventSessionTurnClose
-  | EventPermissionAsked
-  | EventPermissionReplied
-  | EventSessionDiff
-  | EventSessionError
-  | EventFileEdited
-  | EventFileWatcherUpdated
-  | EventVcsBranchUpdated
-  | EventCommandExecuted
-  | EventQuestionAsked
-  | EventQuestionReplied
-  | EventQuestionRejected
-  | EventTodoUpdated
-  | EventSessionStatus
-  | EventSessionIdle
-  | EventSessionCompacted
-  | EventKiloSessionsRemoteStatusChanged
-  | EventWorkspaceReady
-  | EventWorkspaceFailed
-  | EventPtyCreated
-  | EventPtyUpdated
-  | EventPtyExited
-  | EventPtyDeleted
-  | EventWorktreeReady
-  | EventWorktreeFailed
-  | EventMessageUpdated
-  | EventMessageRemoved
-  | EventMessagePartUpdated
-  | EventMessagePartRemoved
-  | EventSessionCreated
-  | EventSessionUpdated
-  | EventSessionDeleted
-
-export type GlobalEvent = {
-  directory: string
-  payload: Event
-}
-
 export type SyncEventMessageUpdated = {
-  type: "message.updated.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "message.updated.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     info: Message
@@ -1117,8 +1138,11 @@ export type SyncEventMessageUpdated = {
 }
 
 export type SyncEventMessageRemoved = {
-  type: "message.removed.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "message.removed.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     messageID: string
@@ -1126,8 +1150,11 @@ export type SyncEventMessageRemoved = {
 }
 
 export type SyncEventMessagePartUpdated = {
-  type: "message.part.updated.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "message.part.updated.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     part: Part
@@ -1136,8 +1163,11 @@ export type SyncEventMessagePartUpdated = {
 }
 
 export type SyncEventMessagePartRemoved = {
-  type: "message.part.removed.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "message.part.removed.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     messageID: string
@@ -1146,8 +1176,11 @@ export type SyncEventMessagePartRemoved = {
 }
 
 export type SyncEventSessionCreated = {
-  type: "session.created.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "session.created.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     info: Session
@@ -1155,8 +1188,11 @@ export type SyncEventSessionCreated = {
 }
 
 export type SyncEventSessionUpdated = {
-  type: "session.updated.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "session.updated.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     info: {
@@ -1200,16 +1236,86 @@ export type SyncEventSessionUpdated = {
 }
 
 export type SyncEventSessionDeleted = {
-  type: "session.deleted.1"
-  aggregate: "sessionID"
+  type: "sync"
+  name: "session.deleted.1"
+  id: string
+  seq: number
+  aggregateID: "sessionID"
   data: {
     sessionID: string
     info: Session
   }
 }
 
-export type SyncEvent = {
-  payload: SyncEvent
+export type GlobalEvent = {
+  directory: string
+  project?: string
+  workspace?: string
+  payload:
+    | EventProjectUpdated
+    | EventServerInstanceDisposed
+    | EventInstallationUpdated
+    | EventInstallationUpdateAvailable
+    | EventServerConnected
+    | EventGlobalDisposed
+    | EventGlobalConfigUpdated
+    | EventFileEdited
+    | EventFileWatcherUpdated
+    | EventLspClientDiagnostics
+    | EventLspUpdated
+    | EventTuiPromptAppend
+    | EventTuiCommandExecute
+    | EventTuiToastShow
+    | EventTuiSessionSelect
+    | EventMcpToolsChanged
+    | EventMcpBrowserOpenFailed
+    | EventSessionNetworkAsked
+    | EventSessionNetworkReplied
+    | EventSessionNetworkRejected
+    | EventSessionNetworkRestored
+    | EventMessagePartDelta
+    | EventSessionTurnOpen
+    | EventSessionTurnClose
+    | EventPermissionAsked
+    | EventPermissionReplied
+    | EventSessionDiff
+    | EventSessionError
+    | EventQuestionAsked
+    | EventQuestionReplied
+    | EventQuestionRejected
+    | EventTodoUpdated
+    | EventSessionStatus
+    | EventSessionIdle
+    | EventSuggestionShown
+    | EventSuggestionAccepted
+    | EventSuggestionDismissed
+    | EventSessionCompacted
+    | EventCommandExecuted
+    | EventVcsBranchUpdated
+    | EventKiloSessionsRemoteStatusChanged
+    | EventWorktreeReady
+    | EventWorktreeFailed
+    | EventPtyCreated
+    | EventPtyUpdated
+    | EventPtyExited
+    | EventPtyDeleted
+    | EventWorkspaceReady
+    | EventWorkspaceFailed
+    | EventWorkspaceStatus
+    | EventMessageUpdated
+    | EventMessageRemoved
+    | EventMessagePartUpdated
+    | EventMessagePartRemoved
+    | EventSessionCreated
+    | EventSessionUpdated
+    | EventSessionDeleted
+    | SyncEventMessageUpdated
+    | SyncEventMessageRemoved
+    | SyncEventMessagePartUpdated
+    | SyncEventMessagePartRemoved
+    | SyncEventSessionCreated
+    | SyncEventSessionUpdated
+    | SyncEventSessionDeleted
 }
 
 /**
@@ -1854,7 +1960,7 @@ export type Model = {
   recommendedIndex?: number
   prompt?: "codex" | "gemini" | "beast" | "anthropic" | "trinity" | "anthropic_without_todo"
   isFree?: boolean
-  ai_sdk_provider?: "anthropic" | "openai" | "openai-compatible" | "openrouter"
+  ai_sdk_provider?: "alibaba" | "anthropic" | "openai" | "openai-compatible" | "openrouter"
 }
 
 export type Provider = {
@@ -1884,8 +1990,8 @@ export type ToolList = Array<ToolListItem>
 export type Workspace = {
   id: string
   type: string
+  name: string
   branch: string | null
-  name: string | null
   directory: string | null
   extra: unknown | null
   projectID: string
@@ -2114,6 +2220,65 @@ export type File = {
   status: "added" | "deleted" | "modified"
 }
 
+export type Event =
+  | EventProjectUpdated
+  | EventServerInstanceDisposed
+  | EventInstallationUpdated
+  | EventInstallationUpdateAvailable
+  | EventServerConnected
+  | EventGlobalDisposed
+  | EventGlobalConfigUpdated
+  | EventFileEdited
+  | EventFileWatcherUpdated
+  | EventLspClientDiagnostics
+  | EventLspUpdated
+  | EventTuiPromptAppend
+  | EventTuiCommandExecute
+  | EventTuiToastShow
+  | EventTuiSessionSelect
+  | EventMcpToolsChanged
+  | EventMcpBrowserOpenFailed
+  | EventSessionNetworkAsked
+  | EventSessionNetworkReplied
+  | EventSessionNetworkRejected
+  | EventSessionNetworkRestored
+  | EventMessagePartDelta
+  | EventSessionTurnOpen
+  | EventSessionTurnClose
+  | EventPermissionAsked
+  | EventPermissionReplied
+  | EventSessionDiff
+  | EventSessionError
+  | EventQuestionAsked
+  | EventQuestionReplied
+  | EventQuestionRejected
+  | EventTodoUpdated
+  | EventSessionStatus
+  | EventSessionIdle
+  | EventSuggestionShown
+  | EventSuggestionAccepted
+  | EventSuggestionDismissed
+  | EventSessionCompacted
+  | EventCommandExecuted
+  | EventVcsBranchUpdated
+  | EventKiloSessionsRemoteStatusChanged
+  | EventWorktreeReady
+  | EventWorktreeFailed
+  | EventPtyCreated
+  | EventPtyUpdated
+  | EventPtyExited
+  | EventPtyDeleted
+  | EventWorkspaceReady
+  | EventWorkspaceFailed
+  | EventWorkspaceStatus
+  | EventMessageUpdated
+  | EventMessageRemoved
+  | EventMessagePartUpdated
+  | EventMessagePartRemoved
+  | EventSessionCreated
+  | EventSessionUpdated
+  | EventSessionDeleted
+
 export type McpStatusConnected = {
   status: "connected"
 }
@@ -2246,23 +2411,6 @@ export type GlobalEventResponses = {
 }
 
 export type GlobalEventResponse = GlobalEventResponses[keyof GlobalEventResponses]
-
-export type GlobalSyncEventSubscribeData = {
-  body?: never
-  path?: never
-  query?: never
-  url: "/global/sync-event"
-}
-
-export type GlobalSyncEventSubscribeResponses = {
-  /**
-   * Event stream
-   */
-  200: SyncEvent
-}
-
-export type GlobalSyncEventSubscribeResponse =
-  GlobalSyncEventSubscribeResponses[keyof GlobalSyncEventSubscribeResponses]
 
 export type GlobalConfigGetData = {
   body?: never
@@ -2969,6 +3117,30 @@ export type ToolListResponses = {
 
 export type ToolListResponse = ToolListResponses[keyof ToolListResponses]
 
+export type ExperimentalWorkspaceAdaptorListData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/workspace/adaptor"
+}
+
+export type ExperimentalWorkspaceAdaptorListResponses = {
+  /**
+   * Workspace adaptors
+   */
+  200: Array<{
+    type: string
+    name: string
+    description: string
+  }>
+}
+
+export type ExperimentalWorkspaceAdaptorListResponse =
+  ExperimentalWorkspaceAdaptorListResponses[keyof ExperimentalWorkspaceAdaptorListResponses]
+
 export type ExperimentalWorkspaceListData = {
   body?: never
   path?: never
@@ -3023,6 +3195,30 @@ export type ExperimentalWorkspaceCreateResponses = {
 
 export type ExperimentalWorkspaceCreateResponse =
   ExperimentalWorkspaceCreateResponses[keyof ExperimentalWorkspaceCreateResponses]
+
+export type ExperimentalWorkspaceStatusData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/workspace/status"
+}
+
+export type ExperimentalWorkspaceStatusResponses = {
+  /**
+   * Workspace status
+   */
+  200: Array<{
+    workspaceID: string
+    status: "connected" | "connecting" | "disconnected" | "error"
+    error?: string
+  }>
+}
+
+export type ExperimentalWorkspaceStatusResponse =
+  ExperimentalWorkspaceStatusResponses[keyof ExperimentalWorkspaceStatusResponses]
 
 export type ExperimentalWorkspaceRemoveData = {
   body?: never
@@ -3508,6 +3704,7 @@ export type SessionGetResponse = SessionGetResponses[keyof SessionGetResponses]
 export type SessionUpdateData = {
   body?: {
     title?: string
+    permission?: PermissionRuleset
     time?: {
       archived?: number
     }
@@ -5690,6 +5887,98 @@ export type NetworkRejectResponses = {
 }
 
 export type NetworkRejectResponse = NetworkRejectResponses[keyof NetworkRejectResponses]
+
+export type SuggestionListData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/suggestion"
+}
+
+export type SuggestionListResponses = {
+  /**
+   * List of pending suggestions
+   */
+  200: Array<SuggestionRequest>
+}
+
+export type SuggestionListResponse = SuggestionListResponses[keyof SuggestionListResponses]
+
+export type SuggestionAcceptData = {
+  body?: {
+    /**
+     * Zero-based action index to accept
+     */
+    index: number
+  }
+  path: {
+    requestID: string
+  }
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/suggestion/{requestID}/accept"
+}
+
+export type SuggestionAcceptErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type SuggestionAcceptError = SuggestionAcceptErrors[keyof SuggestionAcceptErrors]
+
+export type SuggestionAcceptResponses = {
+  /**
+   * Suggestion accepted successfully
+   */
+  200: boolean
+}
+
+export type SuggestionAcceptResponse = SuggestionAcceptResponses[keyof SuggestionAcceptResponses]
+
+export type SuggestionDismissData = {
+  body?: never
+  path: {
+    requestID: string
+  }
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/suggestion/{requestID}/dismiss"
+}
+
+export type SuggestionDismissErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type SuggestionDismissError = SuggestionDismissErrors[keyof SuggestionDismissErrors]
+
+export type SuggestionDismissResponses = {
+  /**
+   * Suggestion dismissed successfully
+   */
+  200: boolean
+}
+
+export type SuggestionDismissResponse = SuggestionDismissResponses[keyof SuggestionDismissResponses]
 
 export type TelemetryCaptureData = {
   body?: {

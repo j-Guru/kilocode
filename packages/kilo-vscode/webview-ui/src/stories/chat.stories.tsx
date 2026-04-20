@@ -12,10 +12,11 @@ import { StoryProviders, defaultMockData, mockSessionValue } from "./StoryProvid
 import { ChatView } from "../components/chat/ChatView"
 import { TaskHeader } from "../components/chat/TaskHeader"
 import { QuestionDock } from "../components/chat/QuestionDock"
+import { SuggestBar } from "../components/chat/SuggestBar"
 import { MessageList } from "../components/chat/MessageList"
 import { SessionContext } from "../context/session"
 import { ServerContext } from "../context/server"
-import type { QuestionRequest, TodoItem } from "../types/messages"
+import type { QuestionRequest, SuggestionRequest, TodoItem } from "../types/messages"
 
 const SESSION_ID = "story-session-chat-001"
 
@@ -67,6 +68,14 @@ const multiQuestion: QuestionRequest = {
   tool: { messageID: "asst-msg-001", callID: "call-question-002" },
 }
 
+const reviewSuggestion: SuggestionRequest = {
+  id: "s-review-001",
+  sessionID: SESSION_ID,
+  text: "Start a code review of uncommitted changes?",
+  actions: [{ label: "Start review", description: "Run a local review now", prompt: "/local-review-uncommitted" }],
+  tool: { messageID: "asst-msg-002", callID: "call-suggest-001" },
+}
+
 // ---------------------------------------------------------------------------
 // Meta
 // ---------------------------------------------------------------------------
@@ -113,6 +122,44 @@ export const ChatViewWithMessages: Story = {
       </StoryProviders>
     )
   },
+}
+
+/**
+ * ChatView with a pending question tool call and an empty input.
+ *
+ * Locks in the fix for the regression where the question tool's pending request
+ * caused the Send button to render as a Stop square. The snapshot captures the
+ * prompt bar footer — the submit control must be the paper-plane arrow icon,
+ * not the filled square Stop icon.
+ *
+ * If someone re-couples the prompt input to the question tool, this story's
+ * baseline PNG will diverge and the visual-regression CI job will fail.
+ */
+const pendingToolQuestion: QuestionRequest = {
+  id: "q-toolcall-001",
+  sessionID: SESSION_ID,
+  questions: [
+    {
+      question: "What would you like to do next?",
+      header: "Next step",
+      options: [
+        { label: "Continue", description: "Keep going with the current plan" },
+        { label: "Revise", description: "Adjust the approach before continuing" },
+      ],
+    },
+  ],
+  tool: { messageID: "asst-q-001", callID: "call-q-001" },
+}
+
+export const ChatViewWithPendingQuestionEmptyInput: Story = {
+  name: "ChatView — pending question, empty input (submit must be arrow, not square)",
+  render: () => (
+    <StoryProviders sessionID={SESSION_ID} status="busy" questions={[pendingToolQuestion]}>
+      <div style={{ "max-height": "400px", display: "flex", "flex-direction": "column" }}>
+        <ChatView />
+      </div>
+    </StoryProviders>
+  ),
 }
 
 // ---------------------------------------------------------------------------
@@ -173,9 +220,21 @@ export const QuestionDockManyOptions: Story = {
   ),
 }
 
+export const SuggestBarReview: Story = {
+  name: "SuggestBar — review suggestion",
+  render: () => (
+    <StoryProviders sessionID={SESSION_ID} suggestions={[reviewSuggestion]}>
+      <div style={{ width: "100%" }}>
+        <SuggestBar request={reviewSuggestion} />
+      </div>
+    </StoryProviders>
+  ),
+}
+
 const toolUserID = "user-msg-spacing-001"
 const toolAssistantID = "asst-msg-spacing-001"
 const queuedUserID = "user-msg-spacing-002"
+const queuedSecondID = "user-msg-spacing-003"
 const toolNow = 1_700_000_000_000
 const spacingMessages = [
   {
@@ -183,6 +242,18 @@ const spacingMessages = [
     sessionID: SESSION_ID,
     role: "user",
     time: { created: toolNow - 9000 },
+  },
+  {
+    id: queuedUserID,
+    sessionID: SESSION_ID,
+    role: "user",
+    time: { created: toolNow - 1000 },
+  },
+  {
+    id: queuedSecondID,
+    sessionID: SESSION_ID,
+    role: "user",
+    time: { created: toolNow - 500 },
   },
   {
     id: toolAssistantID,
@@ -195,12 +266,6 @@ const spacingMessages = [
     mode: "default",
     agent: "default",
     path: { cwd: "/project", root: "/project" },
-  },
-  {
-    id: queuedUserID,
-    sessionID: SESSION_ID,
-    role: "user",
-    time: { created: toolNow - 1000 },
   },
 ]
 const spacingParts = {
@@ -240,6 +305,15 @@ const spacingParts = {
       text: "ok",
     },
   ],
+  [queuedSecondID]: [
+    {
+      id: "part-user-spacing-003",
+      sessionID: SESSION_ID,
+      messageID: queuedSecondID,
+      type: "text",
+      text: "and then explain it",
+    },
+  ],
 }
 const spacingData = {
   ...defaultMockData,
@@ -248,15 +322,119 @@ const spacingData = {
 }
 
 export const MessageListToolToQueuedUserSpacing: Story = {
-  name: "MessageList — tool to queued user spacing",
+  name: "MessageList — queued users stay at bottom",
   render: () => {
     const session = {
-      ...mockSessionValue({ id: SESSION_ID, status: "idle" }),
+      ...mockSessionValue({ id: SESSION_ID, status: "busy" }),
       messages: () => spacingMessages,
       userMessages: () => spacingMessages.filter((msg) => msg.role === "user"),
     }
     return (
-      <StoryProviders data={spacingData} sessionID={SESSION_ID} status="idle" noPadding>
+      <StoryProviders data={spacingData} sessionID={SESSION_ID} status="busy" noPadding>
+        <SessionContext.Provider value={session as any}>
+          <div style={{ height: "420px", display: "flex", "flex-direction": "column" }}>
+            <MessageList />
+          </div>
+        </SessionContext.Provider>
+      </StoryProviders>
+    )
+  },
+}
+
+// ---------------------------------------------------------------------------
+// MessageList — sub-agent (task tool) to queued user spacing
+// Verifies the same vertical gap applies when the last assistant part is a
+// sub-agent's expanded task tool, not just a regular tool like bash.
+// ---------------------------------------------------------------------------
+
+const subUserID = "user-msg-subagent-spacing-001"
+const subAssistantID = "asst-msg-subagent-spacing-001"
+const subQueuedUserID = "user-msg-subagent-spacing-002"
+const subChildSessionID = "story-session-child-subagent-001"
+const subNow = 1_700_000_100_000
+const subagentSpacingMessages = [
+  {
+    id: subUserID,
+    sessionID: SESSION_ID,
+    role: "user",
+    time: { created: subNow - 9000 },
+  },
+  {
+    id: subAssistantID,
+    sessionID: SESSION_ID,
+    role: "assistant",
+    parentID: subUserID,
+    time: { created: subNow - 8000 },
+    modelID: "claude-sonnet-4-20250514",
+    providerID: "anthropic",
+    mode: "default",
+    agent: "default",
+    path: { cwd: "/project", root: "/project" },
+  },
+  {
+    id: subQueuedUserID,
+    sessionID: SESSION_ID,
+    role: "user",
+    time: { created: subNow - 1000 },
+  },
+]
+const subagentSpacingParts = {
+  [subUserID]: [
+    {
+      id: "part-user-subagent-spacing-001",
+      sessionID: SESSION_ID,
+      messageID: subUserID,
+      type: "text",
+      text: "Delegate a search to a sub-agent so I can test the spacing.",
+    },
+  ],
+  [subAssistantID]: [
+    {
+      id: "part-task-subagent-spacing-001",
+      sessionID: SESSION_ID,
+      messageID: subAssistantID,
+      type: "tool",
+      callID: "call-task-subagent-spacing-001",
+      tool: "task",
+      state: {
+        status: "completed",
+        input: { description: "Find auth usage", subagent_type: "explore" },
+        output: "done",
+        title: "Find auth usage",
+        metadata: { sessionId: subChildSessionID },
+        time: { start: subNow - 7000, end: subNow - 6500 },
+      },
+    },
+  ],
+  [subQueuedUserID]: [
+    {
+      id: "part-user-subagent-spacing-002",
+      sessionID: SESSION_ID,
+      messageID: subQueuedUserID,
+      type: "text",
+      text: "continue",
+    },
+  ],
+}
+const subagentSpacingData = {
+  ...defaultMockData,
+  message: {
+    [SESSION_ID]: subagentSpacingMessages,
+    [subChildSessionID]: [],
+  },
+  part: subagentSpacingParts,
+}
+
+export const MessageListSubagentToQueuedUserSpacing: Story = {
+  name: "MessageList — sub-agent to queued user spacing",
+  render: () => {
+    const session = {
+      ...mockSessionValue({ id: SESSION_ID, status: "idle" }),
+      messages: () => subagentSpacingMessages,
+      userMessages: () => subagentSpacingMessages.filter((msg) => msg.role === "user"),
+    }
+    return (
+      <StoryProviders data={subagentSpacingData} sessionID={SESSION_ID} status="idle" noPadding>
         <SessionContext.Provider value={session as any}>
           <div style={{ height: "420px", display: "flex", "flex-direction": "column" }}>
             <MessageList />

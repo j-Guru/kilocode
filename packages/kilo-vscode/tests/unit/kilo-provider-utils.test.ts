@@ -13,6 +13,7 @@ import {
   getConfigErrorDetails,
   type ProviderInfo,
 } from "../../src/kilo-provider-utils"
+import { mergeFileSearchItems } from "../../src/kilo-provider/file-search-items"
 import type { CloudSessionMessage } from "../../src/services/cli-backend/types"
 import type {
   Session,
@@ -28,6 +29,9 @@ import type {
   EventQuestionAsked,
   EventQuestionReplied,
   EventQuestionRejected,
+  EventSuggestionShown,
+  EventSuggestionAccepted,
+  EventSuggestionDismissed,
   EventSessionCreated,
   EventSessionUpdated,
   EventServerConnected,
@@ -446,6 +450,43 @@ describe("mapSSEEventToWebviewMessage", () => {
     }
   })
 
+  it("maps suggestion.shown to suggestionRequest", () => {
+    const event: EventSuggestionShown = {
+      type: "suggestion.shown",
+      properties: {
+        id: "sug-1",
+        sessionID: "sess-1",
+        text: "Review changes?",
+        actions: [{ label: "Start", prompt: "/local-review-uncommitted" }],
+      },
+    }
+    const msg = mapSSEEventToWebviewMessage(event, "sess-1")
+    expect(msg?.type).toBe("suggestionRequest")
+  })
+
+  it("maps suggestion.accepted to suggestionResolved", () => {
+    const event: EventSuggestionAccepted = {
+      type: "suggestion.accepted",
+      properties: {
+        sessionID: "sess-1",
+        requestID: "sug-1",
+        index: 0,
+        action: { label: "Start", prompt: "/local-review-uncommitted" },
+      },
+    }
+    const msg = mapSSEEventToWebviewMessage(event, "sess-1")
+    expect(msg?.type).toBe("suggestionResolved")
+  })
+
+  it("maps suggestion.dismissed to suggestionResolved", () => {
+    const event: EventSuggestionDismissed = {
+      type: "suggestion.dismissed",
+      properties: { sessionID: "sess-1", requestID: "sug-2" },
+    }
+    const msg = mapSSEEventToWebviewMessage(event, "sess-1")
+    expect(msg?.type).toBe("suggestionResolved")
+  })
+
   it("maps session.created to sessionCreated with ISO dates", () => {
     const event: EventSessionCreated = {
       type: "session.created",
@@ -566,6 +607,47 @@ describe("mapCloudSessionMessage", () => {
   })
 })
 
+describe("mergeFileSearchItems", () => {
+  it("puts exact folder matches before file matches", () => {
+    const result = mergeFileSearchItems({
+      query: "script",
+      files: ["script/hooks", "script/release", "script/beta.ts"],
+      folders: ["script/", "script/run-script/"],
+    })
+    expect(result).toEqual([
+      { path: "script/", type: "folder" },
+      { path: "script/hooks", type: "file" },
+      { path: "script/release", type: "file" },
+      { path: "script/beta.ts", type: "file" },
+      { path: "script/run-script/", type: "folder" },
+    ])
+  })
+
+  it("keeps file ordering before non-prefix folder matches", () => {
+    const result = mergeFileSearchItems({
+      query: "test",
+      files: ["src/test.ts"],
+      folders: ["src/latest/"],
+    })
+    expect(result).toEqual([
+      { path: "src/test.ts", type: "file" },
+      { path: "src/latest/", type: "folder" },
+    ])
+  })
+
+  it("normalizes Windows separators for matching and output", () => {
+    const result = mergeFileSearchItems({
+      query: "kilo-vscode",
+      files: ["packages\\kilo-vscode\\src\\KiloProvider.ts"],
+      folders: ["packages\\kilo-vscode\\"],
+    })
+    expect(result).toEqual([
+      { path: "packages/kilo-vscode/", type: "folder" },
+      { path: "packages/kilo-vscode/src/KiloProvider.ts", type: "file" },
+    ])
+  })
+})
+
 describe("mergeFileSearchResults", () => {
   it("returns backend results when no open files", () => {
     const result = mergeFileSearchResults({
@@ -658,6 +740,16 @@ describe("mergeFileSearchResults", () => {
       active: "src/utils/path.ts",
     })
     expect(result).toEqual(["src/utils/path.ts", "src/index.ts"])
+  })
+
+  it("normalizes backslash paths before filtering and deduping", () => {
+    const result = mergeFileSearchResults({
+      query: "utils/path",
+      backend: ["src\\utils\\path.ts"],
+      open: new Set(["src/utils/path.ts"]),
+      active: "src\\utils\\path.ts",
+    })
+    expect(result).toEqual(["src/utils/path.ts"])
   })
 })
 

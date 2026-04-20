@@ -1,25 +1,29 @@
 import { PlanExitTool } from "./plan"
+import { Session } from "../session"
 import { QuestionTool } from "./question"
+import { SuggestTool } from "../kilocode/suggestion/tool" // kilocode_change
 import { BashTool } from "./bash"
 import { EditTool } from "./edit"
 import { GlobTool } from "./glob"
 import { GrepTool } from "./grep"
 import { ReadTool } from "./read"
-import { TaskDescription, TaskTool } from "./task"
+import { TaskTool } from "./task"
 import { TodoWriteTool } from "./todo"
 import { WebFetchTool } from "./webfetch"
 import { WriteTool } from "./write"
 import { InvalidTool } from "./invalid"
-import { SkillDescription, SkillTool } from "./skill"
+import { SkillTool } from "./skill"
 import { Tool } from "./tool"
 import { Config } from "../config/config"
-import { type ToolContext as PluginToolContext, type ToolDefinition } from "@kilocode/plugin" // kilocode_change
+import { type ToolContext as PluginToolContext, type ToolDefinition } from "@kilocode/plugin"
 import z from "zod"
 import { Plugin } from "../plugin"
+import { Provider } from "../provider/provider"
 import { ProviderID, type ModelID } from "../provider/schema"
 import { WebSearchTool } from "./websearch"
 import { CodeSearchTool } from "./codesearch"
 import { KiloToolRegistry } from "../kilocode/tool/registry" // kilocode_change
+import { makeRuntime } from "@/effect/run-service" // kilocode_change
 import { Flag } from "@/flag/flag"
 import { Log } from "@/util/log"
 import { LspTool } from "./lsp"
@@ -28,17 +32,23 @@ import { ApplyPatchTool } from "./apply_patch"
 import { Glob } from "../util/glob"
 import path from "path"
 import { pathToFileURL } from "url"
-import { Effect, Layer, ServiceMap } from "effect"
+import { Effect, Layer, Context } from "effect"
+import { FetchHttpClient, HttpClient } from "effect/unstable/http"
+import { ChildProcessSpawner } from "effect/unstable/process/ChildProcessSpawner"
+import * as CrossSpawnSpawner from "@/effect/cross-spawn-spawner"
+import { Ripgrep } from "../file/ripgrep"
+import { Format } from "../format"
 import { InstanceState } from "@/effect/instance-state"
-import { makeRuntime } from "@/effect/run-service"
-import { Env } from "../env"
 import { Question } from "../question"
 import { Todo } from "../session/todo"
 import { LSP } from "../lsp"
 import { FileTime } from "../file/time"
 import { Instruction } from "../session/instruction"
 import { AppFileSystem } from "../filesystem"
+import { Bus } from "../bus"
 import { Agent } from "../agent/agent"
+import { Skill } from "../skill"
+import { Permission } from "@/permission"
 
 export namespace ToolRegistry {
   const log = Log.create({ service: "tool.registry" })
@@ -64,7 +74,7 @@ export namespace ToolRegistry {
     }) => Effect.Effect<Tool.Def[]>
   }
 
-  export class Service extends ServiceMap.Service<Service, Interface>()("@opencode/ToolRegistry") {}
+  export class Service extends Context.Service<Service, Interface>()("@opencode/ToolRegistry") {}
 
   export const layer: Layer.Layer<
     Service,
@@ -74,20 +84,48 @@ export namespace ToolRegistry {
     | Question.Service
     | Todo.Service
     | Agent.Service
+    | Skill.Service
+    | Session.Service
+    | Provider.Service
     | LSP.Service
     | FileTime.Service
     | Instruction.Service
     | AppFileSystem.Service
+    | Bus.Service
+    | HttpClient.HttpClient
+    | ChildProcessSpawner
+    | Ripgrep.Service
+    | Format.Service
+    | Truncate.Service
   > = Layer.effect(
     Service,
     Effect.gen(function* () {
       const config = yield* Config.Service
       const plugin = yield* Plugin.Service
+      const agents = yield* Agent.Service
+      const skill = yield* Skill.Service
+      const truncate = yield* Truncate.Service
 
+      const invalid = yield* InvalidTool
       const task = yield* TaskTool
       const read = yield* ReadTool
       const question = yield* QuestionTool
       const todo = yield* TodoWriteTool
+      const lsptool = yield* LspTool
+      const plan = yield* PlanExitTool
+      const webfetch = yield* WebFetchTool
+      const websearch = yield* WebSearchTool
+      const bash = yield* BashTool
+      const codesearch = yield* CodeSearchTool
+      const globtool = yield* GlobTool
+      const writetool = yield* WriteTool
+      const edit = yield* EditTool
+      const greptool = yield* GrepTool
+      const patchtool = yield* ApplyPatchTool
+      const skilltool = yield* SkillTool
+      const suggesttool = yield* SuggestTool // kilocode_change
+      const agent = yield* Agent.Service
+      const kiloToolInfos = yield* KiloToolRegistry.infos() // kilocode_change
 
       const state = yield* InstanceState.make<State>(
         Effect.fn("ToolRegistry.state")(function* (ctx) {
@@ -98,23 +136,26 @@ export namespace ToolRegistry {
               id,
               parameters: z.object(def.args),
               description: def.description,
-              execute: async (args, toolCtx) => {
-                const pluginCtx: PluginToolContext = {
-                  ...toolCtx,
-                  directory: ctx.directory,
-                  worktree: ctx.worktree,
-                }
-                const result = await def.execute(args as any, pluginCtx)
-                const out = await Truncate.output(result, {}, await Agent.get(toolCtx.agent))
-                return {
-                  title: "",
-                  output: out.truncated ? out.content : result,
-                  metadata: {
-                    truncated: out.truncated,
-                    outputPath: out.truncated ? out.outputPath : undefined,
-                  },
-                }
-              },
+              execute: (args, toolCtx) =>
+                Effect.gen(function* () {
+                  const pluginCtx: PluginToolContext = {
+                    ...toolCtx,
+                    ask: (req) => toolCtx.ask(req),
+                    directory: ctx.directory,
+                    worktree: ctx.worktree,
+                  }
+                  const result = yield* Effect.promise(() => def.execute(args as any, pluginCtx))
+                  const info = yield* agent.get(toolCtx.agent)
+                  const out = yield* truncate.output(result, {}, info)
+                  return {
+                    title: "",
+                    output: out.truncated ? out.content : result,
+                    metadata: {
+                      truncated: out.truncated,
+                      outputPath: out.truncated ? out.outputPath : undefined,
+                    },
+                  }
+                }),
             }
           }
 
@@ -144,26 +185,27 @@ export namespace ToolRegistry {
           const questionEnabled = KiloToolRegistry.question() // kilocode_change
 
           const tool = yield* Effect.all({
-            invalid: Tool.init(InvalidTool),
-            bash: Tool.init(BashTool),
+            invalid: Tool.init(invalid),
+            bash: Tool.init(bash),
             read: Tool.init(read),
-            glob: Tool.init(GlobTool),
-            grep: Tool.init(GrepTool),
-            edit: Tool.init(EditTool),
-            write: Tool.init(WriteTool),
+            glob: Tool.init(globtool),
+            grep: Tool.init(greptool),
+            edit: Tool.init(edit),
+            write: Tool.init(writetool),
             task: Tool.init(task),
-            fetch: Tool.init(WebFetchTool),
+            fetch: Tool.init(webfetch),
             todo: Tool.init(todo),
-            search: Tool.init(WebSearchTool),
-            code: Tool.init(CodeSearchTool),
-            skill: Tool.init(SkillTool),
-            patch: Tool.init(ApplyPatchTool),
+            search: Tool.init(websearch),
+            code: Tool.init(codesearch),
+            skill: Tool.init(skilltool),
+            patch: Tool.init(patchtool),
             question: Tool.init(question),
-            lsp: Tool.init(LspTool),
-            plan: Tool.init(PlanExitTool),
+            lsp: Tool.init(lsptool),
+            plan: Tool.init(plan),
+            suggest: Tool.init(suggesttool), // kilocode_change
           })
 
-          const kilo = yield* KiloToolRegistry.build() // kilocode_change
+          const kilo = yield* KiloToolRegistry.build(kiloToolInfos) // kilocode_change
 
           return {
             custom,
@@ -183,9 +225,10 @@ export namespace ToolRegistry {
               tool.code,
               tool.skill,
               tool.patch,
-              ...(Flag.KILO_EXPERIMENTAL_LSP_TOOL ? [tool.lsp] : []), // kilocode_change
               ...(KiloToolRegistry.plan() ? [tool.plan] : []), // kilocode_change
+              ...KiloToolRegistry.suggest(tool.suggest), // kilocode_change
               ...KiloToolRegistry.extra(kilo, cfg), // kilocode_change
+              ...(Flag.KILO_EXPERIMENTAL_LSP_TOOL ? [tool.lsp] : []),
             ],
             task: tool.task,
             read: tool.read,
@@ -202,6 +245,40 @@ export namespace ToolRegistry {
         return (yield* all()).map((tool) => tool.id)
       })
 
+      const describeSkill = Effect.fn("ToolRegistry.describeSkill")(function* (agent: Agent.Info) {
+        const list = yield* skill.available(agent)
+        if (list.length === 0) return "No skills are currently available."
+        return [
+          "Load a specialized skill that provides domain-specific instructions and workflows.",
+          "",
+          "When you recognize that a task matches one of the available skills listed below, use this tool to load the full skill instructions.",
+          "",
+          "The skill will inject detailed instructions, workflows, and access to bundled resources (scripts, references, templates) into the conversation context.",
+          "",
+          'Tool output includes a `<skill_content name="...">` block with the loaded content.',
+          "",
+          "The following skills provide specialized sets of instructions for particular tasks",
+          "Invoke this tool to load a skill when a task matches one of the available skills listed below:",
+          "",
+          Skill.fmt(list, { verbose: false }),
+        ].join("\n")
+      })
+
+      const describeTask = Effect.fn("ToolRegistry.describeTask")(function* (agent: Agent.Info) {
+        const items = (yield* agents.list()).filter((item) => item.mode !== "primary")
+        const filtered = items.filter(
+          (item) => Permission.evaluate("task", item.name, agent.permission).action !== "deny",
+        )
+        const list = filtered.toSorted((a, b) => a.name.localeCompare(b.name))
+        const description = list
+          .map(
+            (item) =>
+              `- ${item.name}: ${item.description ?? "This subagent should only be called manually by the user."}`,
+          )
+          .join("\n")
+        return ["Available agent types and the tools they have access to:", description].join("\n")
+      })
+
       const tools: Interface["tools"] = Effect.fn("ToolRegistry.tools")(function* (input) {
         const filtered = (yield* all()).filter((tool) => {
           if (tool.id === CodeSearchTool.id || tool.id === WebSearchTool.id) {
@@ -212,7 +289,7 @@ export namespace ToolRegistry {
             KiloToolRegistry.e2e() || // kilocode_change
             (input.modelID.includes("gpt-") && !input.modelID.includes("oss") && !input.modelID.includes("gpt-4"))
           if (tool.id === ApplyPatchTool.id) return usePatch
-          if (tool.id === EditTool.id || tool.id === WriteTool.id) return !usePatch
+          if (tool.id === EditTool.id) return !usePatch // kilocode_change
 
           return true
         })
@@ -230,8 +307,8 @@ export namespace ToolRegistry {
               id: tool.id,
               description: [
                 output.description,
-                tool.id === TaskTool.id ? yield* TaskDescription(input.agent) : undefined,
-                tool.id === SkillTool.id ? yield* SkillDescription(input.agent) : undefined,
+                tool.id === TaskTool.id ? yield* describeTask(input.agent) : undefined,
+                tool.id === SkillTool.id ? yield* describeSkill(input.agent) : undefined,
               ]
                 .filter(Boolean)
                 .join("\n"),
@@ -253,33 +330,31 @@ export namespace ToolRegistry {
     }),
   )
 
-  export const defaultLayer = Layer.unwrap(
-    Effect.sync(() =>
-      layer.pipe(
-        Layer.provide(Config.defaultLayer),
-        Layer.provide(Plugin.defaultLayer),
-        Layer.provide(Question.defaultLayer),
-        Layer.provide(Todo.defaultLayer),
-        Layer.provide(Agent.defaultLayer),
-        Layer.provide(LSP.defaultLayer),
-        Layer.provide(FileTime.defaultLayer),
-        Layer.provide(Instruction.defaultLayer),
-        Layer.provide(AppFileSystem.defaultLayer),
-      ),
+  export const defaultLayer = Layer.suspend(() =>
+    layer.pipe(
+      Layer.provide(Config.defaultLayer),
+      Layer.provide(Plugin.defaultLayer),
+      Layer.provide(Question.defaultLayer),
+      Layer.provide(Todo.defaultLayer),
+      Layer.provide(Skill.defaultLayer),
+      Layer.provide(Agent.defaultLayer),
+      Layer.provide(Session.defaultLayer),
+      Layer.provide(Provider.defaultLayer),
+      Layer.provide(LSP.defaultLayer),
+      Layer.provide(FileTime.defaultLayer),
+      Layer.provide(Instruction.defaultLayer),
+      Layer.provide(AppFileSystem.defaultLayer),
+      Layer.provide(Bus.layer),
+      Layer.provide(FetchHttpClient.layer),
+      Layer.provide(Format.defaultLayer),
+      Layer.provide(CrossSpawnSpawner.defaultLayer),
+      Layer.provide(Ripgrep.defaultLayer),
+      Layer.provide(Truncate.defaultLayer),
     ),
   )
 
+  // kilocode_change start
   const { runPromise } = makeRuntime(Service, defaultLayer)
-
-  export async function ids() {
-    return runPromise((svc) => svc.ids())
-  }
-
-  export async function tools(input: {
-    providerID: ProviderID
-    modelID: ModelID
-    agent: Agent.Info
-  }): Promise<(Tool.Def & { id: string })[]> {
-    return runPromise((svc) => svc.tools(input))
-  }
+  export const ids = () => runPromise((svc) => svc.ids())
+  // kilocode_change end
 }

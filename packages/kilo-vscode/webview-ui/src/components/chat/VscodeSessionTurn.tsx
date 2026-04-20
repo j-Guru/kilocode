@@ -32,6 +32,7 @@ import { ErrorDisplay } from "./ErrorDisplay"
 import { useServer } from "../../context/server"
 import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
+import type { Message as WebMessage } from "../../types/messages"
 
 function getDirectory(path: string): string {
   const sep = path.includes("/") ? "/" : "\\"
@@ -45,10 +46,16 @@ function getFilename(path: string): string {
   return idx === -1 ? path : path.slice(idx + 1)
 }
 
+export interface VscodeTurn {
+  id: string
+  user: WebMessage
+  assistant: WebMessage[]
+}
+
 interface VscodeSessionTurnProps {
-  sessionID: string
-  messageID: string
+  turn: VscodeTurn
   queued?: boolean
+  onForkMessage?: (sessionId: string, messageId: string) => void
 }
 
 export const VscodeSessionTurn: Component<VscodeSessionTurnProps> = (props) => {
@@ -59,45 +66,22 @@ export const VscodeSessionTurn: Component<VscodeSessionTurnProps> = (props) => {
   const session = useSession()
   const language = useLanguage()
 
-  const emptyMessages: SDKMessage[] = []
   const emptyParts: SDKPart[] = []
   const emptyDiffs: SnapshotFileDiff[] = []
 
-  const allMessages = createMemo(() => {
-    const msgs = data.store.message?.[props.sessionID]
-    return (msgs ?? emptyMessages) as SDKMessage[]
+  createEffect(() => {
+    const turn = props.turn
+    session.hydrateParts([turn.user.id, ...turn.assistant.map((m) => m.id)])
   })
 
-  const message = createMemo(() => {
-    return allMessages().find((m) => m.id === props.messageID && m.role === "user") as
-      | (SDKMessage & { role: "user" })
-      | undefined
-  })
+  const message = createMemo(() => props.turn.user as SDKMessage & { role: "user" })
 
   const parts = createMemo(() => {
     const msg = message()
-    if (!msg) return emptyParts
     return (data.store.part?.[msg.id] ?? emptyParts) as SDKPart[]
   })
 
-  const messageIndex = createMemo(() => {
-    const msgs = allMessages()
-    return msgs.findIndex((m) => m.id === props.messageID)
-  })
-
-  const assistantMessages = createMemo(() => {
-    const index = messageIndex()
-    if (index < 0) return [] as SDKAssistantMessage[]
-    const msgs = allMessages()
-    const result: SDKAssistantMessage[] = []
-    for (let i = index + 1; i < msgs.length; i++) {
-      const m = msgs[i]
-      if (!m) continue
-      if (m.role === "user") break
-      if (m.role === "assistant") result.push(m as SDKAssistantMessage)
-    }
-    return result
-  })
+  const assistantMessages = createMemo(() => props.turn.assistant as SDKAssistantMessage[])
 
   const interrupted = createMemo(() => assistantMessages().some((m) => m.error?.name === "MessageAbortedError"))
 
@@ -170,11 +154,12 @@ export const VscodeSessionTurn: Component<VscodeSessionTurnProps> = (props) => {
               parts={parts() as unknown as Parameters<typeof UserMessageDisplay>[0]["parts"]}
               interrupted={interrupted()}
               queued={props.queued}
+              onFork={props.onForkMessage ? () => props.onForkMessage?.(msg().sessionID, msg().id) : undefined}
               onRevert={
                 assistantMessages().length > 0 && !session.revert()
                   ? () => {
                       if (session.status() !== "idle") return
-                      session.revertSession(props.messageID)
+                      session.revertSession(msg().id)
                     }
                   : undefined
               }

@@ -220,6 +220,25 @@ export interface QuestionRequest {
   id: string
   sessionID: string
   questions: QuestionInfo[]
+  blocking?: boolean
+  tool?: {
+    messageID: string
+    callID: string
+  }
+}
+
+export interface SuggestionAction {
+  label: string
+  description?: string
+  prompt: string
+}
+
+export interface SuggestionRequest {
+  id: string
+  sessionID: string
+  text: string
+  actions: SuggestionAction[]
+  blocking?: boolean
   tool?: {
     messageID: string
     callID: string
@@ -554,6 +573,11 @@ export interface SessionCreatedMessage {
   draftID?: string
 }
 
+export interface SessionForkedMessage {
+  type: "sessionForked"
+  sessionID: string
+}
+
 export interface SessionUpdatedMessage {
   type: "sessionUpdated"
   session: SessionInfo
@@ -570,10 +594,15 @@ export interface MessageRemovedMessage {
   messageID: string
 }
 
+export type MessageLoadMode = "replace" | "prepend" | "focus" | "reconcile"
+
 export interface MessagesLoadedMessage {
   type: "messagesLoaded"
   sessionID: string
   messages: Message[]
+  mode?: Exclude<MessageLoadMode, "focus">
+  cursor?: string
+  hasMore?: boolean
 }
 
 export interface MessageCreatedMessage {
@@ -730,9 +759,15 @@ export interface ChatCompletionResultMessage {
   requestId: string
 }
 
+export interface FileSearchItem {
+  path: string
+  type: "file" | "folder"
+}
+
 export interface FileSearchResultMessage {
   type: "fileSearchResult"
   paths: string[]
+  items?: FileSearchItem[]
   dir: string
   requestId: string
 }
@@ -762,6 +797,21 @@ export interface QuestionResolvedMessage {
 
 export interface QuestionErrorMessage {
   type: "questionError"
+  requestID: string
+}
+
+export interface SuggestionRequestMessage {
+  type: "suggestionRequest"
+  suggestion: SuggestionRequest
+}
+
+export interface SuggestionResolvedMessage {
+  type: "suggestionResolved"
+  requestID: string
+}
+
+export interface SuggestionErrorMessage {
+  type: "suggestionError"
   requestID: string
 }
 
@@ -1019,6 +1069,12 @@ export interface RecentsLoadedMessage {
 export interface FavoritesLoadedMessage {
   type: "favoritesLoaded"
   favorites: ModelSelection[]
+}
+
+// Per-mode model selections loaded from model.json (extension → webview)
+export interface ModelSelectionsLoadedMessage {
+  type: "modelSelectionsLoaded"
+  selections: Record<string, ModelSelection>
 }
 
 export interface BranchInfo {
@@ -1363,6 +1419,13 @@ export interface DiffViewerLoadingMessage {
   loading: boolean
 }
 
+export interface DiffViewerRevertFileResultMessage {
+  type: "diffViewer.revertFileResult"
+  file: string
+  status: "success" | "error"
+  message: string
+}
+
 export interface ClearPendingPromptsMessage {
   type: "clearPendingPrompts"
 }
@@ -1475,6 +1538,7 @@ export type ExtensionMessage =
   | PermissionErrorMessage
   | TodoUpdatedMessage
   | SessionCreatedMessage
+  | SessionForkedMessage
   | SessionUpdatedMessage
   | SessionDeletedMessage
   | MessageRemovedMessage
@@ -1502,6 +1566,9 @@ export type ExtensionMessage =
   | QuestionRequestMessage
   | QuestionResolvedMessage
   | QuestionErrorMessage
+  | SuggestionRequestMessage
+  | SuggestionResolvedMessage
+  | SuggestionErrorMessage
   | BrowserSettingsLoadedMessage
   | ClaudeCompatSettingLoadedMessage
   | ConfigLoadedMessage
@@ -1555,6 +1622,7 @@ export type ExtensionMessage =
   | ViewSubAgentSessionMessage
   | DiffViewerDiffsMessage
   | DiffViewerLoadingMessage
+  | DiffViewerRevertFileResultMessage
   | MarketplaceDataMessage
   | MarketplaceInstallResultMessage
   | MarketplaceRemoveResultMessage
@@ -1565,6 +1633,7 @@ export type ExtensionMessage =
   | CustomProviderModelsFetchedMessage
   | RecentsLoadedMessage
   | FavoritesLoadedMessage
+  | ModelSelectionsLoadedMessage
   | LanguageChangedMessage
   | ContinueInWorktreeProgressMessage
   | WorktreeStatsLoadedMessage
@@ -1634,6 +1703,9 @@ export interface ClearSessionRequest {
 export interface LoadMessagesRequest {
   type: "loadMessages"
   sessionID: string
+  mode?: MessageLoadMode
+  before?: string
+  limit?: number
 }
 
 export interface LoadSessionsRequest {
@@ -1815,6 +1887,19 @@ export interface QuestionRejectRequest {
   sessionID?: string
 }
 
+export interface SuggestionAcceptRequest {
+  type: "suggestionAccept"
+  requestID: string
+  sessionID: string
+  index: number
+}
+
+export interface SuggestionDismissRequest {
+  type: "suggestionDismiss"
+  requestID: string
+  sessionID: string
+}
+
 export interface DeleteSessionRequest {
   type: "deleteSession"
   sessionID: string
@@ -1846,6 +1931,7 @@ export interface RequestFileSearchMessage {
   type: "requestFileSearch"
   query: string
   requestId: string
+  sessionID?: string
 }
 
 export interface RequestTerminalContextMessage {
@@ -1981,6 +2067,13 @@ export interface ForkSessionRequest {
   type: "agentManager.forkSession"
   sessionId: string
   worktreeId?: string
+  messageId?: string
+}
+
+export interface SidebarForkSessionRequest {
+  type: "forkSession"
+  sessionId: string
+  messageId?: string
 }
 
 // Close (remove) a session from its worktree
@@ -2348,6 +2441,23 @@ export interface RequestFavoritesMessage {
   type: "requestFavorites"
 }
 
+// Per-mode model selection persistence (webview → extension)
+export interface PersistModelSelectionRequest {
+  type: "persistModelSelection"
+  agent: string
+  providerID: string
+  modelID: string
+}
+
+export interface ClearModelSelectionRequest {
+  type: "clearModelSelection"
+  agent: string
+}
+
+export interface RequestModelSelectionsMessage {
+  type: "requestModelSelections"
+}
+
 // Continue in Worktree: transfer sidebar session + git state to an isolated worktree
 export interface ContinueInWorktreeRequest {
   type: "continueInWorktree"
@@ -2451,6 +2561,8 @@ export type WebviewMessage =
   | SetLanguageRequest
   | QuestionReplyRequest
   | QuestionRejectRequest
+  | SuggestionAcceptRequest
+  | SuggestionDismissRequest
   | DeleteSessionRequest
   | RenameSessionRequest
   | RequestAutocompleteSettingsMessage
@@ -2480,6 +2592,7 @@ export type WebviewMessage =
   | OpenLocallyRequest
   | AddSessionToWorktreeRequest
   | ForkSessionRequest
+  | SidebarForkSessionRequest
   | CloseSessionRequest
   | PersistSessionRequest
   | ForgetSessionRequest
@@ -2549,6 +2662,9 @@ export type WebviewMessage =
   | RequestRecentsMessage
   | ToggleFavoriteRequest
   | RequestFavoritesMessage
+  | PersistModelSelectionRequest
+  | ClearModelSelectionRequest
+  | RequestModelSelectionsMessage
   | ToggleRemoteMessage
   | SetRemoteEnabledMessage
   | RequestRemoteStatusMessage
