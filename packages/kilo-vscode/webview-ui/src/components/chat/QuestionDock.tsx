@@ -247,13 +247,16 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
   // Keep keyboard navigation when the webview already has focus, but do not
   // steal focus from the editor, terminal, or other VS Code surfaces.
+  // preventScroll avoids the browser's focus-into-view behavior fighting
+  // createAutoScroll (and yanking the viewport back to the dock while the
+  // user has scrolled up to read earlier context).
   createEffect(() => {
     void store.tab
     if (store.collapsed || store.editing || confirm()) return
     requestAnimationFrame(() => {
       if (!document.hasFocus()) return
       const btn = root?.querySelector<HTMLButtonElement>("button[data-slot='question-option']:not(:disabled)")
-      btn?.focus()
+      btn?.focus({ preventScroll: true })
     })
   })
 
@@ -370,9 +373,11 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
                   </span>
                   <span data-slot="question-option-main">
                     <span data-slot="option-label">{language.t("ui.messagePart.option.typeOwnAnswer")}</span>
-                    <span data-slot="option-description" data-placeholder={!input()}>
-                      {input() || language.t("ui.question.custom.placeholder")}
-                    </span>
+                    <Show when={!store.editing}>
+                      <span data-slot="option-description" data-placeholder={!input()}>
+                        {input() || language.t("ui.question.custom.placeholder")}
+                      </span>
+                    </Show>
                   </span>
                 </button>
                 <Show when={store.editing}>
