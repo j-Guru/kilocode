@@ -48,6 +48,8 @@ tsconfig.tsbuildinfo
 # Kilo
 .kilo/plans/*
 .kilo/plans/*upstream-merge-report-*.md
+.kilo/package-lock.json
+.kilocode/package-lock.json
 
 # Test Artifacts
 packages/app/.artifacts/
