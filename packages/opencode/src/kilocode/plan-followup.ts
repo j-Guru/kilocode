@@ -16,6 +16,7 @@ import { MessageV2 } from "@/session/message-v2"
 import { Todo } from "@/session/todo"
 import { makeRuntime } from "@/effect/run-service"
 import { Log } from "@/util/log"
+import { KiloSessionPromptQueue } from "@/kilocode/session/prompt-queue"
 import path from "path"
 import z from "zod"
 
@@ -255,6 +256,7 @@ export namespace PlanFollowup {
       text: input.text,
       synthetic: input.synthetic ?? true,
     } satisfies MessageV2.TextPart)
+    return msg
   }
 
   function prompt(input: { sessionID: SessionID; abort: AbortSignal }) {
@@ -264,7 +266,12 @@ export namespace PlanFollowup {
         {
           question: "Ready to implement?",
           header: "Implement",
-          custom: true,
+          // On CLI the main prompt input is hidden while a blocking question is active,
+          // so we need the custom-answer row to allow a free-text reply. On VS Code the
+          // main prompt input below the dock already routes typed text as a question
+          // reply, so "Type your own answer" would be redundant (originally hidden in
+          // 65566af7f8, flipped back during the v1.4.4 upstream merge).
+          custom: Flag.KILO_CLIENT === "cli",
           options: [
             {
               label: ANSWER_NEW_SESSION,
@@ -398,22 +405,24 @@ export namespace PlanFollowup {
       const code = await resolveCodeModel({
         model: user.model,
       })
-      await inject({
+      const msg = await inject({
         sessionID: input.sessionID,
         agent: "code",
         model: code.model,
         text: "Implement the plan above.",
       })
+      KiloSessionPromptQueue.retarget(input.sessionID, msg.id)
       return "continue"
     }
 
     Telemetry.trackPlanFollowup(input.sessionID, "custom")
-    await inject({
+    const msg = await inject({
       sessionID: input.sessionID,
       agent: "plan",
       model: user.model,
       text: answer,
     })
+    KiloSessionPromptQueue.retarget(input.sessionID, msg.id)
     return "continue"
   }
 }

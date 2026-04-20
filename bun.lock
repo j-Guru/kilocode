@@ -201,6 +201,7 @@
       "name": "@kilocode/kilo-gateway",
       "version": "7.2.14",
       "dependencies": {
+        "@ai-sdk/alibaba": "1.0.17",
         "@ai-sdk/anthropic": "3.0.71",
         "@ai-sdk/openai": "3.0.48",
         "@ai-sdk/openai-compatible": "2.0.37",

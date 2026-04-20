@@ -1960,7 +1960,7 @@ export type Model = {
   recommendedIndex?: number
   prompt?: "codex" | "gemini" | "beast" | "anthropic" | "trinity" | "anthropic_without_todo"
   isFree?: boolean
-  ai_sdk_provider?: "anthropic" | "openai" | "openai-compatible" | "openrouter"
+  ai_sdk_provider?: "alibaba" | "anthropic" | "openai" | "openai-compatible" | "openrouter"
 }
 
 export type Provider = {

@@ -12,7 +12,12 @@ import { Icon } from "@kilocode/kilo-ui/icon"
 import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
 import type { QuestionRequest } from "../../types/messages"
-import { resolveOptimisticQuestionAgent, resolveSelectedQuestionMode, toggleAnswer } from "./question-dock-utils"
+import {
+  pickOutcome,
+  resolveOptimisticQuestionAgent,
+  resolveSelectedQuestionMode,
+  toggleAnswer,
+} from "./question-dock-utils"
 
 export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => {
   const session = useSession()
@@ -119,7 +124,14 @@ export const QuestionDock: Component<{ request: QuestionRequest }> = (props) => 
 
     syncAgent(answers, kinds)
 
-    if (!single() && !multi()) {
+    const outcome = pickOutcome({ single: single(), multi: multi(), custom })
+    if (outcome.kind === "submit") {
+      // Mirror TUI behaviour: a single-question single-select option pick submits immediately.
+      // handleCustomSubmit covers the custom-input path via its own submit() call.
+      reply([[answer]])
+      return
+    }
+    if (outcome.kind === "advance") {
       setStore("tab", store.tab + 1)
     }
   }
