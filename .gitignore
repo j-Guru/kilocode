@@ -56,5 +56,7 @@ packages/app/.artifacts/
 packages/opencode/.artifacts/
 
 # CLI build residuals (from ./packages/opencode/script/build.ts)
-src/
-!src/webview-ui/.gitignore
+/src/*
+!/src/webview-ui/
+/src/webview-ui/*
+!/src/webview-ui/.gitignore
