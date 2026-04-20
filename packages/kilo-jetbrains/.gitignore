@@ -1,0 +1,8 @@
+# Gradle build cache and wrapper files
+.gradle/
+
+# IntelliJ Platform SDK downloaded by the Gradle plugin (IDE, JBR, plugins)
+.intellijPlatform/
+
+# Gradle build output
+build/

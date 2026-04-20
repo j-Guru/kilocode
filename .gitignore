@@ -79,3 +79,12 @@ qdrant_storage/
 ./plans/
 
 roo-cli-*.tar.gz*
+
+# OpenCode runtime
+.opencode/
+
+# Bun build cache
+*.bun-build
+
+# TypeScript incremental build info
+*.tsbuildinfo
