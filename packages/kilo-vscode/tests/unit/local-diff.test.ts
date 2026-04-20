@@ -120,6 +120,18 @@ describe("diffSummary", () => {
     })
   })
 
+  it("does not silently fall back to a candidate when an explicit base is stale", async () => {
+    await withRepo(async (dir) => {
+      // main exists locally, but caller provided a misspelled explicit base.
+      // We must NOT diff against main — merge-base should fail loudly.
+      runSync(dir, ["checkout", "-b", "feature"])
+      await fs.writeFile(path.join(dir, "seed.txt"), "seed\nfeature\n")
+      runSync(dir, ["commit", "-am", "feature commit"])
+      const result = await diffSummary(git(), dir, "typo-main")
+      expect(result).toEqual([])
+    })
+  })
+
   it("reports modified, added, and deleted tracked files", async () => {
     await withRepo(async (dir, base) => {
       // seed.txt is tracked on base. Modify it; add new.txt; delete seed.txt on HEAD.
