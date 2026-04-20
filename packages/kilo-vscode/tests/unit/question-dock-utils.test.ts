@@ -144,7 +144,7 @@ describe("pickOutcome", () => {
   })
 
   it("defers submission for a single-select custom-input pick (handleCustomSubmit owns the submit)", () => {
-    expect(pickOutcome({ single: true, multi: false, custom: true })).toEqual({ kind: "advance" })
+    expect(pickOutcome({ single: true, multi: false, custom: true })).toEqual({ kind: "stay" })
   })
 
   it("stays on the current tab for a multi-select custom-input pick", () => {
