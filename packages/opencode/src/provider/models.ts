@@ -93,7 +93,6 @@ export namespace ModelsDev {
       input: ["text"],
       output: ["text"],
     },
-    options: {},
   }
 
   const glm5turbo: Model = {
@@ -122,7 +121,6 @@ export namespace ModelsDev {
       input: ["text"],
       output: ["text"],
     },
-    options: {},
   }
 
   function ensureZaiGlm51(providers: Record<string, Provider>) {

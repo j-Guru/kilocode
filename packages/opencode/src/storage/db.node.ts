@@ -1,3 +1,4 @@
+// @ts-ignore node:sqlite types not yet in @types/node
 import { DatabaseSync } from "node:sqlite"
 import { drizzle } from "drizzle-orm/node-sqlite"
 
