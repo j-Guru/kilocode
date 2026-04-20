@@ -52,3 +52,7 @@ tsconfig.tsbuildinfo
 # Test Artifacts
 packages/app/.artifacts/
 packages/opencode/.artifacts/
+
+# CLI build residuals (from ./packages/opencode/script/build.ts)
+src/
+!src/webview-ui/.gitignore

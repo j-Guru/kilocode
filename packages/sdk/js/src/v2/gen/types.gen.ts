@@ -1537,9 +1537,9 @@ export type ProviderConfig = {
            */
           disabled?: boolean
           [key: string]: unknown | boolean | undefined
-        }
+        } | null
       }
-    }
+    } | null
   }
 }
 
