@@ -123,6 +123,28 @@ export namespace ModelsDev {
     },
   }
 
+  const kimiK26: Model = {
+    id: "kimi-k2.6",
+    name: "Kimi K2.6",
+    family: "kimi",
+    release_date: "2026-04-21",
+    attachment: true,
+    reasoning: true,
+    temperature: false,
+    tool_call: true,
+    interleaved: {
+      field: "reasoning_content",
+    },
+    limit: {
+      context: 262144,
+      output: 32768,
+    },
+    modalities: {
+      input: ["text", "image", "video"],
+      output: ["text"],
+    },
+  }
+
   function ensureZaiGlm51(providers: Record<string, Provider>) {
     const targets = ["zai", "zhipuai"]
     for (const id of targets) {
@@ -138,6 +160,15 @@ export namespace ModelsDev {
           ...glm5turbo,
         }
       }
+    }
+  }
+
+  function ensureMoonshotKimiK26(providers: Record<string, Provider>) {
+    const provider = providers["moonshotai"]
+    if (!provider) return
+    if (provider.models["kimi-k2.6"]) return
+    provider.models["kimi-k2.6"] = {
+      ...kimiK26,
     }
   }
   // kilocode_change end
@@ -262,6 +293,7 @@ export namespace ModelsDev {
     // kilocode_change start
     const providers = result as Record<string, Provider>
     ensureZaiGlm51(providers)
+    ensureMoonshotKimiK26(providers)
 
     if (providers["kilo"]) {
       delete providers["kilo"]
