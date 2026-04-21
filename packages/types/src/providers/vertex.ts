@@ -567,6 +567,14 @@ export const vertexModels = {
 		outputPrice: 1.7,
 		description: "DeepSeek V3.1. Available in us-west2",
 	},
+	"deepseek-v3.2-maas": {
+		maxTokens: 65_536,
+		contextWindow: 163_840,
+		supportsImages: false,
+		supportsPromptCache: false,
+		supportsNativeTools: true,
+		description: "DeepSeek V3.2. Available in global",
+	},
 	"gpt-oss-120b-maas": {
 		maxTokens: 32_768,
 		contextWindow: 131_072,
