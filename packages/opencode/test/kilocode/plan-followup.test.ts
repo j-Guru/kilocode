@@ -325,6 +325,44 @@ describe("plan follow-up", () => {
       }
     }))
 
+  test("ask - emits i18n keys alongside the canonical English labels", () =>
+    withInstance(async () => {
+      const seeded = await seed({ text: "1. Build" })
+      const pending = PlanFollowup.ask({
+        sessionID: seeded.sessionID,
+        messages: seeded.messages,
+        abort: AbortSignal.any([]),
+      })
+
+      const item = await waitQuestion(seeded.sessionID)
+      expect(item).toBeDefined()
+      if (!item) return
+      const q = item.questions[0]
+      expect(q).toBeDefined()
+      if (!q) return
+
+      // i18n keys for question-level strings
+      expect(q.questionKey).toBe("plan.followup.question")
+      expect(q.headerKey).toBe("plan.followup.header")
+
+      // i18n keys for option labels — order matters: newSession is first, continue second.
+      expect(q.options.map((o) => o.labelKey)).toEqual([
+        "plan.followup.answer.newSession",
+        "plan.followup.answer.continue",
+      ])
+      expect(q.options.map((o) => o.descriptionKey)).toEqual([
+        "plan.followup.answer.newSession.description",
+        "plan.followup.answer.continue.description",
+      ])
+
+      // Canonical English labels stay on the wire — the server still matches on `label`,
+      // so translating the UI must not change the reply format.
+      expect(q.options.map((o) => o.label)).toEqual([PlanFollowup.ANSWER_NEW_SESSION, PlanFollowup.ANSWER_CONTINUE])
+
+      await question.reject(item.id)
+      await expect(pending).resolves.toBe("break")
+    }))
+
   test("ask - returns continue and creates code message on Continue here", () =>
     withInstance(async () => {
       const get = spyOn(PlanFollowupRuntime, "agent").mockImplementation(async (name: string) => {

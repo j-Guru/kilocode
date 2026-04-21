@@ -1,7 +1,9 @@
-package ai.kilocode.client.session.model
+package ai.kilocode.client.session
 
 import ai.kilocode.client.app.KiloAppService
 import ai.kilocode.client.app.KiloSessionService
+import ai.kilocode.client.session.model.SessionModel
+import ai.kilocode.client.session.model.SessionModelEvent
 import ai.kilocode.client.testing.FakeAppRpcApi
 import ai.kilocode.client.testing.FakeWorkspaceRpcApi
 import ai.kilocode.client.testing.FakeSessionRpcApi
@@ -10,6 +12,8 @@ import ai.kilocode.client.app.Workspace
 import ai.kilocode.rpc.dto.AgentDto
 import ai.kilocode.rpc.dto.AgentsDto
 import ai.kilocode.rpc.dto.ChatEventDto
+import ai.kilocode.rpc.dto.KiloAppStateDto
+import ai.kilocode.rpc.dto.KiloAppStatusDto
 import ai.kilocode.rpc.dto.KiloWorkspaceStateDto
 import ai.kilocode.rpc.dto.KiloWorkspaceStatusDto
 import ai.kilocode.rpc.dto.MessageDto
@@ -30,12 +34,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 
 /**
- * Base class for [SessionModel] tests.
+ * Base class for [SessionController] tests.
  *
  * Provides real IntelliJ Application/EDT/Disposer via [BasePlatformTestCase],
  * real frontend services wired to fake RPC backends, and shared helpers.
  */
-abstract class SessionModelTestBase : BasePlatformTestCase() {
+abstract class SessionControllerTestBase : BasePlatformTestCase() {
 
     protected lateinit var rpc: FakeSessionRpcApi
     protected lateinit var appRpc: FakeAppRpcApi
@@ -73,20 +77,31 @@ abstract class SessionModelTestBase : BasePlatformTestCase() {
         }
     }
 
-    // ------ Model creation ------
+    // ------ Controller creation ------
 
-    protected fun model(id: String? = null) =
-        SessionModel(parent, id, sessions, workspace, app, scope)
+    protected fun controller(id: String? = null) =
+        SessionController(parent, id, sessions, workspace, app, scope)
 
     // ------ Event collection ------
 
-    /** Attach a listener that collects events and asserts EDT. */
-    protected fun collect(m: SessionModel): MutableList<SessionEvent> {
-        val events = mutableListOf<SessionEvent>()
+    /** Attach a listener that collects lifecycle events and asserts EDT. */
+    protected fun collect(m: SessionController): MutableList<SessionControllerEvent> {
+        val events = mutableListOf<SessionControllerEvent>()
         val disposable = Disposer.newDisposable("listener")
         Disposer.register(parent, disposable)
         m.addListener(disposable) { event ->
             assertTrue("Listener must be called on EDT", ApplicationManager.getApplication().isDispatchThread)
+            events.add(event)
+        }
+        return events
+    }
+
+    /** Attach a listener that collects model events (messages, parts, phase). */
+    protected fun collectModelEvents(m: SessionController): MutableList<SessionModelEvent> {
+        val events = mutableListOf<SessionModelEvent>()
+        val disposable = Disposer.newDisposable("model-listener")
+        Disposer.register(parent, disposable)
+        m.model.addListener(disposable) { event ->
             events.add(event)
         }
         return events
@@ -107,17 +122,43 @@ abstract class SessionModelTestBase : BasePlatformTestCase() {
     }
 
     /** Emit a chat event into the fake RPC flow. */
-    protected fun emit(event: ChatEventDto) = runBlocking {
-        rpc.events.emit(event)
+    protected fun emit(event: ChatEventDto, flush: Boolean = true) {
+        runBlocking { rpc.events.emit(event) }
+        if (flush) flush()
     }
 
-    /** Create a model, attach listener, send initial prompt, and flush. */
-    protected fun prompted(): Pair<SessionModel, MutableList<SessionEvent>> {
-        val m = model()
+    /** Create a controller, attach both listeners, send initial prompt, and flush. */
+    protected fun prompted(): Triple<SessionController, MutableList<SessionControllerEvent>, MutableList<SessionModelEvent>> {
+        appRpc.state.value = KiloAppStateDto(KiloAppStatusDto.READY)
+        projectRpc.state.value = workspaceReady()
+        val m = controller()
         val events = collect(m)
+        val modelEvents = collectModelEvents(m)
+        flush()
         edt { m.prompt("go") }
         flush()
-        return m to events
+        return Triple(m, events, modelEvents)
+    }
+
+    protected fun assertModel(expected: String, model: SessionModel) {
+        assertEquals(expected.trimIndent().trim(), model.toString().trim())
+    }
+
+    protected fun assertModel(expected: String, c: SessionController) {
+        assertModel(expected, c.model)
+    }
+
+    protected fun assertSession(expected: String, c: SessionController, show: Boolean = true) {
+        assertEquals(expected.trimIndent().trim(), c.toString().trim())
+        assertEquals(show, c.model.showMessages)
+    }
+
+    protected fun assertControllerEvents(expected: String, events: List<SessionControllerEvent>) {
+        assertEquals(expected.trimIndent().trim(), events.joinToString("\n"))
+    }
+
+    protected fun assertModelEvents(expected: String, events: List<SessionModelEvent>) {
+        assertEquals(expected.trimIndent().trim(), events.joinToString("\n"))
     }
 
     // ------ DTO factories ------

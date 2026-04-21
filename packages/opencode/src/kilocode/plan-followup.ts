@@ -265,7 +265,9 @@ export namespace PlanFollowup {
       questions: [
         {
           question: "Ready to implement?",
+          questionKey: "plan.followup.question",
           header: "Implement",
+          headerKey: "plan.followup.header",
           // On CLI the main prompt input is hidden while a blocking question is active,
           // so we need the custom-answer row to allow a free-text reply. On VS Code the
           // main prompt input below the dock already routes typed text as a question
@@ -275,11 +277,15 @@ export namespace PlanFollowup {
           options: [
             {
               label: ANSWER_NEW_SESSION,
+              labelKey: "plan.followup.answer.newSession",
               description: "Implement in a fresh session with a clean context",
+              descriptionKey: "plan.followup.answer.newSession.description",
             },
             {
               label: ANSWER_CONTINUE,
+              labelKey: "plan.followup.answer.continue",
               description: "Implement the plan in this session",
+              descriptionKey: "plan.followup.answer.continue.description",
             },
           ],
         },

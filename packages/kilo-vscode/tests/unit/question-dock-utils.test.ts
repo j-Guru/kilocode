@@ -5,6 +5,7 @@ import {
   resolveQuestionMode,
   resolveSelectedQuestionMode,
   toggleAnswer,
+  tr,
 } from "../../webview-ui/src/components/chat/question-dock-utils"
 
 describe("toggleAnswer", () => {
@@ -149,5 +150,34 @@ describe("pickOutcome", () => {
 
   it("stays on the current tab for a multi-select custom-input pick", () => {
     expect(pickOutcome({ single: false, multi: true, custom: true })).toEqual({ kind: "stay" })
+  })
+})
+
+describe("tr", () => {
+  it("returns the translated value when the key is present", () => {
+    const dict: Record<string, string> = { "plan.followup.answer.continue": "Continuer ici" }
+    const t = (key: string) => dict[key] ?? key
+    expect(tr(t, "plan.followup.answer.continue", "Continue here")).toBe("Continuer ici")
+  })
+
+  it("returns the fallback when key is undefined", () => {
+    const t = (key: string) => key
+    expect(tr(t, undefined, "Continue here")).toBe("Continue here")
+  })
+
+  it("returns the fallback when the key is missing from the dict (language.t echoes the key)", () => {
+    const t = (key: string) => key
+    expect(tr(t, "plan.followup.answer.continue", "Continue here")).toBe("Continue here")
+  })
+
+  it("returns an empty string fallback when no key and no label are available", () => {
+    const t = (key: string) => key
+    expect(tr(t, undefined, "")).toBe("")
+  })
+
+  it("returns the translated value even when the fallback is empty", () => {
+    const dict: Record<string, string> = { "plan.followup.question": "Prêt à implémenter ?" }
+    const t = (key: string) => dict[key] ?? key
+    expect(tr(t, "plan.followup.question", "")).toBe("Prêt à implémenter ?")
   })
 })

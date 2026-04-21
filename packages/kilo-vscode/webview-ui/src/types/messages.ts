@@ -206,6 +206,10 @@ export interface QuestionOption {
   label: string
   description: string
   mode?: string
+  // Optional i18n keys — the backend fills these for strings it wants translated in the webview.
+  // The canonical English `label` stays on the reply wire, so server-side matching is unaffected.
+  labelKey?: string
+  descriptionKey?: string
 }
 
 export interface QuestionInfo {
@@ -214,6 +218,9 @@ export interface QuestionInfo {
   options: QuestionOption[]
   multiple?: boolean
   custom?: boolean
+  // Optional i18n keys for question text and header (see QuestionOption for details).
+  questionKey?: string
+  headerKey?: string
 }
 
 export interface QuestionRequest {

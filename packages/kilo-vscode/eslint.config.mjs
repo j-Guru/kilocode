@@ -80,10 +80,6 @@ export default [
     rules: { complexity: ["error", 27] },
   },
   {
-    files: ["webview-ui/src/components/settings/CustomProviderDialog.tsx"],
-    rules: { complexity: ["error", 26] },
-  },
-  {
     files: ["src/agent-manager/WorktreeStateManager.ts"],
     rules: { complexity: ["error", 24] },
   },

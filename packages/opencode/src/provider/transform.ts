@@ -7,6 +7,7 @@ import type { ModelsDev } from "./models"
 import { iife } from "@/util/iife"
 import { Flag } from "@/flag/flag"
 import { kiloProviderOptions } from "@/kilocode/provider-options"
+import { isLing } from "@/kilocode/model-match" // kilocode_change
 
 type Modality = NonNullable<ModelsDev.Model["modalities"]>["input"][number]
 
@@ -349,6 +350,7 @@ export namespace ProviderTransform {
       }
       return 0.6
     }
+    if (isLing(model.api.id)) return 0.3 // kilocode_change
     return undefined
   }
 
@@ -359,6 +361,7 @@ export namespace ProviderTransform {
     if (["minimax-m2", "gemini", "kimi-k2.5", "kimi-k2p5", "kimi-k2-5"].some((s) => id.includes(s))) {
       return 0.95
     }
+    if (isLing(model.api.id)) return 0.95 // kilocode_change
     return undefined
   }
 
@@ -369,6 +372,7 @@ export namespace ProviderTransform {
       return 20
     }
     if (id.includes("gemini")) return 64
+    if (isLing(model.api.id)) return 20 // kilocode_change
     return undefined
   }
 
