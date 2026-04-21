@@ -104,6 +104,10 @@ bun run package
 bunx vsce package --no-dependencies --skip-license --target linux-x64
 ```
 
+- `--single` builds artifacts only for the current OS and CPU architecture
+- `--single` skips ABI-specific variants by default and only includes the current-platform baseline build when combined with `--baseline`
+- Use `./packages/opencode/script/build.ts --single` for the CLI-only current-platform build
+- Use `cd packages/kilo-vscode && rm -rf bin/ dist/ out/ && rm -f *.vsix && cd ../.. && ./packages/opencode/script/build.ts --single && cd packages/kilo-vscode && bun run package` for a current-platform VSIX preparation flow
 - CLI output: `packages/opencode/dist/@kilocode/cli-{platform}/bin/kilo`
 - Replace `linux-x64` with the current platform target
 - The VSIX must bundle the locally built CLI binary
@@ -131,7 +135,7 @@ If the user says `new version`, `we have new version`, `new version was released
 3. Merge updated `kilo-new-upstream` into `main-vertex-new`
 4. Resolve conflicts with priority given to project-specific behavior, especially Vertex AI fixes
 5. If conflict intent is unclear, stop and ask the user
-6. Build the local VS Code plugin
+6. Build the local VS Code plugin using a current-platform-only CLI build with `./packages/opencode/script/build.ts --single`
 7. On success, reply exactly: `New VS Code plugin (version x.y.z) is READY TO TEST!`
 
 ## Git rules
