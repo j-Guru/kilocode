@@ -76,8 +76,7 @@ export class AutocompleteModel {
     )
 
     for await (const chunk of stream) {
-      // Support both chat-style (delta.content) and text-completion-style (text) streaming formats
-      const choice = chunk.choices?.[0] as any
+      const choice = chunk.choices?.[0]
       const content = choice?.delta?.content ?? choice?.text
       if (content) onChunk(content)
       if (chunk.usage) {
