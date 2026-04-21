@@ -328,7 +328,6 @@ export const vertexModels = {
 		cacheWritesPrice: 3.75, // $3.75 per million tokens
 		cacheReadsPrice: 0.3, // $0.30 per million tokens
 		supportsReasoningBudget: true,
-		// Tiered pricing for extended context (requires beta flag 'context-1m-2025-08-07')
 		tiers: [
 			{
 				contextWindow: 1_000_000, // 1M tokens with beta flag
@@ -351,7 +350,6 @@ export const vertexModels = {
 		cacheWritesPrice: 3.75, // $3.75 per million tokens
 		cacheReadsPrice: 0.3, // $0.30 per million tokens
 		supportsReasoningBudget: true,
-		// Tiered pricing for extended context (requires beta flag 'context-1m-2025-08-07')
 		tiers: [
 			{
 				contextWindow: 1_000_000, // 1M tokens with beta flag
@@ -374,7 +372,6 @@ export const vertexModels = {
 		cacheWritesPrice: 3.75, // $3.75 per million tokens
 		cacheReadsPrice: 0.3, // $0.30 per million tokens
 		supportsReasoningBudget: true,
-		// Tiered pricing for extended context (requires beta flag 'context-1m-2025-08-07')
 		tiers: [
 			{
 				contextWindow: 1_000_000, // 1M tokens with beta flag
@@ -615,7 +612,25 @@ export const vertexModels = {
 		outputPrice: 1.0,
 		description: "Qwen3 235B A22B Instruct. Available in us-south1",
 	},
+	"glm-5-maas": {
+		maxTokens: 128_000,
+		contextWindow: 200_000,
+		supportsImages: false,
+		supportsPromptCache: false,
+		supportsNativeTools: true,
+		defaultToolProtocol: "native",
+		vertexPublisher: "zaiorg",
+		description: "GLM 5. Available in global",
+	},
 } as const satisfies Record<string, ModelInfo>
+
+export const vertexPickerModelIds = [
+	"gemini-3.1-pro-preview",
+	"gemini-3-flash-preview",
+	"deepseek-v3.2-maas",
+	"gpt-oss-120b-maas",
+	"glm-5-maas",
+] as const satisfies readonly VertexModelId[]
 
 // kilocode_change start
 /**

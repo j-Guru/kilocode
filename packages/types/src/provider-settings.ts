@@ -26,7 +26,7 @@ import {
 	openAiNativeModels,
 	qwenCodeModels,
 	sambaNovaModels,
-	vertexModels,
+	vertexPickerModelIds,
 	vscodeLlmModels,
 	xaiModels,
 	internationalZAiModels,
@@ -975,7 +975,7 @@ export const MODELS_BY_PROVIDER: Record<
 	vertex: {
 		id: "vertex",
 		label: "GCP Vertex AI",
-		models: Object.keys(vertexModels),
+		models: [...vertexPickerModelIds],
 	},
 	"vscode-lm": {
 		id: "vscode-lm",
