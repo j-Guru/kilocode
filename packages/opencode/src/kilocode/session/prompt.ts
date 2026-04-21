@@ -50,6 +50,10 @@ export namespace KiloSessionPrompt {
     return action === "continue" ? "continue" : "break"
   }
 
+  export function abortPlanFollowup(sessionID: SessionID) {
+    return PlanFollowup.abort(sessionID)
+  }
+
   /**
    * Mutable cache for environment details, keyed by user message ID
    * so it recomputes when a new user message arrives.
