@@ -55,6 +55,10 @@ tsconfig.tsbuildinfo
 packages/app/.artifacts/
 packages/opencode/.artifacts/
 
+# Electron / unpacked build output
+/bin/
+/bin-unpacked/
+
 # CLI build residuals (from ./packages/opencode/script/build.ts)
 /src/*
 !/src/webview-ui/
