@@ -11429,6 +11429,14 @@
           "description": {
             "description": "Explanation of choice",
             "type": "string"
+          },
+          "labelKey": {
+            "description": "Optional i18n key for the label; clients translate and still reply with `label`",
+            "type": "string"
+          },
+          "descriptionKey": {
+            "description": "Optional i18n key for the description",
+            "type": "string"
           }
         },
         "required": ["label", "description"]
@@ -11454,6 +11462,14 @@
           "multiple": {
             "description": "Allow selecting multiple choices",
             "type": "boolean"
+          },
+          "questionKey": {
+            "description": "Optional i18n key for the question text; clients fall back to `question` when missing",
+            "type": "string"
+          },
+          "headerKey": {
+            "description": "Optional i18n key for the header; clients fall back to `header` when missing",
+            "type": "string"
           },
           "custom": {
             "description": "Allow typing a custom answer (default: true)",
@@ -15677,7 +15693,7 @@
           },
           "ai_sdk_provider": {
             "type": "string",
-            "enum": ["anthropic", "openai", "openai-compatible", "openrouter"]
+            "enum": ["alibaba", "anthropic", "openai", "openai-compatible", "openrouter"]
           }
         },
         "required": [
