@@ -1307,9 +1307,14 @@ NOTE: At any point in time through this workflow you should feel free to ask the
           }
 
           if (input.noReply === true) return message
-          // kilocode_change start — dismiss pending suggestions so a previous loop
-          // blocked on a suggestion can settle before the queue runs the next prompt
+          // kilocode_change start — hot-inject semantics: cancel any in-flight loop
+          // and drop any queued follow-ups so the new prompt runs immediately.
+          // Dismissing pending suggestions also unblocks the in-flight loop if it was
+          // waiting on Suggestion.show() — the suggest tool's abort listener then
+          // resolves the suggestion promise on cancel.
           yield* Effect.promise(() => Suggestion.dismissAll(input.sessionID))
+          yield* KiloSessionPromptQueue.cancel(input.sessionID)
+          yield* state.cancel(input.sessionID)
           // kilocode_change end
           return yield* KiloSessionPromptQueue.enqueue(
             input.sessionID,

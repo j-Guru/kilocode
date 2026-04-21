@@ -221,11 +221,10 @@ describe("session prompt queue", () => {
     expect(ids[ids.length - 1]).toBe(injected)
   })
 
-  test("continues a queued prompt after the active run finishes", async () => {
+  test("cancels the in-flight turn when a new prompt arrives", async () => {
     const ready = Promise.withResolvers<void>()
-    const release = Promise.withResolvers<void>()
+    const injected = Promise.withResolvers<void>()
     const calls: number[] = []
-    const replies = ["first reply", "second reply", "third reply"]
     const server = Bun.serve({
       port: 0,
       fetch(req) {
@@ -235,8 +234,8 @@ describe("session prompt queue", () => {
         calls.push(Date.now())
         const body =
           calls.length === 1
-            ? reply({ text: replies[0], ready: ready.resolve, wait: release.promise })
-            : reply({ text: replies[calls.length - 1] ?? "extra reply" })
+            ? reply({ text: "first reply", ready: ready.resolve, wait: new Promise(() => {}) })
+            : reply({ text: "second reply", ready: injected.resolve })
         return new Response(body, {
           status: 200,
           headers: { "Content-Type": "text/event-stream" },
@@ -288,43 +287,40 @@ describe("session prompt queue", () => {
             agent: "code",
             parts: [{ type: "text", text: "second prompt" }],
           })
-          const third = SessionPrompt.prompt({
-            sessionID: session.id,
-            agent: "code",
-            parts: [{ type: "text", text: "third prompt" }],
-          })
 
-          await Bun.sleep(20)
-          expect(calls).toHaveLength(1)
-          const queued = await Session.messages({ sessionID: session.id })
-          expect(queued.filter((msg) => msg.info.role === "user")).toHaveLength(3)
-          expect(queued.filter((msg) => msg.info.role === "assistant")).toHaveLength(1)
+          await injected.promise
+          expect(calls).toHaveLength(2)
 
-          release.resolve()
-          await first
+          const one = await first
           const two = await second
-          const three = await third
 
+          expect(one.info.role).toBe("assistant")
           expect(hasText(two, "second reply")).toBe(true)
-          expect(hasText(three, "third reply")).toBe(true)
-          expect(calls).toHaveLength(3)
+          expect(calls).toHaveLength(2)
 
           const msgs = await Session.messages({ sessionID: session.id })
           const users = msgs.filter((msg) => msg.info.role === "user")
           const assistants = msgs.filter((msg) => msg.info.role === "assistant")
+          const prompts = users.flatMap((msg) =>
+            msg.parts.filter((part) => part.type === "text").map((part) => part.text),
+          )
           const text = assistants.flatMap((msg) =>
             msg.parts.filter((part) => part.type === "text").map((part) => part.text),
           )
-          expect(users).toHaveLength(3)
-          expect(assistants).toHaveLength(3)
-          expect(text).toContain("first reply")
+          expect(users).toHaveLength(2)
+          expect(prompts).toContain("first prompt")
+          expect(prompts).toContain("second prompt")
           expect(text).toContain("second reply")
-          expect(text).toContain("third reply")
-          for (const [index, item] of assistants.entries()) {
-            const user = users[index]?.info
-            if (item.info.role !== "assistant" || user?.role !== "user") throw new Error("missing turn")
-            expect(item.info.parentID).toBe(user.id)
+          expect(text).not.toContain("first reply")
+
+          const latest = assistants.find((msg) => hasText(msg, "second reply"))
+          const secondUser = users.find((msg) => hasText(msg, "second prompt"))
+          expect(latest?.info.role).toBe("assistant")
+          expect(secondUser?.info.role).toBe("user")
+          if (latest?.info.role !== "assistant" || secondUser?.info.role !== "user") {
+            throw new Error("missing hot-injected turn")
           }
+          expect(latest.info.parentID).toBe(secondUser.info.id)
         },
       })
     } finally {
@@ -332,8 +328,9 @@ describe("session prompt queue", () => {
     }
   })
 
-  test("cancel drops queued prompts and resets internal state", async () => {
+  test("cancel resets internal state after a hot-injected prompt replaces the active turn", async () => {
     const ready = Promise.withResolvers<void>()
+    const injected = Promise.withResolvers<void>()
     const calls: number[] = []
     const server = Bun.serve({
       port: 0,
@@ -342,7 +339,10 @@ describe("session prompt queue", () => {
         if (!url.pathname.endsWith("/chat/completions")) return new Response("not found", { status: 404 })
 
         calls.push(Date.now())
-        const body = reply({ text: "first reply", ready: ready.resolve, wait: new Promise(() => {}) })
+        const body =
+          calls.length === 1
+            ? reply({ text: "first reply", ready: ready.resolve, wait: new Promise(() => {}) })
+            : reply({ text: "second reply", ready: injected.resolve, wait: new Promise(() => {}) })
         return new Response(body, {
           status: 200,
           headers: { "Content-Type": "text/event-stream" },
@@ -386,23 +386,21 @@ describe("session prompt queue", () => {
             agent: "code",
             parts: [{ type: "text", text: "second prompt" }],
           })
-          const third = SessionPrompt.prompt({
-            sessionID: session.id,
-            agent: "code",
-            parts: [{ type: "text", text: "third prompt" }],
-          })
 
-          await Bun.sleep(20)
-          expect(calls).toHaveLength(1)
+          await injected.promise
+          expect(calls).toHaveLength(2)
 
           await SessionPrompt.cancel(session.id)
-          await Promise.all([first, second, third])
+          const [one, two] = await Promise.all([first, second])
 
-          expect(calls).toHaveLength(1)
+          expect(one.info.role).toBe("assistant")
+          expect(two.info.role).toBe("assistant")
+          expect(calls).toHaveLength(2)
           const msgs = await Session.messages({ sessionID: session.id })
+          const users = msgs.filter((msg) => msg.info.role === "user")
           const assistants = msgs.filter((msg) => msg.info.role === "assistant")
-          expect(assistants).toHaveLength(1)
-          expect(msgs.filter((msg) => msg.info.role === "user")).toHaveLength(3)
+          expect(users).toHaveLength(2)
+          expect(assistants).toHaveLength(2)
 
           // Internal state should have no lingering tail/version/target entries after the last release.
           const ids = await Effect.runPromise(

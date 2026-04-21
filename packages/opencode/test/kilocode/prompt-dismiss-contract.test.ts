@@ -23,12 +23,12 @@ describe("prompt.ts Kilo-specific invariants", () => {
     expect(content).toContain("Suggestion.dismissAll")
   })
 
-  test("dismissAll runs before the prompt queue enqueues the new loop", () => {
+  test("dismissAll and cancel run before the prompt queue enqueues the new loop", () => {
     const content = fs.readFileSync(PROMPT_FILE, "utf-8")
-    // dismissAll must precede KiloSessionPromptQueue.enqueue so a previous loop
-    // blocked on a suggestion can settle before the queue starts the next prompt.
+    // dismissAll must precede queue/state cancellation so a previous loop blocked
+    // on a suggestion can settle before the replacement prompt restarts the loop.
     const block = content.match(
-      /kilocode_change start[^\n]*dismiss[\s\S]*?Suggestion\.dismissAll[\s\S]*?kilocode_change end[\s\S]*?KiloSessionPromptQueue\.enqueue/,
+      /kilocode_change start[^\n]*hot-inject[\s\S]*?Suggestion\.dismissAll[\s\S]*?KiloSessionPromptQueue\.cancel\(input\.sessionID\)[\s\S]*?state\.cancel\(input\.sessionID\)[\s\S]*?kilocode_change end[\s\S]*?KiloSessionPromptQueue\.enqueue/,
     )
     expect(block).not.toBeNull()
   })
