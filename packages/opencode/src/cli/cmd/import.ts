@@ -10,7 +10,7 @@ import { Instance } from "../../project/instance"
 import { EOL } from "os"
 import { Filesystem } from "../../util"
 import { AppRuntime } from "@/effect/app-runtime"
-import { Log } from "../../util/log"
+import { Log } from "../../util"
 
 const log = Log.create({ service: "import" })
 

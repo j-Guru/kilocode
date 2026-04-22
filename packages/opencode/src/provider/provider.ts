@@ -1692,18 +1692,18 @@ export function sort<T extends { id: string }>(models: T[]) {
     [(model) => (model.id.includes("latest") ? 0 : 1), "asc"],
     [(model) => model.id, "desc"],
   )
-
-  // kilocode_change start - legacy promise helpers for Kilo callsites
-  const { runPromise } = makeRuntime(Service, defaultLayer)
-  export const list = () => runPromise((svc) => svc.list())
-  export const getModel = (providerID: ProviderID, modelID: ModelID) =>
-    runPromise((svc) => svc.getModel(providerID, modelID))
-  export const getProvider = (providerID: ProviderID) => runPromise((svc) => svc.getProvider(providerID))
-  export const getLanguage = (model: Model) => runPromise((svc) => svc.getLanguage(model))
-  export const getSmallModel = (providerID: ProviderID) => runPromise((svc) => svc.getSmallModel(providerID))
-  export const defaultModel = () => runPromise((svc) => svc.defaultModel())
-  // kilocode_change end
 }
+
+// kilocode_change start - legacy promise helpers for Kilo callsites
+const { runPromise: runProviderPromise } = makeRuntime(Service, defaultLayer)
+export const list = () => runProviderPromise((svc) => svc.list())
+export const getModel = (providerID: ProviderID, modelID: ModelID) =>
+  runProviderPromise((svc) => svc.getModel(providerID, modelID))
+export const getProvider = (providerID: ProviderID) => runProviderPromise((svc) => svc.getProvider(providerID))
+export const getLanguage = (model: Model) => runProviderPromise((svc) => svc.getLanguage(model))
+export const getSmallModel = (providerID: ProviderID) => runProviderPromise((svc) => svc.getSmallModel(providerID))
+export const defaultModel = () => runProviderPromise((svc) => svc.defaultModel())
+// kilocode_change end
 
 export function parseModel(model: string) {
   const [providerID, ...rest] = model.split("/")

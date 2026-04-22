@@ -1,9 +1,9 @@
 // kilocode_change new file
 import { fetchKiloModels } from "@kilocode/kilo-gateway"
-import { Config } from "../config/config"
+import { Config } from "../config"
 import { Auth } from "../auth"
 import { Env } from "../env"
-import { Log } from "../util/log"
+import { Log } from "../util"
 
 export namespace ModelCache {
   const log = Log.create({ service: "model-cache" })

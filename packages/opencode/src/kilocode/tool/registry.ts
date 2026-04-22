@@ -1,7 +1,7 @@
 // kilocode_change - new file
 import { CodebaseSearchTool } from "../../tool/warpgrep"
 import { RecallTool } from "../../tool/recall"
-import { Tool } from "../../tool/tool"
+import { Tool } from "../../tool"
 import { Flag } from "@/flag/flag"
 import { ProviderID } from "../../provider/schema"
 import { Env } from "../../env"

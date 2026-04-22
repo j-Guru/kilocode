@@ -11,7 +11,7 @@ import { PlanFollowup } from "@/kilocode/plan-followup"
 import { KiloSession } from "@/kilocode/session"
 import { environmentDetails, type EditorContext } from "@/kilocode/editor-context"
 import { Identifier } from "@/id/id"
-import { Filesystem } from "@/util/filesystem"
+import { Filesystem } from "@/util"
 import PROMPT_PLAN from "@/session/prompt/plan.txt"
 import CODE_SWITCH from "@/session/prompt/code-switch.txt"
 

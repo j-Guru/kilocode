@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test"
-import { Log } from "../../../src/util/log"
+import { Log } from "../../../src/util"
 
 Log.init({ print: false })
 

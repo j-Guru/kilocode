@@ -21,7 +21,7 @@ import { Flag } from "@/flag/flag"
 import semver from "semver"
 import { DialogProvider, useDialog } from "@tui/ui/dialog"
 import { DialogProvider as DialogProviderList } from "@tui/component/dialog-provider"
-import { Installation } from "@/installation" // kilocode_change
+import { InstallationVersion } from "@/installation/version" // kilocode_change
 import { PluginRouteMissing } from "@tui/component/plugin-route-missing"
 import { ProjectProvider } from "@tui/context/project"
 import { useEvent } from "@tui/context/event"
@@ -981,7 +981,7 @@ function ErrorComponent(props: {
     )
   }
 
-  issueURL.searchParams.set("opencode-version", Installation.VERSION)
+  issueURL.searchParams.set("opencode-version", InstallationVersion)
 
   const copyIssueURL = () => {
     Clipboard.copy(issueURL.toString()).then(() => {

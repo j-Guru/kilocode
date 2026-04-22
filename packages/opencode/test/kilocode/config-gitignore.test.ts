@@ -8,10 +8,10 @@
 import { expect, spyOn, test } from "bun:test"
 import fs from "fs/promises"
 import path from "path"
-import { Config } from "../../src/config/config"
+import { Config } from "../../src/config"
 import { Npm } from "../../src/npm"
 import * as Network from "../../src/util/network"
-import { Filesystem } from "../../src/util/filesystem"
+import { Filesystem } from "../../src/util"
 import { AppRuntime } from "../../src/effect/app-runtime"
 import { tmpdir } from "../fixture/fixture"
 

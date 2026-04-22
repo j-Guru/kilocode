@@ -46,7 +46,7 @@ interface GitResult {
 
 // kilocode_change start
 export const MAX_DIFF_SIZE = 256 * 1024
-const cache = new Map<string, Promise<Snapshot.FileDiff[]>>()
+const cache = new Map<string, Promise<FileDiff[]>>()
 const max = 100
 // kilocode_change end
 
@@ -773,25 +773,25 @@ export const layer: Layer.Layer<
         return yield* InstanceState.useEffect(state, (s) => s.diff(hash))
       }),
       diffFull: Effect.fn("Snapshot.diffFull")(function* (from: string, to: string) {
-          // kilocode_change start - cache full diffs at the service boundary
-          if (from === to) return []
-          const key = `${from}:${to}`
-          const hit = cache.get(key)
-          if (hit) return yield* Effect.promise(() => hit)
-          if (cache.size >= max) {
-            const first = cache.keys().next().value
-            if (first) cache.delete(first)
-          }
-          const ctx = yield* Effect.context()
-          const pending = Effect.runPromiseWith(ctx)(InstanceState.useEffect(state, (s) => s.diffFull(from, to))).catch(
-            (err) => {
-              cache.delete(key)
-              throw err
-            },
-          )
-          cache.set(key, pending)
-          return yield* Effect.promise(() => pending)
-          // kilocode_change end
+        // kilocode_change start - cache full diffs at the service boundary
+        if (from === to) return []
+        const key = `${from}:${to}`
+        const hit = cache.get(key)
+        if (hit) return yield* Effect.promise(() => hit)
+        if (cache.size >= max) {
+          const first = cache.keys().next().value
+          if (first) cache.delete(first)
+        }
+        const ctx = yield* Effect.context()
+        const pending = Effect.runPromiseWith(ctx)(InstanceState.useEffect(state, (s) => s.diffFull(from, to))).catch(
+          (err) => {
+            cache.delete(key)
+            throw err
+          },
+        )
+        cache.set(key, pending)
+        return yield* Effect.promise(() => pending)
+        // kilocode_change end
       }),
     })
   }),

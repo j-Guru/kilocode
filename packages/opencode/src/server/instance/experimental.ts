@@ -18,10 +18,10 @@ import { Snapshot } from "../../snapshot" // kilocode_change
 import { Review } from "../../kilocode/review/review" // kilocode_change
 import { WorktreeDiff } from "../../kilocode/review/worktree-diff" // kilocode_change
 import { WorktreeFamily } from "../../kilocode/worktree-family" // kilocode_change
-import { Log } from "../../util/log" // kilocode_change
+import { Log } from "../../util" // kilocode_change
 import { Effect, Option } from "effect"
 import { WorkspaceRoutes } from "./workspace"
-import { Filesystem } from "../../util/filesystem" // kilocode_change
+import { Filesystem } from "../../util" // kilocode_change
 import path from "path" // kilocode_change
 import { Agent } from "@/agent/agent"
 

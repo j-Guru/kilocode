@@ -51,9 +51,9 @@ if (!process.env[ENV_FEATURE]) {
 
 // kilocode_change - set version so kilo-gateway can include it in the editor name header
 if (!process.env[ENV_VERSION]) {
-  process.env[ENV_VERSION] = Installation.VERSION
+  process.env[ENV_VERSION] = InstallationVersion
 }
-import { Config } from "./config/config"
+import { Config } from "./config"
 import { Auth } from "./auth"
 // kilocode_change end
 import { DbCommand } from "./cli/cmd/db"
@@ -142,7 +142,7 @@ let cli = yargs(args) // kilocode_change
     const globalCfg = await Config.getGlobal()
     await Telemetry.init({
       dataPath: Global.Path.data,
-      version: Installation.VERSION,
+      version: InstallationVersion,
       enabled: globalCfg.experimental?.openTelemetry !== false,
     })
 

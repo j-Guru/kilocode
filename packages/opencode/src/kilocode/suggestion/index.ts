@@ -1,7 +1,7 @@
 import { Bus } from "../../bus"
 import { BusEvent } from "../../bus/bus-event"
 import { Identifier } from "../../id/id"
-import { Log } from "../../util/log"
+import { Log } from "../../util"
 import z from "zod"
 
 export namespace Suggestion {
