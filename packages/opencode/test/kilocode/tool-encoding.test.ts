@@ -323,6 +323,57 @@ describe("tool encoding preservation", () => {
         }),
       ),
     )
+
+    // Deletes exercise a code path in patch/index.ts that doesn't write bytes
+    // back — verify it still works when the target file is non-UTF-8, because
+    // the deletion code has to decode the old contents to confirm match.
+    it.live("deletes a Windows-1251 file without UTF-8 corruption errors", () =>
+      provideTmpdirInstance((dir) =>
+        Effect.gen(function* () {
+          const filepath = path.join(dir, "legacy.txt")
+          yield* putEncoded(filepath, samples.windows1251, "windows-1251")
+          const patch = ["*** Begin Patch", "*** Delete File: legacy.txt", "*** End Patch"].join("\n")
+          yield* runPatch({ patchText: patch })
+          const exists = yield* Effect.promise(() =>
+            fs
+              .access(filepath)
+              .then(() => true)
+              .catch(() => false),
+          )
+          expect(exists).toBe(false)
+        }),
+      ),
+    )
+  })
+
+  // EditTool's replaceAll path rewrites the entire buffer and re-encodes it
+  // in one shot — regression guard that re-encoding a multi-occurrence edit in
+  // a legacy encoding yields byte-exact output.
+  describe("EditTool replaceAll preserves non-UTF-8 encoding", () => {
+    it.live("replaces every occurrence in Shift_JIS", () =>
+      provideTmpdirInstance((dir) =>
+        Effect.gen(function* () {
+          const filepath = path.join(dir, "doc.txt")
+          // Pad with additional Shift_JIS text so jschardet has enough bytes
+          // to confidently identify the encoding.
+          const pad = samples.shiftJis + "\n"
+          const original = pad + "日本語\n日本語\n日本語\n" + pad
+          yield* putEncoded(filepath, original, "Shift_JIS")
+          yield* markRead(filepath)
+
+          yield* runEdit({ filePath: filepath, oldString: "日本語", newString: "ニホンゴ", replaceAll: true })
+
+          const expected =
+            pad.replaceAll("日本語", "ニホンゴ") +
+            "ニホンゴ\nニホンゴ\nニホンゴ\n" +
+            pad.replaceAll("日本語", "ニホンゴ")
+          const decoded = yield* loadDecoded(filepath, "Shift_JIS")
+          expect(decoded).toBe(expected)
+          const bytes = yield* loadBytes(filepath)
+          expect(bytes.equals(encodeBytes(expected, "Shift_JIS"))).toBe(true)
+        }),
+      ),
+    )
   })
 })
 
