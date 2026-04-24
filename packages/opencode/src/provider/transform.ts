@@ -633,6 +633,12 @@ export function variants(model: Provider.Model): Record<string, Record<string, a
     case "@ai-sdk/google-vertex/anthropic":
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-vertex#anthropic-provider
 
+      if (model.providerID === "github-copilot") {
+        if (model.api.id.includes("opus-4.7")) {
+          return Object.fromEntries(["medium"].map((effort) => [effort, { reasoningEffort: effort }]))
+        }
+      }
+
       if (adaptiveEfforts) {
         return Object.fromEntries(
           adaptiveEfforts.map((effort) => [
@@ -675,6 +681,9 @@ export function variants(model: Provider.Model): Record<string, Record<string, a
               reasoningConfig: {
                 type: "adaptive",
                 maxReasoningEffort: effort,
+                ...(model.api.id.includes("opus-4-7") || model.api.id.includes("opus-4.7")
+                  ? { display: "summarized" }
+                  : {}),
               },
             },
           ]),
@@ -844,11 +853,14 @@ export function options(input: {
 
   if (input.model.api.npm === "@ai-sdk/azure") {
     result["store"] = true
+    result["promptCacheKey"] = input.sessionID
   }
 
-  // kilocode_change start
-  if (input.model.api.npm === "@openrouter/ai-sdk-provider" || input.model.api.npm === "@kilocode/kilo-gateway") {
-    // kilocode_change end
+  if (
+    input.model.api.npm === "@openrouter/ai-sdk-provider" ||
+    input.model.api.npm === "@llmgateway/ai-sdk-provider" ||
+    input.model.api.npm === "@kilocode/kilo-gateway" // kilocode_change
+  ) {
     result["usage"] = {
       include: true,
     }
@@ -985,8 +997,11 @@ export function smallOptions(model: Provider.Model) {
     }
     return { thinkingConfig: { thinkingBudget: 0 } }
   }
-  // kilocode_change - add Kilo Gateway support
-  if (model.providerID === "openrouter" || model.api.npm === "@kilocode/kilo-gateway") {
+  if (
+    model.providerID === "openrouter" ||
+    model.providerID === "llmgateway" ||
+    model.api.npm === "@kilocode/kilo-gateway" // kilocode_change
+  ) {
     if (model.api.id.includes("google")) {
       return { reasoning: { enabled: false } }
     }
