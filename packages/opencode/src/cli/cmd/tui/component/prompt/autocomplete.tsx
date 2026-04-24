@@ -493,6 +493,7 @@ export function Autocomplete(props: {
   // kilocode_change start - keep slash text intact when overlays hide the prompt,
   // but still allow normal autocomplete dismissal to clean it up.
   function dismiss() {
+    if (!store.visible) return
     command.keybinds(true)
     setStore("visible", false)
   }
