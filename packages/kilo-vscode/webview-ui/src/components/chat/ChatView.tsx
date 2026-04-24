@@ -53,6 +53,7 @@ export const ChatView: Component<ChatViewProps> = (props) => {
   // "Continue in Worktree" state
   const [transferring, setTransferring] = createSignal(false)
   const [transferDetail, setTransferDetail] = createSignal("")
+  const [repoBranch, setRepoBranch] = createSignal<string>()
 
   // Permissions and questions scoped to this session's family (self + subagents).
   // Each ChatView only sees its own session tree — no cross-session leakage.
@@ -108,6 +109,10 @@ export const ChatView: Component<ChatViewProps> = (props) => {
       forking: "Starting session...",
     }
     const cleanup = vscode.onMessage((msg) => {
+      if (msg.type === "agentManager.repoInfo") {
+        setRepoBranch(msg.branch)
+        return
+      }
       if (msg.type !== "continueInWorktreeProgress") return
       const m = msg as { status: string; error?: string }
       if (m.status === "done") {
@@ -136,6 +141,9 @@ export const ChatView: Component<ChatViewProps> = (props) => {
 
   const startWorktree = () => vscode.postMessage({ type: "agentManager.createWorktree" })
 
+  const startWorktreeFromBranch = () =>
+    vscode.postMessage({ type: "agentManager.createWorktree", baseBranch: repoBranch() || undefined })
+
   const openAgentManager = () => vscode.postMessage({ type: "openAgentManager" })
 
   const moveToWorktree = () => {
@@ -149,10 +157,14 @@ export const ChatView: Component<ChatViewProps> = (props) => {
   const worktreeTooltip =
     "Create an isolated git worktree to experiment safely, keep changes separated, and run parallel sessions without disrupting your current branch."
 
-  const advancedTooltip =
-    "Open the Agent Manager worktree dialog to choose advanced branch options before creating the worktree."
+  const advancedTooltip = "Open the Agent Manager worktree dialog to configure a new worktree before creating it."
 
   const showAdvancedWorktree = () => vscode.postMessage({ type: "openAdvancedWorktree" })
+
+  createEffect(() => {
+    if (!isSidebar() || !server.gitInstalled()) return
+    vscode.postMessage({ type: "agentManager.requestRepoInfo" })
+  })
 
   const renderActions = (hasChat: boolean) => (
     <div class="new-task-button-wrapper" classList={{ "new-task-button-wrapper--empty": !hasChat }}>
@@ -175,7 +187,7 @@ export const ChatView: Component<ChatViewProps> = (props) => {
                 New Worktree
               </Button>
             </Tooltip>
-            <DropdownMenu gutter={4} placement="bottom-end">
+            <DropdownMenu gutter={4} placement="top-end">
               <Tooltip value={advancedTooltip} placement="top">
                 <DropdownMenu.Trigger class="session-worktree-split-arrow" aria-label="Advanced worktree options">
                   <Icon name="chevron-down" size="small" />
@@ -183,12 +195,19 @@ export const ChatView: Component<ChatViewProps> = (props) => {
               </Tooltip>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content class="session-worktree-split-menu">
-                  <DropdownMenu.Item onSelect={startWorktree}>
-                    <DropdownMenu.ItemLabel>{language.t("agentManager.worktree.new")}</DropdownMenu.ItemLabel>
+                  <DropdownMenu.Item onSelect={startWorktreeFromBranch}>
+                    <span class="session-worktree-menu-gap" aria-hidden="true" />
+                    <DropdownMenu.ItemLabel class="session-worktree-menu-label">
+                      <span>New Worktree from</span>
+                      <span class="session-worktree-menu-branch">
+                        <Icon name="branch" size="small" />
+                        <strong>{repoBranch() ?? "current branch"}</strong>
+                      </span>
+                    </DropdownMenu.ItemLabel>
                   </DropdownMenu.Item>
                   <DropdownMenu.Item onSelect={showAdvancedWorktree}>
                     <Icon name="settings-gear" size="small" />
-                    <DropdownMenu.ItemLabel>{language.t("agentManager.dialog.advanced")}</DropdownMenu.ItemLabel>
+                    <DropdownMenu.ItemLabel>Configure New Worktree...</DropdownMenu.ItemLabel>
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Portal>

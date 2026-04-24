@@ -713,6 +713,16 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         case "openAdvancedWorktree":
           vscode.commands.executeCommand("kilo-code.new.agentManager.advancedWorktree")
           break
+        case "agentManager.requestRepoInfo": {
+          const root = getWorkspaceRoot()
+          if (!root) break
+          const git = new GitOps({ log: () => {} })
+          const branch = await git.currentBranch(root).catch(() => "")
+          git.dispose()
+          if (!branch || branch === "HEAD") break
+          this.postMessage({ type: "agentManager.repoInfo", branch })
+          break
+        }
         case "agentManager.createWorktree":
           await this.createWorktreeHandler?.(message.baseBranch, message.branchName)
           break
