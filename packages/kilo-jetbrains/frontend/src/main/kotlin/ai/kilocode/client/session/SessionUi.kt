@@ -36,9 +36,6 @@ import javax.swing.SwingUtilities
  *
  * It builds the session panels, wires controller/model listeners, and swaps the
  * center body between the empty state and the message list.
- *
- * The only custom layout logic kept here is the prompt-relative connection
- * overlay. All user actions still flow through [SessionController].
  */
 class SessionUi(
     project: Project,
@@ -109,7 +106,7 @@ class SessionUi(
 
         prompt = PromptPanel(
             project = project,
-            onSend = { text -> sendPrompot(text) },
+            onSend = { text -> sendPrompt(text) },
             onAbort = { controller.abort() },
         )
 
@@ -201,7 +198,7 @@ class SessionUi(
         }
     }
 
-    private fun sendPrompot(text: String) {
+    private fun sendPrompt(text: String) {
         if (text.isBlank()) return
         LOG.debug {
             "${ChatLogSummary.prompt(text)} agent=${controller.model.agent ?: "none"} model=${controller.model.model ?: "none"} ready=${controller.ready}"
