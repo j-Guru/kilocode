@@ -8,7 +8,7 @@ const GH_PROBE_TTL = 300_000
 
 type Pr = { number: number; title: string }
 
-let ghAvailable: boolean | undefined
+let ghPath: string | null | undefined
 let ghProbeTime = 0
 
 function wait(ms: number, signal: AbortSignal) {
@@ -37,7 +37,7 @@ async function lookup(cwd: string, branch: string): Promise<Pr | null> {
   const deadline = wait(20_000, ctrl.signal).then(() => ctrl.abort())
 
   try {
-    if (!(await probeGh(cwd, ctrl.signal))) return null
+    if (!probeGh()) return null
 
     // Try the tracking ref first (works when PR was checked out via `gh pr checkout`
     // or when the branch's upstream is a fork). Fall back to an explicit branch
@@ -123,21 +123,12 @@ async function lookupBySha(cwd: string, signal: AbortSignal): Promise<Pr | null>
   return null
 }
 
-async function probeGh(cwd: string, signal: AbortSignal): Promise<boolean> {
+function probeGh(): string | null {
   const now = Date.now()
-  if (ghAvailable !== undefined && now - ghProbeTime < GH_PROBE_TTL) {
-    return ghAvailable
-  }
-
-  const res = await Process.text(["gh", "--version"], {
-    cwd,
-    abort: signal,
-    nothrow: true,
-    timeout: 1_000,
-  })
-  ghAvailable = res.code === 0
-  ghProbeTime = Date.now()
-  return ghAvailable
+  if (ghPath !== undefined && now - ghProbeTime < GH_PROBE_TTL) return ghPath
+  ghPath = Bun.which("gh") ?? null
+  ghProbeTime = now
+  return ghPath
 }
 
 function View(props: { api: TuiPluginApi }) {
