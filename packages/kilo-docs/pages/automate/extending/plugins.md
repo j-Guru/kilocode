@@ -86,7 +86,7 @@ kilo plugin my-plugin --global
 kilo plugin my-plugin --force
 ```
 
-The command resolves the package, reads its `package.json` for `exports["./server"]` / `exports["./tui"]`, and writes the entry into your `kilo.json` / `opencode.json` while preserving comments.
+The command resolves the package, reads its `package.json` for plugin entrypoints, and writes the entry into the appropriate config file (currently `.opencode/opencode.jsonc` / `.opencode/tui.jsonc` for local installs, or `~/.config/kilo/opencode.jsonc` / `~/.config/kilo/tui.jsonc` for `--global`) while preserving JSONC comments.
 
 ### How plugins are installed
 
