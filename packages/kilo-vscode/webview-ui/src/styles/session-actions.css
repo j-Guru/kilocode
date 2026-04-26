@@ -60,6 +60,7 @@
 .session-actions-row > [data-component="tooltip-trigger"] > [data-component="button"]:hover:not(:disabled),
 .session-actions-row > [data-component="tooltip-trigger"] > [data-component="button"]:focus-visible:not(:disabled),
 .session-actions-row > [data-component="tooltip-trigger"] > [data-component="button"]:active:not(:disabled) {
+  background: var(--surface-interactive-hover, var(--vscode-list-hoverBackground));
   color: var(--vscode-foreground);
 }
 
@@ -72,9 +73,8 @@
   flex: 0 0 auto;
   min-width: 0;
   align-items: stretch;
-  gap: 0;
+  gap: 2px;
   border-radius: var(--session-action-radius);
-  background: transparent;
   box-shadow: none;
   overflow: hidden;
   color: var(--vscode-descriptionForeground);
@@ -87,8 +87,24 @@
 .session-worktree-split:has(.session-worktree-main:focus-visible),
 .session-worktree-split:has(.session-worktree-split-arrow:focus-visible),
 .session-worktree-split:has(.session-worktree-split-arrow[data-expanded]) {
-  background: var(--surface-base-hover);
   color: var(--vscode-foreground);
+}
+
+.session-worktree-split:hover > [data-component="tooltip-trigger"] > .session-worktree-main,
+.session-worktree-split:hover .session-worktree-split-arrow,
+.session-worktree-split:has(.session-worktree-main:focus-visible)
+  > [data-component="tooltip-trigger"]
+  > .session-worktree-main,
+.session-worktree-split:has(.session-worktree-main:focus-visible) .session-worktree-split-arrow,
+.session-worktree-split:has(.session-worktree-split-arrow:focus-visible)
+  > [data-component="tooltip-trigger"]
+  > .session-worktree-main,
+.session-worktree-split:has(.session-worktree-split-arrow:focus-visible) .session-worktree-split-arrow,
+.session-worktree-split:has(.session-worktree-split-arrow[data-expanded])
+  > [data-component="tooltip-trigger"]
+  > .session-worktree-main,
+.session-worktree-split:has(.session-worktree-split-arrow[data-expanded]) .session-worktree-split-arrow {
+  background: var(--surface-interactive-hover, var(--vscode-list-hoverBackground));
 }
 
 .session-worktree-split > [data-component="tooltip-trigger"] {
@@ -98,7 +114,7 @@
 
 .session-worktree-split > [data-component="tooltip-trigger"] > [data-component="button"] {
   flex: 0 0 auto;
-  border-radius: 0;
+  border-radius: var(--session-action-radius) 0 0 var(--session-action-radius);
   background: transparent;
   box-shadow: none;
   color: inherit;
@@ -108,7 +124,7 @@
 .session-worktree-split > [data-component="tooltip-trigger"] > [data-component="button"]:hover:not(:disabled),
 .session-worktree-split > [data-component="tooltip-trigger"] > [data-component="button"]:focus-visible:not(:disabled),
 .session-worktree-split > [data-component="tooltip-trigger"] > [data-component="button"]:active:not(:disabled) {
-  background: transparent;
+  background: var(--surface-base-hover);
   box-shadow: none;
 }
 
@@ -116,27 +132,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   min-width: 20px;
-  padding: 0 6px 0 5px;
+  padding: 0 6px;
   border: none;
-  border-radius: 0;
+  border-radius: 0 var(--session-action-radius) var(--session-action-radius) 0;
   background: transparent;
   color: inherit;
   cursor: pointer;
 }
 
-.session-worktree-split-arrow::before {
-  content: "";
-  width: 1px;
-  height: 14px;
-  background: color-mix(in srgb, currentColor 25%, transparent);
-  opacity: 0.7;
-}
-
 .session-worktree-split-arrow:focus-visible {
   outline: none;
-  background: transparent;
+  background: inherit;
 }
 
 .session-worktree-split > [data-component="tooltip-trigger"] > [data-component="button"],
@@ -210,7 +217,7 @@
 .session-move-group:has(.session-move-action:focus-visible) .session-move-changes,
 .session-move-group:has(.session-move-changes:focus-visible) .session-move-action,
 .session-move-group:has(.session-move-changes:focus-visible) .session-move-changes {
-  background: var(--surface-base-hover);
+  background: var(--surface-interactive-hover, var(--vscode-list-hoverBackground));
 }
 
 .session-move-action {
@@ -295,11 +302,15 @@
   flex: 0 0 auto;
   border-radius: var(--session-action-radius);
   color: var(--vscode-descriptionForeground);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .session-agent-manager:hover:not(:disabled),
 .session-agent-manager:focus-visible:not(:disabled),
 .session-agent-manager:active:not(:disabled) {
+  background: var(--surface-interactive-hover, var(--vscode-list-hoverBackground));
   color: var(--vscode-foreground);
 }
 
