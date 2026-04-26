@@ -136,14 +136,10 @@ interface ApplyState {
   message: string
   conflicts: AgentManagerApplyWorktreeDiffConflict[]
 }
-
 /** Sidebar selection: LOCAL for local repo, worktree ID for a worktree, or null for an unassigned session. */
 type SidebarSelection = typeof LOCAL | string | null
-
 type SidePanel = "diff" | "pr" | null
-
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.userAgent)
-
 // Fallback keybindings before extension sends resolved ones
 const MAX_JUMP_INDEX = 9
 
@@ -178,7 +174,6 @@ function useTabScroll(activeTabs: Accessor<SessionInfo[]>, activeId: Accessor<st
   const [ref, setRef] = createSignal<HTMLDivElement | undefined>()
   const [showLeft, setShowLeft] = createSignal(false)
   const [showRight, setShowRight] = createSignal(false)
-
   let scrollFrame: number | undefined
   const update = () => {
     if (scrollFrame !== undefined) return
@@ -190,7 +185,6 @@ function useTabScroll(activeTabs: Accessor<SessionInfo[]>, activeId: Accessor<st
       setShowRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 2)
     })
   }
-
   // Wheel → horizontal scroll conversion
   const onWheel = (e: WheelEvent) => {
     const el = ref()
@@ -199,7 +193,6 @@ function useTabScroll(activeTabs: Accessor<SessionInfo[]>, activeId: Accessor<st
     e.preventDefault()
     el.scrollLeft += e.deltaY > 0 ? 60 : -60
   }
-
   // Recalculate on scroll, resize, or tab changes
   createEffect(() => {
     const el = ref()
@@ -217,7 +210,6 @@ function useTabScroll(activeTabs: Accessor<SessionInfo[]>, activeId: Accessor<st
       mo.disconnect()
     })
   })
-
   createEffect(() => {
     const id = activeId()
     const el = ref()
@@ -236,7 +228,6 @@ function useTabScroll(activeTabs: Accessor<SessionInfo[]>, activeId: Accessor<st
       }
     })
   })
-
   return { setRef, showLeft, showRight }
 }
 
