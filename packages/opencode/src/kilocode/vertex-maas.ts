@@ -1,5 +1,5 @@
 // kilocode_change - new file
-import type { Provider } from "../provider/provider"
+import type { Model } from "../provider/provider"
 import { ModelID, ProviderID } from "../provider/schema"
 
 /**
@@ -43,7 +43,7 @@ function maasModel(
   cost: { input: number; output: number; cacheRead?: number; cacheWrite?: number },
   limit: { context: number; output: number },
   opts: MaaSModelOptions = {},
-): Provider.Model {
+): Model {
   return {
     id: ModelID.make(id),
     providerID: ProviderID.googleVertex,
@@ -103,7 +103,7 @@ function maasModel(
  *  - URL template substitution for project/location/endpoint
  *  - `includeUsage: true` for OpenAI-compatible models
  */
-export const VERTEX_MAAS_MODELS: Provider.Model[] = [
+export const VERTEX_MAAS_MODELS: Model[] = [
   // ── Meta ──────────────────────────────────────────────────────────────────
   maasModel(
     "llama-4-maverick-17b-128e-instruct-maas",
