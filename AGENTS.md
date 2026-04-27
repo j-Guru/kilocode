@@ -138,6 +138,7 @@ If the user says `new version`, `we have new version`, `new version was released
 6. On success, reply exactly: `New VS Code plugin (version x.y.z) is READY TO TEST!`
 7. Clean workspace: 1. gitignore new build dirs if applicable (not files) 2. decide what residual files are from build and can be discarded and discard them 3. if you find files that need to be commited and are not part of merge do coherent commits. 4. do final commit of new `main-vertex-new` (should consist of new files from merge)
 8. Verify that workspace is clean without uncommited files.
+9. Push the repo! there are git hooks, it might take 2-3 mins and som quirks might appear. Fix it. If needed to rebuild, do it, otherwise do necessary commits and push until success.
 
 ## Git rules
 
