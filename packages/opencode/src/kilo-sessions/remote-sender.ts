@@ -15,7 +15,7 @@ import { PermissionID } from "@/permission/schema"
 import { SessionID } from "@/session/schema"
 import { QuestionID } from "@/question/schema"
 import { ModelID, ProviderID } from "@/provider/schema"
-import { Log } from "@/util/log"
+import { Log } from "@/util"
 import z from "zod"
 
 const QuestionData = z.object({
@@ -277,7 +277,7 @@ export namespace RemoteSender {
           return
         }
         dispatchLongRunning(msg, directoryFor(input.data.sessionID), async () => {
-          await SessionPrompt.prompt(input.data)
+          await SessionPrompt.prompt(input.data as SessionPrompt.PromptInput)
         })
         return
       }

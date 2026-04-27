@@ -9,12 +9,12 @@
 // delete them cleanly.
 
 import { describe, expect, it } from "bun:test"
-import { Config } from "../../src/config/config"
+import * as Config from "../../src/config/config"
 import { KilocodeConfig } from "../../src/kilocode/config/config"
 
 describe("Config.Info — null sentinels for custom provider deletes", () => {
   it("accepts a null model value inside a provider", () => {
-    const parsed = Config.Info.safeParse({
+    const parsed = Config.Info.zod.safeParse({
       provider: {
         myprovider: {
           name: "My Provider",
@@ -28,7 +28,7 @@ describe("Config.Info — null sentinels for custom provider deletes", () => {
   })
 
   it("accepts a null variant value inside a model", () => {
-    const parsed = Config.Info.safeParse({
+    const parsed = Config.Info.zod.safeParse({
       provider: {
         myprovider: {
           name: "My Provider",
