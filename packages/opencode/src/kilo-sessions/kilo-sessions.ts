@@ -180,6 +180,11 @@ export namespace KiloSessions {
   export async function init() {
     if (ingestDisabled) return
 
+    // kilocode_change start - Same type-erasure upstream uses in share/share-next.ts:165-169.
+    const watch = <D extends { type: string }>(def: D, fn: (evt: { properties: any }) => unknown) =>
+      Bus.subscribe(def as never, fn as never)
+    // kilocode_change end
+
     Bus.subscribe(Session.Event.Created, (evt) => {
       const sessionId = evt.properties.info.id
       void create(sessionId).catch((error) => log.error("share init create failed", { sessionId, error }))
@@ -201,7 +206,7 @@ export namespace KiloSessions {
       ])
     })
 
-    Bus.subscribe(MessageV2.Event.Updated, async (evt) => {
+    watch(MessageV2.Event.Updated, async (evt) => {
       await ingest.sync(evt.properties.info.sessionID, [
         {
           type: "message",
@@ -223,7 +228,7 @@ export namespace KiloSessions {
       }
     })
 
-    Bus.subscribe(MessageV2.Event.PartUpdated, async (evt) => {
+    watch(MessageV2.Event.PartUpdated, async (evt) => {
       await ingest.sync(evt.properties.part.sessionID, [
         {
           type: "part",
@@ -232,7 +237,7 @@ export namespace KiloSessions {
       ])
     })
 
-    Bus.subscribe(Session.Event.Diff, async (evt) => {
+    watch(Session.Event.Diff, async (evt) => {
       await ingest.sync(evt.properties.sessionID, [
         {
           type: "session_diff",
