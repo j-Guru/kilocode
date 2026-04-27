@@ -731,6 +731,7 @@ export interface OpenChangesRequest {
 export interface OpenDiffVirtualRequest {
   type: "openDiffVirtual"
   diff: PermissionFileDiff
+  initialDiffStyle: "unified" | "split"
 }
 
 export interface RetryConnectionRequest {
