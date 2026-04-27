@@ -630,7 +630,7 @@ export const { use: useSync, provider: SyncProvider } = createSimpleContext({
         return store.status
       },
       get ready() {
-        return true
+        // return true // kilocode_change - upstream #23037 left this debug path enabled; keep it commented so future merges do not restore eager ready state.
         if (process.env.KILO_FAST_BOOT) return true
         return store.status !== "loading"
       },

@@ -1704,10 +1704,6 @@ export type Config = {
    */
   autoshare?: boolean
   /**
-   * Enable remote control of sessions via Kilo Cloud. Equivalent to running /remote on startup.
-   */
-  remote_control?: boolean
-  /**
    * Automatically update to the latest version. Set to true to auto-update, false to disable, or 'notify' to show update notifications
    */
   autoupdate?: boolean | "notify"
@@ -1719,6 +1715,10 @@ export type Config = {
    * When set, ONLY these providers will be enabled. All other providers will be ignored
    */
   enabled_providers?: Array<string>
+  /**
+   * Enable remote control of sessions via Kilo Cloud. Equivalent to running /remote on startup.
+   */
+  remote_control?: boolean
   /**
    * Model to use in the format of provider/model, eg anthropic/claude-2
    */
@@ -2011,6 +2011,12 @@ export type Provider = {
   models: {
     [key: string]: Model
   }
+}
+
+export type ConsoleState = {
+  consoleManagedProviders: Array<string>
+  activeOrgName?: string
+  switchableOrgCount: number
 }
 
 export type ToolIds = Array<string>
@@ -3195,11 +3201,7 @@ export type ExperimentalConsoleGetResponses = {
   /**
    * Active Console provider metadata
    */
-  200: {
-    consoleManagedProviders: Array<string>
-    activeOrgName?: string
-    switchableOrgCount: number
-  }
+  200: ConsoleState
 }
 
 export type ExperimentalConsoleGetResponse = ExperimentalConsoleGetResponses[keyof ExperimentalConsoleGetResponses]
@@ -4944,6 +4946,25 @@ export type ProviderOauthCallbackResponses = {
 }
 
 export type ProviderOauthCallbackResponse = ProviderOauthCallbackResponses[keyof ProviderOauthCallbackResponses]
+
+export type SyncStartData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/sync/start"
+}
+
+export type SyncStartResponses = {
+  /**
+   * Workspace sync started
+   */
+  200: boolean
+}
+
+export type SyncStartResponse = SyncStartResponses[keyof SyncStartResponses]
 
 export type SyncReplayData = {
   body?: {
