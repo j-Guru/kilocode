@@ -619,10 +619,12 @@ export const BashTool = Tool.define(
               const ps = PS.has(name)
               const root = yield* parse(params.command, ps)
               const scan = yield* collect(root, cwd, ps, shell)
+              // kilocode_change start
               if (!Instance.containsPath(cwd)) {
                 scan.dirs.add(cwd)
-                scan.access = "unknown" // kilocode_change
+                scan.access = "unknown"
               }
+              // kilocode_change end
               yield* ask(ctx, scan, params.command) // kilocode_change
 
               return yield* run(
