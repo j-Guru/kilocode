@@ -10,6 +10,7 @@ import { iife } from "@/util/iife"
 import { useToast } from "../ui/toast"
 import { useArgs } from "./args"
 import { useSDK } from "./sdk"
+import { useProject } from "./project" // kilocode_change
 import { RGBA } from "@opentui/core"
 import { Filesystem } from "@/util"
 
@@ -26,6 +27,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
   init: () => {
     const sync = useSync()
     const sdk = useSDK()
+    const project = useProject() // kilocode_change
     const toast = useToast()
 
     function isModelValid(model: { providerID: string; modelID: string }) {
@@ -152,12 +154,18 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
       }
 
       // kilocode_change start - keep configured-agent selections process-local
+      const scope = createMemo(() => project.workspace.current() ?? project.instance.directory())
+
+      function key(name: string) {
+        return [scope(), name].join(":")
+      }
+
       function clear(name: string) {
         setModelStore("model", name, undefined)
       }
 
       function apply(name: string, value: { providerID: string; modelID: string }, persist: boolean) {
-        setModelStore("override", name, { ...value })
+        setModelStore("override", key(name), { ...value })
         if (persist) {
           setModelStore("model", name, { ...value })
           return
@@ -239,7 +247,7 @@ export const { use: useLocal, provider: LocalProvider } = createSimpleContext({
         // kilocode_change start - configured models beat stale persisted picks
         return (
           getFirstValidModel(
-            () => a && modelStore.override[a.name],
+            () => a && modelStore.override[key(a.name)],
             () => a && a.model,
             () => a && modelStore.model[a.name],
             fallbackModel,

@@ -57,6 +57,8 @@ let mockAgents = [
 
 let mockConfig: { model?: string } = {}
 let mockArgs: { model?: string } = {}
+let mockWorkspace: string | undefined
+let mockDirectory = "mock-project"
 let toastMessages: Array<{ variant: string; message: string }> = []
 
 // ── Mocks ────────────────────────────────────────────────────────────────────
@@ -70,6 +72,7 @@ const realSync = await import("@tui/context/sync")
 const realTheme = await import("@tui/context/theme")
 const realArgs = await import("@tui/context/args")
 const realSdk = await import("@tui/context/sdk")
+const realProject = await import("@tui/context/project")
 const realToast = await import("@tui/ui/toast")
 
 let capturedInit: (() => any) | undefined
@@ -127,6 +130,18 @@ mock.module("@tui/context/sdk", () => ({
   }),
 }))
 
+mock.module("@tui/context/project", () => ({
+  ...realProject,
+  useProject: () => ({
+    workspace: {
+      current: () => mockWorkspace,
+    },
+    instance: {
+      directory: () => mockDirectory,
+    },
+  }),
+}))
+
 const toastMock = {
   show: (opts: { variant: string; message: string; duration?: number }) => {
     toastMessages.push({ variant: opts.variant, message: opts.message })
@@ -154,6 +169,8 @@ function resetMockState() {
   ]
   mockConfig = {}
   mockArgs = {}
+  mockWorkspace = undefined
+  mockDirectory = "mock-project"
   toastMessages = []
 }
 
