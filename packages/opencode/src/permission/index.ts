@@ -321,10 +321,12 @@ export const layer = Layer.effect(
       for (const [id, item] of pending.entries()) {
         if (item.info.sessionID !== existing.info.sessionID) continue
         if (ConfigProtection.isRequest(item.info)) continue // kilocode_change
+        // kilocode_change start
         const ok = item.info.patterns.every((pattern) => {
-          if (veto(item.info.permission, pattern, item.hardRuleset)) return false // kilocode_change
-          return evaluate(item.info.permission, pattern, item.ruleset, approved).action === "allow" // kilocode_change — include original ruleset
+          if (veto(item.info.permission, pattern, item.hardRuleset)) return false
+          return evaluate(item.info.permission, pattern, item.ruleset, approved).action === "allow"
         })
+        // kilocode_change end
         if (!ok) continue
         pending.delete(id)
         yield* bus.publish(Event.Replied, {
