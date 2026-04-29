@@ -397,7 +397,7 @@ export const BashTool = Tool.define(
       }
       // kilocode_change end
 
-      for (const node of nodes) {
+      for (const node of nodes) { // kilocode_change
         const command = parts(node)
         const tokens = command.map((item) => item.text)
         const cmd = ps ? tokens[0]?.toLowerCase() : tokens[0]
