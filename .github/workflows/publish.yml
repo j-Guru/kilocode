@@ -95,15 +95,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
 
+      # kilocode_change start - tar the whole dist tree into a single file before upload.
+      # download-artifact@v4's streaming unzip is CPU-bound and processes entries one by
+      # one; collapsing ~480 files into one tar cuts build-vscode download from >30m to
+      # seconds. compression-level: 0 avoids double-compressing binaries on the outer zip.
+      # See actions/upload-artifact#36, actions/toolkit#1533.
+      - name: Pack CLI dist into tar
+        run: |
+          find packages/opencode/dist -name '*.map' -delete
+          tar -cf /tmp/kilo-cli.tar -C packages/opencode/dist .
+
       - uses: actions/upload-artifact@v4
         with:
           name: kilo-cli
-          # kilocode_change start - exclude sourcemaps + skip zstd to keep the artifact under the v4 download flaky threshold
-          path: |
-            packages/opencode/dist
-            !packages/opencode/dist/**/*.map
+          path: /tmp/kilo-cli.tar
           compression-level: 0
-          # kilocode_change end
+      # kilocode_change end
 
     outputs:
       version: ${{ needs.version.outputs.version }}
@@ -128,8 +135,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: kilo-cli
-          path: packages/opencode/dist
+          path: /tmp
 
+      # kilocode_change start - extract the tar packed by build-cli
+      - name: Unpack CLI dist
+        run: |
+          mkdir -p packages/opencode/dist
+          tar -xf /tmp/kilo-cli.tar -C packages/opencode/dist
+      # kilocode_change end
       - name: Build VSIX packages
         run: bun script/build.ts
         working-directory: ./packages/kilo-vscode
@@ -320,8 +333,14 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: kilo-cli
-          path: packages/opencode/dist
+          path: /tmp
 
+      # kilocode_change start - extract the tar packed by build-cli
+      - name: Unpack CLI dist
+        run: |
+          mkdir -p packages/opencode/dist
+          tar -xf /tmp/kilo-cli.tar -C packages/opencode/dist
+      # kilocode_change end
       - uses: actions/download-artifact@v4
         with:
           name: kilo-vscode
