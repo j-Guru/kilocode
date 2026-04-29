@@ -16,7 +16,7 @@ If you already use the sidebar chat and want to start running multiple agents in
 Rule of thumb: if you would stash or switch branches to do the work, create a worktree instead.
 
 {% callout type="info" %}
-All Agent Manager sessions share a single `kilo serve` process. What each worktree isolates is the filesystem and git state — the branch, the directory, the terminal. API keys, models, and configuration are shared.
+All Agent Manager sessions use the extension's embedded runtime. What each worktree isolates is the filesystem and git state: the branch, the directory, and the terminal. Providers, BYOK keys, custom providers, models, and extension settings are shared with the sidebar.
 {% /callout %}
 
 ## What parallelizes well
@@ -174,18 +174,18 @@ Merge the most foundational one first. Then, in each remaining worktree, ask the
 
 ## Cheatsheet
 
-| Situation                                              | Where                         |
-| ------------------------------------------------------ | ----------------------------- |
-| Small, interactive task                                | Sidebar                       |
-| Long task, want to do something else meanwhile         | New worktree (`Cmd+N`)        |
-| Two or three approaches, pick the winner               | Multi-version (`Cmd+Shift+N`) |
-| Sidebar task outgrew the sidebar                       | Continue in Worktree          |
-| Separate conversation on the same branch               | New tab (`Cmd+T`)             |
-| Long conversation, want a fresh context on same branch | New tab, summarize            |
-| Run the app to verify                                  | Run script (`Cmd+E`)          |
-| One-off git or shell commands                          | Terminal (`Cmd+/`)            |
-| Team review                                            | Push + `gh pr create`         |
-| Ship without ceremony                                  | Apply to local                |
+| Situation | Where |
+|---|---|
+| Small, interactive task | Sidebar |
+| Long task, want to do something else meanwhile | New worktree (`Cmd+N`) |
+| Two or three approaches, pick the winner | Multi-version (`Cmd+Shift+N`) |
+| Sidebar task outgrew the sidebar | Continue in Worktree |
+| Separate conversation on the same branch | New tab (`Cmd+T`) |
+| Long conversation, want a fresh context on same branch | New tab, summarize |
+| Run the app to verify | Run script (`Cmd+E`) |
+| One-off git or shell commands | Terminal (`Cmd+/`) |
+| Team review | Push + `gh pr create` |
+| Ship without ceremony | Apply to local |
 
 ## Related
 
