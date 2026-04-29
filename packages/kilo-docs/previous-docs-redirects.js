@@ -859,4 +859,10 @@ module.exports = [
     basePath: false,
     permanent: true,
   },
+  {
+    source: "/docs/kiloclaw/version-pinning",
+    destination: "/docs/kiloclaw/control-ui/version-pinning",
+    basePath: false,
+    permanent: true,
+  },
 ]
