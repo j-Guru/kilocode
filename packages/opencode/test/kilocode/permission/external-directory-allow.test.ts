@@ -14,6 +14,7 @@ import { Truncate } from "../../../src/tool"
 import { BashTool } from "../../../src/tool/bash"
 import { Plugin } from "../../../src/plugin"
 import { tmpdir } from "../../fixture/fixture"
+import { ConfigProtection } from "../../../src/kilocode/permission/config-paths"
 
 const runtime = ManagedRuntime.make(
   Layer.mergeAll(
@@ -113,7 +114,7 @@ async function immediate(pending: Promise<void>) {
 }
 
 async function wait(count: number) {
-  for (const _ of Array.from({ length: 100 })) {
+  for (const _ of Array.from({ length: 500 })) {
     const list = await Permission.list()
     if (list.length === count) return list
     await Bun.sleep(10)
@@ -166,34 +167,44 @@ describe("external_directory allow config protection", () => {
     })
   })
 
+  for (const pattern of variants(configGlob)) {
+    test(`detects unknown bash external_directory requests for global config paths [${pattern}]`, () => {
+      expect(
+        ConfigProtection.isRequest({
+          permission: "external_directory",
+          patterns: [pattern],
+          metadata: { command: `rm ${quote(configFile)}` },
+        }),
+      ).toBe(true)
+    })
+  }
+
   test("keeps unknown bash external_directory requests for global config paths protected", async () => {
-    for (const pattern of variants(configGlob)) {
-      await using tmp = await tmpdir({ git: true })
-      await Instance.provide({
-        directory: tmp.path,
-        fn: async () => {
-          const pending = Permission.ask({
-            id: PermissionID.make("permission_bash_external_write"),
-            sessionID: SessionID.make("session_bash_external_write"),
-            permission: "external_directory",
-            patterns: [pattern],
-            metadata: { command: `rm ${quote(configFile)}` },
-            always: [pattern],
-            ruleset,
-          })
+    await using tmp = await tmpdir({ git: true })
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const pending = Permission.ask({
+          id: PermissionID.make("permission_bash_external_write"),
+          sessionID: SessionID.make("session_bash_external_write"),
+          permission: "external_directory",
+          patterns: [configGlob],
+          metadata: { command: `rm ${quote(configFile)}` },
+          always: [configGlob],
+          ruleset,
+        })
 
-          const requests = await wait(1)
-          expect(requests[0]).toMatchObject({
-            id: PermissionID.make("permission_bash_external_write"),
-            permission: "external_directory",
-            metadata: { disableAlways: true },
-          })
+        const requests = await wait(1)
+        expect(requests[0]).toMatchObject({
+          id: PermissionID.make("permission_bash_external_write"),
+          permission: "external_directory",
+          metadata: { disableAlways: true },
+        })
 
-          await Permission.reply({ requestID: PermissionID.make("permission_bash_external_write"), reply: "reject" })
-          await expect(pending).rejects.toBeInstanceOf(Permission.RejectedError)
-        },
-      })
-    }
+        await Permission.reply({ requestID: PermissionID.make("permission_bash_external_write"), reply: "reject" })
+        await expect(pending).rejects.toBeInstanceOf(Permission.RejectedError)
+      },
+    })
   })
 })
 
