@@ -35,6 +35,11 @@ interface Text {
   final: boolean
 }
 
+interface Clean {
+  text: Text
+  marks: Marks
+}
+
 interface Diff {
   lines: Set<number>
   deleted: number
@@ -45,6 +50,19 @@ interface Range {
   end: number
 }
 
+interface Block extends Range {
+  before: string
+  after: string
+}
+
+interface Marks {
+  inline: Map<number, string>
+  starts: Map<number, string>
+  ends: Map<number, string>
+  blocks: Block[]
+  file?: string
+}
+
 type Style = "slash" | "hash" | "jsx" | "block"
 
 const standalone = [
@@ -52,6 +70,9 @@ const standalone = [
   /^\s*#\s*kilocode_change\b.*$/,
   /^\s*\{?\s*\/\*\s*kilocode_change\b.*\*\/\}?\s*$/,
 ]
+const start = /\bkilocode_change\s+start\b/
+const end = /\bkilocode_change\s+end\b/
+const freshmark = /\bkilocode_change\s*-\s*new\s*file\b/
 const unsupported = new Set([".json", ".jsonc", ".lock", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico"])
 const styles = new Map<string, Style>([
   [".ts", "slash"],
@@ -157,8 +178,8 @@ function join(text: Text) {
   return text.lines.join(text.eol) + (text.final ? text.eol : "")
 }
 
-function strip(file: string, line: string) {
-  if (standalone.some((item) => item.test(line))) return null
+function strip(file: string, line: string): { line: string | null; mark?: string } {
+  if (standalone.some((item) => item.test(line))) return { line: null }
   if (style(file) === "hash") return comment(line, [/^#\s*kilocode_change\b/])
   return comment(line, [/^\{\/\*\s*kilocode_change\b/, /^\/\*\s*kilocode_change\b/, /^\/\/\s*kilocode_change\b/])
 }
@@ -190,20 +211,63 @@ function comment(line: string, tokens: RegExp[]) {
     }
 
     const rest = line.slice(i)
-    if (tokens.some((item) => item.test(rest))) return line.slice(0, i).trimEnd()
+    if (tokens.some((item) => item.test(rest))) {
+      const next = line.slice(0, i).trimEnd()
+      return { line: next, mark: line.slice(next.length) }
+    }
   }
 
-  return line
+  return { line }
 }
 
-function clean(file: string, text: string): Text {
+function clean(file: string, text: string): Clean {
   const parsed = split(text)
-  const lines = parsed.lines.flatMap((line) => {
+  const marks: Marks = { inline: new Map(), starts: new Map(), ends: new Map(), blocks: [] }
+  const lines: string[] = []
+  const opens: { before: string; start?: number }[] = []
+  const pending: string[] = []
+
+  for (const line of parsed.lines) {
+    if (standalone.some((item) => item.test(line))) {
+      if (freshmark.test(line)) marks.file = line
+      if (start.test(line)) {
+        opens.push({ before: line })
+        continue
+      }
+      if (end.test(line)) {
+        const open = opens.pop()
+        const last = lines.length - 1
+        if (open?.start !== undefined && last >= open.start) {
+          marks.ends.set(last, line)
+          marks.blocks.push({ start: open.start, end: last, before: open.before, after: line })
+        }
+        if (!open && last >= 0) marks.ends.set(last, line)
+        continue
+      }
+      pending.push(line)
+      continue
+    }
+
     const next = strip(file, line)
-    if (next === null) return []
-    return [next]
-  })
-  return { ...parsed, lines }
+    if (next.line === null) continue
+
+    const index = lines.length
+    lines.push(next.line)
+
+    for (const open of opens) {
+      if (open.start !== undefined) continue
+      open.start = index
+      marks.starts.set(index, open.before)
+    }
+
+    const marker = pending.at(-1)
+    if (marker) marks.starts.set(index, marker)
+    pending.length = 0
+
+    if (next.mark) marks.inline.set(index, next.mark)
+  }
+
+  return { text: { ...parsed, lines }, marks }
 }
 
 async function last(): Promise<VersionInfo> {
@@ -336,31 +400,72 @@ function inline(file: string, lines: string[], range: Range, mode: Style) {
   return true
 }
 
-function ranges(nums: Set<number>): Range[] {
-  const sorted = [...nums].sort((a, b) => a - b)
-  return sorted.reduce<Range[]>((acc, num) => {
-    const prev = acc.at(-1)
-    if (prev && num === prev.end + 1) {
-      prev.end = num
+function merge(items: Range[]) {
+  return [...items]
+    .sort((a, b) => a.start - b.start)
+    .reduce<Range[]>((acc, item) => {
+      const prev = acc.at(-1)
+      if (prev && item.start <= prev.end + 1) {
+        prev.end = Math.max(prev.end, item.end)
+        return acc
+      }
+      acc.push({ ...item })
       return acc
-    }
-    acc.push({ start: num, end: num })
-    return acc
-  }, [])
+    }, [])
 }
 
-function annotate(file: string, text: Text, found: Range[]) {
+function ranges(nums: Set<number>): Range[] {
+  const sorted = [...nums].sort((a, b) => a - b)
+  return merge(
+    sorted.reduce<Range[]>((acc, num) => {
+      const prev = acc.at(-1)
+      if (prev && num === prev.end + 1) {
+        prev.end = num
+        return acc
+      }
+      acc.push({ start: num, end: num })
+      return acc
+    }, []),
+  )
+}
+
+function expand(found: Range[], marks: Marks) {
+  return merge(
+    found.map((range) => {
+      const next = { ...range }
+      for (const block of marks.blocks) {
+        if (next.end < block.start || next.start > block.end) continue
+        next.start = Math.min(next.start, block.start)
+        next.end = Math.max(next.end, block.end)
+      }
+      return next
+    }),
+  )
+}
+
+function saved(marks: Marks, range: Range) {
+  return marks.blocks.find((block) => block.start === range.start && block.end === range.end)
+}
+
+function annotate(file: string, clean: Clean, found: Range[]) {
+  const text = clean.text
+  const marks = clean.marks
   const lines = [...text.lines]
 
-  for (const range of [...found].reverse()) {
+  for (const range of expand(found, marks).reverse()) {
     const mode = context(file, text, range)
     if (range.start === range.end && inline(file, text.lines, range, mode)) {
-      lines[range.start] = `${lines[range.start]}${note(mode)}`
+      lines[range.start] = `${lines[range.start]}${marks.inline.get(range.start) ?? note(mode)}`
       continue
     }
 
     const pad = indent(text.lines[range.start] ?? "")
-    const pair = block(mode, pad)
+    const fallback = block(mode, pad)
+    const prior = saved(marks, range)
+    const pair = {
+      start: prior?.before ?? marks.starts.get(range.start) ?? fallback.start,
+      end: prior?.after ?? marks.ends.get(range.end) ?? fallback.end,
+    }
     lines.splice(range.end + 1, 0, pair.end)
     lines.splice(range.start, 0, pair.start)
   }
@@ -368,13 +473,13 @@ function annotate(file: string, text: Text, found: Range[]) {
   return join({ ...text, lines })
 }
 
-function fresh(file: string, text: Text) {
-  const lines = [...text.lines]
+function fresh(file: string, clean: Clean) {
+  const lines = [...clean.text.lines]
   const mode = style(file)
-  const line = mode === "hash" ? "# kilocode_change - new file" : "// kilocode_change - new file"
+  const line = clean.marks.file ?? (mode === "hash" ? "# kilocode_change - new file" : "// kilocode_change - new file")
   const at = lines[0]?.startsWith("#!") ? 1 : 0
   lines.splice(at, 0, line)
-  return join({ ...text, lines })
+  return join({ ...clean.text, lines })
 }
 
 function patch(out: string): Diff {
@@ -458,7 +563,7 @@ async function main() {
   const base = await upstream(version.commit, file)
   const head = clean(file, current)
   const baseText = base === null ? null : await translate(file, base)
-  const diff = baseText === null ? null : await changed(clean(file, baseText), head)
+  const diff = baseText === null ? null : await changed(clean(file, baseText).text, head.text)
   const found = ranges(diff?.lines ?? new Set())
   const next = base === null ? fresh(file, head) : annotate(file, head, found)
 
