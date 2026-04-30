@@ -123,6 +123,7 @@ export interface PermissionResolvedMessage {
 export interface PermissionErrorMessage {
   type: "permissionError"
   permissionID: string
+  stale?: boolean
 }
 
 export interface TodoUpdatedMessage {
@@ -538,6 +539,11 @@ export interface AgentManagerKeybindingsMessage {
   bindings: Record<string, string>
 }
 
+export interface AutoApproveStateMessage {
+  type: "autoApproveState"
+  active: boolean
+}
+
 // Multi-version creation progress (extension → webview)
 export interface AgentManagerMultiVersionProgressMessage {
   type: "agentManager.multiVersionProgress"
@@ -870,6 +876,7 @@ export type ExtensionMessage =
   | AgentManagerStateMessage
   | AgentManagerRunStatusMessage
   | AgentManagerKeybindingsMessage
+  | AutoApproveStateMessage
   | AgentManagerMultiVersionProgressMessage
   | AgentManagerSetSessionModelMessage
   | AgentManagerSendInitialMessage

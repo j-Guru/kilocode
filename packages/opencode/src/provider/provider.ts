@@ -1,4 +1,3 @@
-import z from "zod"
 import os from "os"
 import fuzzysort from "fuzzysort"
 import { Config } from "../config"
@@ -9,7 +8,6 @@ import { Npm } from "../npm"
 import { Hash } from "@opencode-ai/shared/util/hash"
 import { Plugin } from "../plugin"
 import { makeRuntime } from "@/effect/run-service" // kilocode_change
-import { NamedError } from "@opencode-ai/shared/util/error"
 import { type LanguageModelV3 } from "@ai-sdk/provider"
 import * as ModelsDev from "./models"
 import { VERTEX_MAAS_MODELS } from "@/kilocode/vertex-maas" // kilocode_change
@@ -18,6 +16,7 @@ import { Env } from "../env"
 import { InstallationVersion } from "../installation/version"
 import { Flag } from "../flag/flag"
 import { zod } from "@/util/effect-zod"
+import { namedSchemaError } from "@/util/named-schema-error"
 import { iife } from "@/util/iife"
 import { Global } from "../global"
 import path from "path"
@@ -1067,7 +1066,7 @@ export function fromModelsDevProvider(provider: ModelsDev.Provider): Info {
     id: ProviderID.make(provider.id),
     source: "custom",
     name: provider.name,
-    env: provider.env ?? [],
+    env: [...(provider.env ?? [])],
     options: {},
     models,
   }
@@ -1339,8 +1338,7 @@ const layer: Layer.Layer<
           const providerID = ProviderID.make(id)
           // kilocode_change start - keep OAuth plugin source when config and Codex auth coexist
           const oauth =
-            auths[providerID]?.type === "oauth" &&
-            plugins.some((x) => x.auth?.provider === providerID && x.auth.loader)
+            auths[providerID]?.type === "oauth" && plugins.some((x) => x.auth?.provider === providerID && x.auth.loader)
           const partial: Partial<Info> = oauth ? {} : { source: "config" }
           if (provider.env) partial.env = provider.env
           // kilocode_change end
@@ -1808,18 +1806,12 @@ export function parseModel(model: string) {
   }
 }
 
-export const ModelNotFoundError = NamedError.create(
-  "ProviderModelNotFoundError",
-  z.object({
-    providerID: ProviderID.zod,
-    modelID: ModelID.zod,
-    suggestions: z.array(z.string()).optional(),
-  }),
-)
+export const ModelNotFoundError = namedSchemaError("ProviderModelNotFoundError", {
+  providerID: ProviderID,
+  modelID: ModelID,
+  suggestions: Schema.optional(Schema.Array(Schema.String)),
+})
 
-export const InitError = NamedError.create(
-  "ProviderInitError",
-  z.object({
-    providerID: ProviderID.zod,
-  }),
-)
+export const InitError = namedSchemaError("ProviderInitError", {
+  providerID: ProviderID,
+})

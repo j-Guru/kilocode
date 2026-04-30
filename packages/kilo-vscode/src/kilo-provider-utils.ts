@@ -322,11 +322,39 @@ export function resolveContextDirectory(input: {
   contextSessionID?: string
   sessionDirectories: Map<string, string>
   workspaceDirectory: string
+  forceWorkspaceRoot?: boolean
 }) {
+  if (input.forceWorkspaceRoot) return input.workspaceDirectory
+
   return resolveWorkspaceDirectory({
     sessionID: input.currentSessionID ?? input.contextSessionID,
     sessionDirectories: input.sessionDirectories,
     workspaceDirectory: input.workspaceDirectory,
+  })
+}
+
+export function resolveNewSessionDirectory(input: {
+  sessionID?: string
+  currentSessionID?: string
+  contextSessionID?: string
+  agentManagerContext?: string
+  sessionDirectories: Map<string, string>
+  workspaceDirectory: string
+}) {
+  if (input.sessionID) {
+    return resolveWorkspaceDirectory({
+      sessionID: input.sessionID,
+      sessionDirectories: input.sessionDirectories,
+      workspaceDirectory: input.workspaceDirectory,
+    })
+  }
+
+  return resolveContextDirectory({
+    currentSessionID: input.currentSessionID,
+    contextSessionID: input.contextSessionID,
+    sessionDirectories: input.sessionDirectories,
+    workspaceDirectory: input.workspaceDirectory,
+    forceWorkspaceRoot: input.agentManagerContext === "local",
   })
 }
 
@@ -375,7 +403,7 @@ export type WebviewMessage =
   | { type: "suggestionResolved"; requestID: string }
   | { type: "suggestionError"; requestID: string }
   | { type: "permissionResolved"; permissionID: string }
-  | { type: "permissionError"; permissionID: string }
+  | { type: "permissionError"; permissionID: string; stale?: boolean }
   | { type: "sessionCreated"; session: ReturnType<typeof sessionToWebview>; draftID?: string }
   | { type: "sessionUpdated"; session: ReturnType<typeof sessionToWebview> }
   | { type: "messageRemoved"; sessionID: string; messageID: string }
