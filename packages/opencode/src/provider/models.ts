@@ -254,13 +254,14 @@ function ensureZaiGlm51(providers: Record<string, Provider>) {
   for (const id of targets) {
     const provider = providers[id]
     if (!provider) continue
-    if (!provider.models["glm-5.1"]) {
-      provider.models["glm-5.1"] = {
+    const models = provider.models as Record<string, Model>
+    if (!models["glm-5.1"]) {
+      models["glm-5.1"] = {
         ...glm51,
       }
     }
-    if (!provider.models["glm-5-turbo"]) {
-      provider.models["glm-5-turbo"] = {
+    if (!models["glm-5-turbo"]) {
+      models["glm-5-turbo"] = {
         ...glm5turbo,
       }
     }
@@ -270,8 +271,9 @@ function ensureZaiGlm51(providers: Record<string, Provider>) {
 function ensureMoonshotKimiK26(providers: Record<string, Provider>) {
   const provider = providers["moonshotai"]
   if (!provider) return
-  if (provider.models["kimi-k2.6"]) return
-  provider.models["kimi-k2.6"] = {
+  const models = provider.models as Record<string, Model>
+  if (models["kimi-k2.6"]) return
+  models["kimi-k2.6"] = {
     ...kimiK26,
   }
 }
