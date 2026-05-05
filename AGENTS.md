@@ -69,14 +69,7 @@ bun run check-kilocode-change
 bun run test -- --grep "test name"
 bun test tests/unit/slim-metadata.test.ts
 
-# app
-cd packages/app
-bun dev -- --port 4444
-bun run typecheck
-bun run test:unit
-bun test --preload ./happydom.ts ./src/context/model-variant.test.ts
-bun run test:e2e
-playwright test e2e/session/session-review.spec.ts
+
 
 # docs
 cd packages/kilo-docs
