@@ -227,3 +227,177 @@ Do not use these markers in paths that already contain `kilo` in the directory o
 - Server route change: regenerate SDK
 - Source link change: regenerate `packages/kilo-docs/source-links.md`
 - Shared upstream file change: verify `kilocode_change` markers
+
+## Code Style
+
+### Prefer ternary over reassignment
+
+Good:
+
+```ts
+const foo = condition ? 1 : 2
+```
+
+Bad:
+
+```ts
+let foo
+
+if (condition) foo = 1
+else foo = 2
+```
+
+### Avoid else statements
+
+Prefer early returns or using an `iife` to avoid else statements.
+
+Good:
+
+```ts
+function foo() {
+  if (condition) return 1
+  return 2
+}
+```
+
+Bad:
+
+```ts
+function foo() {
+  if (condition) return 1
+  else return 2
+}
+```
+
+### No empty catch blocks
+
+Never leave a `catch` block empty. An empty `catch` silently swallows errors and hides bugs. If you're tempted to write one, ask yourself:
+
+1. Is the `try`/`catch` even needed? (prefer removing it)
+2. Should the error be handled explicitly? (recover, retry, rethrow)
+3. At minimum, log it so failures are visible
+
+Good:
+
+```ts
+try {
+  await save(data)
+} catch (err) {
+  log.error("save failed", { err })
+}
+```
+
+Bad:
+
+```ts
+try {
+  await save(data)
+} catch {}
+```
+
+### Prefer single word naming
+
+Try your best to find a single word name for your variables, functions, etc.
+Only use multiple words if you cannot.
+
+Good:
+
+```ts
+const foo = 1
+const bar = 2
+const baz = 3
+```
+
+Bad:
+
+```ts
+const fooBar = 1
+const barBaz = 2
+const bazFoo = 3
+```
+
+## Testing
+
+You MUST avoid using `mocks` as much as possible.
+Tests MUST test actual implementation, do not duplicate logic into a test.
+
+## Markdown Tables
+
+Do not pad markdown table cells for column alignment. Use the compact form with single-space-padded content cells and a minimal separator row:
+
+```
+| Command | What it runs |
+|---|---|
+| `kilo serve` | The prod CLI on `$PATH`. |
+```
+
+Do **not** right-pad cells to line up columns:
+
+```
+| Command                       | What it runs             |
+| ----------------------------- | ------------------------ |
+| `kilo serve`                  | The prod CLI on `$PATH`. |
+```
+
+Padding makes every content change rewrite the entire table, which blows up diffs on untouched rows. Markdown files are excluded from prettier (see `.prettierignore`) so running the formatter won't re-pad them, and `script/check-md-table-padding.ts` enforces the rule in CI. Run `bun run script/check-md-table-padding.ts --fix` to auto-rewrite padded tables.
+
+## Commit Conventions
+
+[Conventional Commits](https://www.conventionalcommits.org/) with scopes matching packages: `vscode`, `cli`, `agent-manager`, `sdk`, `ui`, `i18n`, `kilo-docs`, `gateway`, `telemetry`, `desktop`. Omit scope when spanning multiple packages.
+
+## Changesets
+
+User-facing changes (features, fixes, breaking changes) require a changeset file for release notes. Run `bunx changeset add` or manually create `.changeset/<slug>.md`. Use `patch` for bug fixes, `minor` for new features, `major` for breaking changes. See `.changeset/README.md` for details.
+
+Changeset descriptions appear directly in release notes and are read by end users. Keep them concise and feature-oriented — describe **what changed from the user's perspective**, not implementation details. Write in imperative mood (e.g. "Support exporting conversations as markdown" not "Add a new export handler that serializes session messages to .md files").
+
+## Pull Requests
+
+PR descriptions should be 2-3 lines covering **what** changed and **why**. Focus on intent and context a reviewer can't get from the diff — skip file-by-file inventories, test result summaries, and anything obvious from the code itself.
+
+## GitHub Issues
+
+When creating or managing GitHub issues for the VS Code extension or JetBrains plugin via `gh`, load `.kilo/skills/gh-issues/SKILL.md`. It covers templates, project boards (`VS Code Extension`, `Jetbrains Plugin`), title conventions, and the `gh auth refresh -s project` recovery path.
+
+## Fork Merge Process
+
+Kilo CLI is a fork of [opencode](https://github.com/anomalyco/opencode).
+
+**Very important**: when planning or coding, update shared files with OpenCode as last resort! Everything is shared code from OpenCode, except folders that contain `kilo` in the name or have a parent directory that contains `kilo` in the name. Example of kilo specific folders: `packages/opencode/src/kilocode/` and `packages/kilo-docs/`. Always look for ways to implement your feature or fix in a way that minimizes changes to shared code.
+
+### Minimizing Merge Conflicts
+
+We regularly merge upstream changes from opencode. To minimize merge conflicts and keep the sync process smooth:
+
+1. **Prefer `kilocode` directories** - Place Kilo-specific code in dedicated directories whenever possible:
+   - `packages/opencode/src/kilocode/` - Kilo-specific source code
+   - `packages/opencode/test/kilocode/` - Kilo-specific tests
+   - `packages/kilo-gateway/` - The Kilo Gateway package
+
+2. **Minimize changes to shared files** - When you must modify files that exist in upstream opencode, keep changes as small and isolated as possible.
+
+3. **Use `kilocode_change` markers** - When modifying shared code, mark your changes with `kilocode_change` comments so they can be easily identified during merges.
+   Do not use these markers in files within directories with kilo in the name
+
+4. **Avoid restructuring upstream code** - Don't refactor or reorganize code that comes from opencode unless absolutely necessary.
+
+5. **Mirror new config keys to the cloud schema** - When adding a `kilocode_change` key to `Config.Info` in `packages/opencode/src/config/config.ts`, also add the matching JSON Schema entry in `apps/web/src/app/config.json/extras.ts` in the [cloud repo](https://github.com/Kilo-Org/cloud). See [CLI Config Schema](packages/kilo-docs/pages/contributing/architecture/config-schema.md) for the step-by-step.
+
+The goal is to keep our diff from upstream as small as possible, making regular merges straightforward and reducing the risk of conflicts.
+
+### Git conflict style
+
+`bun install` sets `merge.conflictStyle=zdiff3` repo-locally via `script/setup-git.ts` (wired into `postinstall`). Conflicts include the common ancestor between `|||||||` and `=======`, which is what `script/upstream/` and `mergiraf` rely on for structural resolution and what makes manual resolution on shared opencode files tractable. If you've overridden it in your user config, the repo-local setting takes precedence — don't override it back.
+
+### Kilocode Change Markers
+
+When editing shared upstream files, mark Kilo-specific lines with `kilocode_change` comments so future merges can find them. The basic forms are:
+
+- Single line: `const value = 42 // kilocode_change`
+- Multi-line block: wrap with `// kilocode_change start` / `// kilocode_change end`
+- New file in a shared path: `// kilocode_change - new file` at the top
+- JSX/TSX: use `{/* kilocode_change */}` (and `{/* kilocode_change start */}` / `end`)
+
+Markers are NOT needed in paths that contain `kilocode` in the name (e.g. `packages/opencode/src/kilocode/`, `packages/opencode/test/kilocode/`) — these are entirely Kilo Code additions and won't conflict with upstream.
+
+For decision rules on when to keep changes inline vs. extract Kilo logic, marker placement guidance, and verification commands, load `.kilo/skills/kilocode-merge-minimizer/SKILL.md`.
