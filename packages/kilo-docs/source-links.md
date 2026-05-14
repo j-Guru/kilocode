@@ -64,6 +64,10 @@
   <!-- packages/kilo-vscode/webview-ui/src/components/settings/AboutKiloCodeTab.tsx -->
 - <https://github.com/Kilo-Org/kilocode/issues/6986>
   <!-- packages/kilo-vscode/src/agent-manager/constants.ts -->
+- <https://github.com/Kilo-Org/kilocode/issues/9618>
+  <!-- packages/opencode/src/kilocode/encoding.ts -->
+- <https://github.com/Kilo-Org/kilocode/issues/9755>
+  <!-- packages/opencode/src/kilocode/encoding.ts -->
 - <https://github.com/Kilo-Org/kilocode/issues/new?template=bug-report.yml>
   <!-- packages/opencode/src/cli/cmd/tui/app.tsx -->
 - <https://github.com/Kilo-Org/kilocode/issues/new/choose>
@@ -89,10 +93,10 @@
 - <https://kilo.ai/docs>
   <!-- packages/kilo-vscode/webview-ui/src/hooks/useSlashCommand.ts -->
   <!-- packages/opencode/src/kilocode/cli/cmd/tui/app.tsx -->
+- <https://kilo.ai/docs/ai-providers#custom-provider>
+  <!-- packages/kilo-vscode/webview-ui/src/components/settings/CustomProviderDialog.tsx -->
 - <https://kilo.ai/docs/code-with-ai/platforms/vscode/whats-new>
   <!-- packages/kilo-vscode/webview-ui/src/components/migration/MigrationWizard.tsx -->
-- <https://kilo.ai/docs/providers/#custom-provider>
-  <!-- packages/kilo-vscode/webview-ui/src/components/settings/CustomProviderDialog.tsx -->
 - <https://kilo.ai/gateway>
   <!-- packages/opencode/src/kilocode/cli/cmd/tui/component/dialog-provider.tsx -->
 - <https://kilo.ai/install>
