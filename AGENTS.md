@@ -17,7 +17,7 @@ There are currently no `.cursor/rules/`, `.cursorrules`, or `.github/copilot-ins
 - **Dev**: `bun run dev` (runs from root) or `bun run --cwd packages/opencode --conditions=browser src/index.ts`
 - **Dev with params**: `bun dev -- help`
 - **Extension**: `bun run extension` (build + launch VS Code with the extension in dev mode). Pass `--no-build` to skip the build.
-- **Typecheck**: `bun turbo typecheck` (uses `tsgo`, not `tsc`)
+- **Typecheck**: `bun turbo typecheck` (uses `tsgo`, not `tsc`). Includes the JetBrains plugin — requires Java 21. Check with `java -version` before running. If missing, install via SDKMAN: `sdk install java 21-tem && sdk use java 21-tem`. If SDKMAN is not installed, see https://sdkman.io/install.
 - **Test**: `bun test` from `packages/opencode/` (NOT from root -- root blocks tests)
 - **Single test**: `bun test test/tool/tool.test.ts` from `packages/opencode/`
 - **CLI build artifact size check**: after `bun run script/build.ts --single --skip-install` in `packages/opencode/`, use `du -h dist/*/*/bin/kilo` (scoped package output lives under `dist/@kilocode/`)
@@ -69,7 +69,10 @@ bun run check-kilocode-change
 bun run test -- --grep "test name"
 bun test tests/unit/slim-metadata.test.ts
 
-
+# JetBrains plugin
+cd packages/kilo-jetbrains
+./gradlew typecheck
+./gradlew test
 
 # docs
 cd packages/kilo-docs
