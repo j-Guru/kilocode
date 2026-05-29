@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import { $ } from "bun"
 import { join, relative, dirname, basename } from "node:path"
-import { chmodSync, statSync, rmSync, readdirSync, existsSync } from "node:fs"
+import { chmodSync, statSync, rmSync, readdirSync, existsSync, mkdirSync, copyFileSync } from "node:fs"
 import { copyTreeSitterResources, hasTreeSitterResources } from "../src/services/cli-backend/cli-resources"
 import { currentFfmpegTarget, ensureFfmpegForTarget } from "./ffmpeg-helper"
 
@@ -190,8 +190,8 @@ async function main() {
   }
 
   const sourceBinPath = await ensureBuiltBinary()
-  await $`mkdir -p ${targetBinDir}`
-  await $`cp ${sourceBinPath} ${targetBinPath}`
+  mkdirSync(targetBinDir, { recursive: true })
+  copyFileSync(sourceBinPath, targetBinPath)
   await copyTreeSitterResources(sourceBinPath, targetBinPath)
   chmodSync(targetBinPath, 0o755)
   await ensureFfmpegForTarget(currentFfmpegTarget(), targetBinDir)

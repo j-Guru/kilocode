@@ -1054,6 +1054,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "@pierre/diffs": "catalog:",
     "fuzzysort": "3.1.0",
     "@kilocode/kilo-gateway": "workspace:*",
     "@kilocode/kilo-i18n": "workspace:*",
