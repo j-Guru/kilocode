@@ -30,12 +30,10 @@ export async function ensureFfmpegForTarget(target: string, bin: string): Promis
   mkdirSync(tmp, { recursive: true })
 
   try {
-    const packed = await $`npm pack ${spec} --pack-destination ${tmp}`.quiet()
-    const name = packed.text().trim().split(/\s+/).pop()
-    if (!name) throw new Error(`npm pack did not return a tarball for ${spec}`)
-
-    await $`tar -xzf ${join(tmp, name)} -C ${tmp}`.quiet()
-    copyFileSync(join(tmp, "package", exe), dest)
+    await $`npm install --prefix ${tmp} --no-save --no-package-lock ${spec}`.quiet()
+    const pkg = spec.replace(/@[^@/][^/]*$/, "") // strip @version suffix, keep @scope/name
+    const installed = join(tmp, "node_modules", pkg, exe)
+    copyFileSync(installed, dest)
     if (!target.startsWith("win32")) chmodSync(dest, 0o755)
   } finally {
     rmSync(tmp, { recursive: true, force: true })
