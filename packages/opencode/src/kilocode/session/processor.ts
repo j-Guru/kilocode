@@ -1,6 +1,6 @@
-// kilocode_change - new file
 import { Telemetry, type ReviewCommand } from "@kilocode/kilo-telemetry"
 import { SessionNetwork } from "@/session/network"
+import type { ProviderID } from "@/provider/schema"
 import type { SessionID } from "@/session/schema"
 import type { SessionStatus } from "@/session/status"
 import { MessageV2 } from "@/session/message-v2"
@@ -9,6 +9,7 @@ import { isReviewCommand, parseReviewCommand } from "@/kilocode/review/command"
 import * as Log from "@opencode-ai/core/util/log"
 import { Effect } from "effect"
 import { Flag } from "@opencode-ai/core/flag/flag"
+import { EffectBridge } from "@/effect/bridge"
 
 export type ReviewTelemetry = {
   mode: "review"
@@ -24,6 +25,26 @@ export namespace KiloSessionProcessor {
     "The model hit its output limit while reasoning and produced no actionable output. Try disabling reasoning or increasing the output limit."
   export const PROVIDER_FINISH_ERROR_MESSAGE =
     "The provider ended the response with an error before returning details. Start a new message to retry; Kilo will compact the oversized conversation first if needed."
+  export const EMPTY_RESPONSE_MESSAGE =
+    "The provider returned an empty response without a finish reason. Kilo will retry the request."
+
+  function tokenTotal(tokens: MessageV2.Assistant["tokens"]) {
+    return (
+      (tokens.total ?? 0) +
+      tokens.input +
+      tokens.output +
+      tokens.reasoning +
+      tokens.cache.read +
+      tokens.cache.write
+    )
+  }
+
+  function output(part: MessageV2.Part) {
+    if (part.type === "tool") return true
+    if (part.type === "text") return part.text.trim() !== ""
+    if (part.type === "reasoning") return part.text.trim() !== ""
+    return false
+  }
 
   export function reviewTelemetry(command: string | undefined): ReviewTelemetry | undefined {
     if (!isReviewCommand(command)) return
@@ -127,7 +148,7 @@ export namespace KiloSessionProcessor {
     return Effect.gen(function* () {
       const msg = SessionNetwork.message(input.error)
 
-      const { id, promise } = yield* Effect.promise(() =>
+      const { id, promise } = yield* EffectBridge.fromPromise(() =>
         SessionNetwork.ask({
           sessionID: input.sessionID,
           message: msg,
@@ -192,6 +213,47 @@ export namespace KiloSessionProcessor {
       log.warn("empty tool-calls", { messageID: msg.id })
       msg.finish = "stop"
     }
+  }
+
+  export function emptyResponseError(input: {
+    msg: MessageV2.Assistant
+    finish: string
+    tokens: MessageV2.Assistant["tokens"]
+    cost: number
+    parts: MessageV2.Part[]
+    step: { reasoning: boolean; text: boolean; tool: boolean }
+  }) {
+    if (input.finish !== "other") return
+    if (input.msg.error) return
+    if (input.cost !== 0) return
+    if (tokenTotal(input.tokens) !== 0) return
+    if (input.step.reasoning || input.step.text || input.step.tool) return
+    if (input.parts.some(output)) return
+
+    log.warn("empty provider response", { messageID: input.msg.id })
+    return new MessageV2.APIError({ message: EMPTY_RESPONSE_MESSAGE, isRetryable: true }).toObject()
+  }
+
+  export function guardEmptyResponse(input: Parameters<typeof emptyResponseError>[0]) {
+    return Effect.gen(function* () {
+      const err = emptyResponseError(input)
+      if (!err) return
+      return yield* Effect.fail(err)
+    })
+  }
+
+  function preserveError(error: unknown): MessageV2.Assistant["error"] | undefined {
+    if (MessageV2.APIError.isInstance(error)) return { name: "APIError", data: error.data }
+  }
+
+  export function parse(error: unknown, input: { providerID: ProviderID; aborted: boolean }) {
+    return (
+      preserveError(error) ??
+      MessageV2.fromError(error, {
+        providerID: input.providerID,
+        aborted: input.aborted,
+      })
+    )
   }
 
   export function lengthWarning(input: {
