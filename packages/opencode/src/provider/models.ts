@@ -93,15 +93,27 @@ function ensureZai(providers: Record<string, Provider>) {
   for (const id of ids) {
     const provider = providers[id]
     if (!provider) continue
-    if (!provider.models["glm-5.1"]) provider.models["glm-5.1"] = { ...glm51 }
-    if (!provider.models["glm-5-turbo"]) provider.models["glm-5-turbo"] = { ...glm5turbo }
+    providers[id] = {
+      ...provider,
+      models: {
+        ...provider.models,
+        ...(provider.models["glm-5.1"] ? {} : { "glm-5.1": { ...glm51 } }),
+        ...(provider.models["glm-5-turbo"] ? {} : { "glm-5-turbo": { ...glm5turbo } }),
+      },
+    }
   }
 }
 
 function ensureMoonshot(providers: Record<string, Provider>) {
   const provider = providers.moonshotai
   if (!provider || provider.models["kimi-k2.6"]) return
-  provider.models["kimi-k2.6"] = { ...kimiK26 }
+  providers.moonshotai = {
+    ...provider,
+    models: {
+      ...provider.models,
+      "kimi-k2.6": { ...kimiK26 },
+    },
+  }
 }
 // kilocode_change end
 
