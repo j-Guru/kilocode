@@ -1,13 +1,14 @@
 import { EOL } from "os"
 import { Effect } from "effect"
-import { ModelsDev } from "@opencode-ai/core/models"
+import { Provider } from "@/provider/provider"
+import { ProviderID } from "../../provider/schema"
+import { ModelsDev } from "@opencode-ai/core/models-dev"
 import { effectCmd, fail } from "../effect-cmd"
 import { UI } from "../ui"
 
 export const ModelsCommand = effectCmd({
   command: "models [provider]",
   describe: "list all available models",
-  instance: false, // kilocode_change - avoid project bootstrap for catalog-only command
   builder: (yargs) =>
     yargs
       .positional("provider", {
@@ -29,14 +30,14 @@ export const ModelsCommand = effectCmd({
       UI.println(UI.Style.TEXT_SUCCESS_BOLD + "Models cache refreshed" + UI.Style.TEXT_NORMAL)
     }
 
-    const svc = yield* ModelsDev.Service
-    const providers = yield* svc.get()
+    const provider = yield* Provider.Service
+    const providers = yield* provider.list()
 
-    const print = (id: string, verbose?: boolean) => {
-      const p = providers[id]
+    const print = (providerID: ProviderID, verbose?: boolean) => {
+      const p = providers[providerID]
       const sorted = Object.entries(p.models).sort(([a], [b]) => a.localeCompare(b))
       for (const [modelID, model] of sorted) {
-        process.stdout.write(`${id}/${modelID}`)
+        process.stdout.write(`${providerID}/${modelID}`)
         process.stdout.write(EOL)
         if (verbose) {
           process.stdout.write(JSON.stringify(model, null, 2))
@@ -46,8 +47,9 @@ export const ModelsCommand = effectCmd({
     }
 
     if (args.provider) {
-      if (!providers[args.provider]) return yield* fail(`Provider not found: ${args.provider}`)
-      print(args.provider, args.verbose)
+      const providerID = ProviderID.make(args.provider)
+      if (!providers[providerID]) return yield* fail(`Provider not found: ${args.provider}`)
+      print(providerID, args.verbose)
       return
     }
 
@@ -61,6 +63,6 @@ export const ModelsCommand = effectCmd({
     })
     // kilocode_change end
 
-    for (const id of ids) print(id, args.verbose)
+    for (const providerID of ids) print(ProviderID.make(providerID), args.verbose)
   }),
 })

@@ -1,10 +1,11 @@
-// kilocode_change - adapt Kilo model assembly to the upstream core models service
+// kilocode_change - new file
 import { Config } from "@/config/config"
 import { Auth } from "@/auth"
 import { ModelCache } from "./model-cache"
-import * as Core from "@opencode-ai/core/models"
+import * as Core from "@opencode-ai/core/models-dev"
 import { Context, Effect, Layer } from "effect"
 import { AI_SDK_PROVIDERS, KILO_OPENROUTER_BASE, PROMPTS } from "@kilocode/kilo-gateway"
+import { overlay } from "@/kilocode/anaconda-desktop/provider"
 
 export const Model = Core.Model
 export type Model = Core.Model
@@ -142,7 +143,7 @@ export const layer: Layer.Layer<Service, never, Core.Service | Config.Service | 
       const cache = yield* ModelCache.Service
 
       const get = Effect.fn("ModelsDev.get")(function* () {
-        const providers = { ...(yield* core.get()) }
+        const providers = overlay(yield* core.get())
         delete providers.kilo
         ensureZai(providers) // kilocode_change
         ensureMoonshot(providers) // kilocode_change
