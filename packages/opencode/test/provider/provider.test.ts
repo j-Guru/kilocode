@@ -223,7 +223,7 @@ it.instance(
   "custom Azure provider selects Chat Completions models",
   Effect.gen(function* () {
     const provider = yield* Provider.Service
-    const model = yield* provider.getModel(ProviderID.make("azure-4"), ModelID.make("deepseek-v4-pro"))
+    const model = yield* provider.getModel(ProviderV2.ID.make("azure-4"), ModelV2.ID.make("deepseek-v4-pro"))
     const language = yield* provider.getLanguage(model)
     expect(language.provider).toBe("azure.chat")
   }),
@@ -1358,7 +1358,7 @@ it.instance(
   "reasoning control none disables generated variants",
   Effect.gen(function* () {
     const providers = yield* list
-    const model = providers[ProviderID.make("azure-kimi")].models["fw-kimi-k2.7-code"]
+    const model = providers[ProviderV2.ID.make("azure-kimi")].models["fw-kimi-k2.7-code"]
     expect(model.capabilities.reasoning).toBe(true)
     expect(model.reasoning_control).toBe("none")
     expect(model.variants).toEqual({})
