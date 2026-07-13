@@ -1414,6 +1414,7 @@ export type ProviderConfig = {
       release_date?: string
       attachment?: boolean
       reasoning?: boolean
+      reasoning_control?: "none"
       temperature?: boolean
       tool_call?: boolean
       interleaved?:
@@ -1814,6 +1815,7 @@ export type Model = {
   autoRouting?: {
     models: Array<string>
   }
+  reasoning_control?: "none"
   ai_sdk_provider?: "alibaba" | "anthropic" | "mistral" | "openai" | "openai-compatible" | "openrouter"
 }
 
