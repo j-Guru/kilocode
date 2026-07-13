@@ -163,7 +163,7 @@ If the user says `new version`, `we have new version`, `new version was released
 1. Check whether `main-vertex-new` has uncommitted files.
 2. Update `kilo-new-upstream` from upstream `Kilo-Org/kilocode` `main`
 3. Merge updated `kilo-new-upstream` into `main-vertex-new` but do not commit `main-vertex-new`
-4. Resolve conflicts with priority given to project-specific behavior, favor my changes (like Vertex AI fix, models reduction in providers etc.) In case of new improvemnts new fetures can be merged.
+4. Resolve conflicts with priority given to project-specific behavior, favor my changes (like Vertex AI fix, multiple "azure" endpoints declaration and processing, models reduction of providers for Vertex AI) In case of new improvemnts new fetures can be merged.
 5. Build the local VS Code plugin using a current-platform-only CLI build with `./packages/opencode/script/build.ts --single`
 6. On success, reply exactly: `New VS Code plugin (version x.y.z) is READY TO TEST!`
 7. Clean workspace: 1. gitignore new build dirs if applicable (not files) 2. decide what residual files are from build and can be discarded and discard them 3. if you find files that need to be commited and are not part of merge do coherent commits. 4. do final commit of new `main-vertex-new` (should consist of new files from merge)
