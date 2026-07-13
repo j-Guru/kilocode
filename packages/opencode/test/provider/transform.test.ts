@@ -497,6 +497,24 @@ describe("ProviderTransform.providerOptions", () => {
       ...overrides,
     }) as any
 
+  // kilocode_change start - Azure third-party deployments can reject prompt_cache_key.
+  test("omits a disabled Azure prompt cache key", () => {
+    const model = createModel({
+      providerID: "azure",
+      api: {
+        id: "DeepSeek-V4-Pro",
+        url: "https://azure.com",
+        npm: "@ai-sdk/azure",
+      },
+    })
+
+    expect(ProviderTransform.providerOptions(model, { promptCacheKey: false, store: false })).toEqual({
+      openai: { store: false },
+      azure: { store: false },
+    })
+  })
+  // kilocode_change end
+
   test("uses sdk key for non-gateway models", () => {
     const model = createModel({
       providerID: "my-bedrock",

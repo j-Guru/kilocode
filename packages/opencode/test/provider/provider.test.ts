@@ -216,6 +216,38 @@ it.instance(
   },
 )
 
+// kilocode_change start - custom Azure resources need per-model Chat Completions routing.
+it.instance(
+  "custom Azure provider selects Chat Completions models",
+  Effect.gen(function* () {
+    const provider = yield* Provider.Service
+    const model = yield* provider.getModel(ProviderID.make("azure-4"), ModelID.make("deepseek-v4-pro"))
+    const language = yield* provider.getLanguage(model)
+    expect(language.provider).toBe("azure.chat")
+  }),
+  {
+    config: {
+      provider: {
+        "azure-4": {
+          name: "Azure 4",
+          npm: "@ai-sdk/azure",
+          options: {
+            resourceName: "azure-test",
+            apiKey: "test-api-key",
+          },
+          models: {
+            "deepseek-v4-pro": {
+              id: "DeepSeek-V4-Pro",
+              options: { useCompletionUrls: true },
+            },
+          },
+        },
+      },
+    },
+  },
+)
+// kilocode_change end
+
 it.instance(
   "filters alpha provider models by default",
   Effect.gen(function* () {

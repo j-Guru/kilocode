@@ -925,7 +925,11 @@ export function variants(model: Provider.Model): Record<string, Record<string, a
         let efforts = [...adaptiveEfforts]
         if (model.providerID === "github-copilot") {
           // kilocode_change start - treat opus-4.8 and fable like opus-4.7
-          if (model.api.id.includes("opus-4.7") || model.api.id.includes("opus-4.8") || anthropicClaude5(model.api.id)) {
+          if (
+            model.api.id.includes("opus-4.7") ||
+            model.api.id.includes("opus-4.8") ||
+            anthropicClaude5(model.api.id)
+          ) {
             efforts = ["medium"]
           }
           // kilocode_change end
@@ -1390,7 +1394,13 @@ export function providerOptions(model: Provider.Model, options: { [x: string]: a
   // providerOptions["openai"], but OpenAIResponsesLanguageModel checks
   // "azure" first. Pass both so model options work on either code path.
   if (model.api.npm === "@ai-sdk/azure") {
-    return { openai: options, azure: options }
+    // kilocode_change start - Azure third-party deployments can reject OpenAI's cache routing hint
+    const opts =
+      options.promptCacheKey === false
+        ? Object.fromEntries(Object.entries(options).filter(([key]) => key !== "promptCacheKey"))
+        : options
+    // kilocode_change end
+    return { openai: opts, azure: opts }
   }
   return { [key]: options }
 }

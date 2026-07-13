@@ -1830,7 +1830,9 @@ export const layer = Layer.effect(
                 ...provider.options,
                 ...model.options,
               })
-            : sdk.languageModel(model.api.id)
+            : model.api.npm === "@ai-sdk/azure" // kilocode_change
+              ? selectAzureLanguageModel(sdk, model.api.id, Boolean(model.options?.["useCompletionUrls"])) // kilocode_change
+              : sdk.languageModel(model.api.id)
           s.models.set(key, language)
           return language
         },
