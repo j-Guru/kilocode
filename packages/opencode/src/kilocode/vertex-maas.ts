@@ -1,6 +1,7 @@
 // kilocode_change - new file
 import type { Model } from "../provider/provider"
-import { ModelID, ProviderID } from "../provider/schema"
+import { ModelV2 } from "@opencode-ai/core/model"
+import { ProviderV2 } from "@opencode-ai/core/provider"
 
 /**
  * Vertex AI Model-as-a-Service (MaaS) model definitions.
@@ -45,8 +46,8 @@ function maasModel(
   opts: MaaSModelOptions = {},
 ): Model {
   return {
-    id: ModelID.make(id),
-    providerID: ProviderID.googleVertex,
+    id: ModelV2.ID.make(id),
+    providerID: ProviderV2.ID.googleVertex,
     api: {
       id: `${publisher}/${id}`,
       url: MAAS_BASE_URL,
