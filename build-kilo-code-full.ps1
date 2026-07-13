@@ -56,7 +56,7 @@ $binary = Join-Path $cli "dist\@kilocode\cli-windows-x64\bin\kilo.exe"
 if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) {
     throw "CLI artifact was not produced at $binary."
 }
-Copy-Item -LiteralPath $binary -Destination (Join-Path $out "kilo-win32-x64.exe")
+Copy-Item -LiteralPath $binary -Destination (Join-Path $out "kilo.exe")
 
 Invoke-Build -Name "Kilo VS Code extension" -Path $vscode -Command "bun" -Arguments @("run", "package")
 Invoke-Build -Name "Kilo VSIX" -Path $vscode -Command "bun" -Arguments @(
