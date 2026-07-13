@@ -13,6 +13,9 @@ export const Model = Schema.Struct({
   release_date: Schema.optional(Schema.String),
   attachment: Schema.optional(Schema.Boolean),
   reasoning: Schema.optional(Schema.NullOr(Schema.Boolean)), // kilocode_change - allow null so reasoning can be removed via stripNulls on save
+  reasoning_control: Schema.optional(Schema.Literal("none")).annotate({
+    description: "Disable the reasoning-level picker while preserving reasoning output",
+  }), // kilocode_change
   temperature: Schema.optional(Schema.Boolean),
   tool_call: Schema.optional(Schema.Boolean),
   interleaved: Schema.optional(

@@ -662,7 +662,7 @@ export function variants(model: Provider.Model): Record<string, Record<string, a
   }
   // kilocode_change end
 
-  if (!model.capabilities.reasoning) return {}
+  if (!model.capabilities.reasoning || model.reasoning_control === "none") return {} // kilocode_change
 
   const id = model.id.toLowerCase()
   const glm52 = ["glm-5.2", "glm-5-2", "glm-5p2"].some(

@@ -48,6 +48,7 @@ export const KILO_MODEL_SCHEMA_EXTENSIONS = {
       models: Schema.Array(Schema.String),
     }),
   ),
+  reasoning_control: Schema.optional(Schema.Literal("none")),
   ai_sdk_provider: Schema.optional(Schema.Literals(AI_SDK_PROVIDERS)),
 }
 
@@ -83,6 +84,7 @@ export function patchConfigModel(cfg: any, existing: any) {
     hasUserByokAvailable: cfg.hasUserByokAvailable ?? existing?.hasUserByokAvailable,
     terminalBench: existing?.terminalBench,
     autoRouting: existing?.autoRouting,
+    reasoning_control: cfg.reasoning_control ?? existing?.reasoning_control,
     ai_sdk_provider: cfg.ai_sdk_provider ?? existing?.ai_sdk_provider,
     variants: cfg.variants
       ? mapValues(
