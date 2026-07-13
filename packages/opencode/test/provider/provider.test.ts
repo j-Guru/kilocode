@@ -1349,6 +1349,36 @@ it.instance("model variants are generated for reasoning models", () =>
 )
 
 it.instance(
+  "reasoning control none disables generated variants",
+  Effect.gen(function* () {
+    const providers = yield* list
+    const model = providers[ProviderID.make("azure-kimi")].models["fw-kimi-k2.7-code"]
+    expect(model.capabilities.reasoning).toBe(true)
+    expect(model.reasoning_control).toBe("none")
+    expect(model.variants).toEqual({})
+  }),
+  {
+    config: {
+      provider: {
+        "azure-kimi": {
+          name: "Azure Kimi",
+          npm: "@ai-sdk/azure",
+          models: {
+            "fw-kimi-k2.7-code": {
+              id: "FW-Kimi-K2.7-Code",
+              reasoning: true,
+              reasoning_control: "none",
+              limit: { context: 262144, output: 32768 },
+            },
+          },
+          options: { resourceName: "azure-test", apiKey: "test-api-key" },
+        },
+      },
+    },
+  },
+)
+
+it.instance(
   "model variants can be disabled via config",
   Effect.gen(function* () {
     yield* set("ANTHROPIC_API_KEY", "test-api-key")
