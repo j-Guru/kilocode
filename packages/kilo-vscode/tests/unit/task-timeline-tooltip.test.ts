@@ -38,10 +38,12 @@ describe("TaskTimeline delegated tooltip contract", () => {
     expect(src).not.toMatch(/data-tip=/)
   })
 
-  it("only collects parts with matching transcript content", () => {
+  it("keeps timeline-only token bars while matching other parts to transcript content", () => {
     expect(src).toMatch(/const revert = session\.revert\(\) \?\? undefined/)
     expect(src).toMatch(/visibleParts\(m\.id, session\.getParts\(m\.id\), revert\)/)
-    expect(src).toMatch(/isRenderable\(part as SDKPart, m as SDKAssistantMessage\)/)
+    expect(src).toMatch(
+      /part\.type !== "step-finish" && !isRenderable\(part as SDKPart, m as SDKAssistantMessage\)/,
+    )
     expect(src).toMatch(/item\.tool\?\.callID === call && item\.tool\?\.messageID === m\.id/)
   })
 

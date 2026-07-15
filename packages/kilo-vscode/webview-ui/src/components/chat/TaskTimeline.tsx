@@ -71,7 +71,7 @@ export const TaskTimeline: Component = () => {
     for (const m of msgs) {
       if (m.role === "user") continue
       const p = visibleParts(m.id, session.getParts(m.id), revert).filter((part) => {
-        if (!isRenderable(part as SDKPart, m as SDKAssistantMessage)) return false
+        if (part.type !== "step-finish" && !isRenderable(part as SDKPart, m as SDKAssistantMessage)) return false
         if (part.type !== "tool" || part.tool !== "question") return true
         if (part.state.status !== "pending" && part.state.status !== "running") return true
         const call = (part as SDKPart & { callID: string }).callID
