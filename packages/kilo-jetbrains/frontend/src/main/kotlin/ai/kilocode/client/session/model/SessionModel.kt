@@ -626,7 +626,7 @@ class SessionModel {
                     id = "${msg.info.id}/${part.id}",
                     part = part,
                     title = part.timelineTitle(),
-                    weight = part.weight().coerceIn(1, 10),
+                    weight = part.weight().coerceAtLeast(1),
                     durationMs = (part as? Tool)?.time?.durationMs(),
                     active = (part as? Tool)?.state == ToolExecState.RUNNING || part is Reasoning && !part.done,
                 )
@@ -756,8 +756,13 @@ private fun TokensDto.total(): Long = listOf(input, output, reasoning, cacheRead
     sum + value
 }
 
-private fun TokensDto.stepWeight(): Int = (input.coerceIn(0L, 10L) + output.coerceIn(0L, 10L) + reasoning.coerceIn(0L, 10L))
-    .coerceIn(1L, 10L)
+private fun TokensDto.stepWeight(): Int = listOf(input, output, reasoning)
+    .fold(0L) { sum, value ->
+        if (value <= 0) return@fold sum
+        if (Int.MAX_VALUE - sum < value) return@fold Int.MAX_VALUE.toLong()
+        sum + value
+    }
+    .coerceAtLeast(1L)
     .toInt()
 
 private fun parseModelKey(value: String): Pair<String, String>? {

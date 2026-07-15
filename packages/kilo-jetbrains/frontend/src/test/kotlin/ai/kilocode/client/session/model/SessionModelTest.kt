@@ -1051,15 +1051,23 @@ class SessionModelTest : BasePlatformTestCase() {
         assertTrue(item.active)
         assertTrue(step.part is StepFinish)
         assertEquals("Step finish", step.title)
-        assertEquals(10, step.weight)
+        assertEquals(325, step.weight)
         assertFalse(step.active)
     }
 
-    fun `test header timeline clamps large step finish token weight`() {
+    fun `test header timeline preserves relative step finish token weight`() {
+        model.upsertMessage(msg("a1", "assistant"))
+        model.updateContent("a1", part("s1", "a1", "step-finish", tokens = TokensDto(100, 50, 0, 0, 0)))
+        model.updateContent("a1", part("s2", "a1", "step-finish", tokens = TokensDto(1_000, 500, 0, 0, 0)))
+
+        assertEquals(listOf(150, 1_500), model.header.timeline.map { it.weight })
+    }
+
+    fun `test header timeline clamps overflowing step finish token weight`() {
         model.upsertMessage(msg("a1", "assistant"))
         model.updateContent("a1", part("s1", "a1", "step-finish", tokens = TokensDto(Long.MAX_VALUE, 1, 1, 0, 0)))
 
-        assertEquals(10, model.header.timeline.single().weight)
+        assertEquals(Int.MAX_VALUE, model.header.timeline.single().weight)
     }
 
     fun `test loadHistory and clear reset header state`() {

@@ -416,6 +416,17 @@ class SessionHeaderPanelTest : SessionControllerTestBase() {
         assertNotSame(panel.contextBarUsedColor(), panel.contextBarReservedColor())
     }
 
+    fun `test green timeline bars scale with token usage`() {
+        val c = promptedHeader()
+        val panel = SessionHeaderPanel(c, parent)
+        emit(ChatEventDto.PartUpdated("ses_test", stepFinish("step_small", 100, 50)))
+        emit(ChatEventDto.PartUpdated("ses_test", stepFinish("step_large", 100_000, 50_000)))
+
+        assertTrue(panel.timelineParts()[4] is StepFinish)
+        assertTrue(panel.timelineParts()[5] is StepFinish)
+        assertTrue(panel.timelineBarHeight(4) < panel.timelineBarHeight(5))
+    }
+
     fun `test timeline width uses uniform bars and gaps`() {
         val c = promptedHeader()
         val panel = SessionHeaderPanel(c, parent)
@@ -637,14 +648,18 @@ class SessionHeaderPanelTest : SessionControllerTestBase() {
         time = PartTimeDto(1.0, 3.0),
     )
 
-    private fun stepFinish() = PartDto(
-        id = "step_finish_1",
+    private fun stepFinish(
+        id: String = "step_finish_1",
+        input: Long = 13_700,
+        output: Long = 2_000,
+    ) = PartDto(
+        id = id,
         sessionID = "ses_test",
         messageID = "msg1",
         type = "step-finish",
         reason = "stop",
         cost = 0.07,
-        tokens = TokensDto(13_700, 2_000, 500, 75, 25),
+        tokens = TokensDto(input, output, 500, 75, 25),
     )
 
     private fun move(panel: SessionHeaderPanel, index: Int) {

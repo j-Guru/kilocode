@@ -18,6 +18,7 @@ import java.awt.Graphics2D
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.MouseMotionAdapter
+import kotlin.math.ln
 import kotlin.math.roundToInt
 import javax.swing.JPanel
 
@@ -122,7 +123,8 @@ internal class TimelinePanel : JPanel() {
     fun hovered() = hover
 
     private fun height(weight: Int, max: Int): Int {
-        val fill = MIN + (weight.toDouble() / max.toDouble()) * (MIN * 3 - MIN - PAD)
+        val ratio = ln(weight.toDouble() + 1) / ln(max.toDouble() + 1)
+        val fill = MIN + ratio * (MIN * 3 - MIN - PAD)
         return JBUI.scale(fill.roundToInt())
     }
 
