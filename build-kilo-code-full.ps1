@@ -13,15 +13,26 @@ function Invoke-Build {
         [Parameter(Mandatory)]
         [string]$Command,
         [Parameter(Mandatory)]
-        [string[]]$Arguments
+        [string[]]$Arguments,
+        [ValidateRange(0, 5)]
+        [int]$Retries = 0
     )
 
     Write-Host "`n==> Building $Name"
     Push-Location $Path
     try {
-        & $Command @Arguments
-        if ($LASTEXITCODE -ne 0) {
-            throw "$Name build failed with exit code $LASTEXITCODE."
+        for ($attempt = 0; $attempt -le $Retries; $attempt++) {
+            & $Command @Arguments
+            if ($LASTEXITCODE -eq 0) {
+                return
+            }
+
+            if ($attempt -eq $Retries) {
+                throw "$Name build failed with exit code $LASTEXITCODE."
+            }
+
+            Write-Host "$Name build failed with exit code $LASTEXITCODE. Retrying in 5 seconds."
+            Start-Sleep -Seconds 5
         }
     }
     finally {
@@ -57,7 +68,7 @@ function Get-TrackedState {
         throw "Could not inspect tracked files in $Path."
     }
 
-    $diff = @(& git -C $Path diff --binary --no-ext-diff HEAD --)
+    $diff = @(& git -C $Path diff --raw --no-ext-diff --no-renames HEAD --)
     if ($LASTEXITCODE -ne 0) {
         throw "Could not inspect tracked changes in $Path."
     }
@@ -70,6 +81,73 @@ function Get-TrackedState {
     }
     finally {
         $sha.Dispose()
+    }
+}
+
+function New-KiloArchive {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Source,
+        [Parameter(Mandatory)]
+        [string]$Destination
+    )
+
+    [System.IO.Compression.ZipFile]::CreateFromDirectory(
+        $Source,
+        $Destination,
+        [System.IO.Compression.CompressionLevel]::Optimal,
+        $false
+    )
+
+    $archive = [System.IO.Compression.ZipFile]::Open($Destination, [System.IO.Compression.ZipArchiveMode]::Update)
+    try {
+        Get-ChildItem -LiteralPath $Source -Directory -Recurse | ForEach-Object {
+            $path = [System.IO.Path]::GetRelativePath($Source, $_.FullName).Replace("\", "/") + "/"
+            [void]$archive.CreateEntry($path)
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+
+    $expected = @(
+        Get-ChildItem -LiteralPath $Source -File -Recurse | ForEach-Object {
+            [System.IO.Path]::GetRelativePath($Source, $_.FullName).Replace("\", "/")
+        }
+    )
+
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($Destination)
+    try {
+        $actual = @(
+            $archive.Entries | Where-Object { -not $_.FullName.EndsWith("/") } | ForEach-Object { $_.FullName }
+        )
+        $diff = @(Compare-Object -ReferenceObject $expected -DifferenceObject $actual)
+        if ($diff.Count -ne 0) {
+            throw "CLI archive contents do not match $Source."
+        }
+
+        $entry = $archive.GetEntry("kilo.exe")
+        if ($null -eq $entry) {
+            throw "CLI archive does not contain kilo.exe."
+        }
+
+        $stream = $entry.Open()
+        $sha = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            $archiveHash = [System.BitConverter]::ToString($sha.ComputeHash($stream)).Replace("-", "")
+        }
+        finally {
+            $sha.Dispose()
+            $stream.Dispose()
+        }
+
+        $binaryHash = Get-Sha256 -Path (Join-Path $Source "kilo.exe")
+        if (-not [System.StringComparer]::OrdinalIgnoreCase.Equals($binaryHash, $archiveHash)) {
+            throw "CLI archive executable does not match the built kilo.exe."
+        }
+    }
+    finally {
+        $archive.Dispose()
     }
 }
 
@@ -118,13 +196,23 @@ try {
 }
 Get-ChildItem -LiteralPath $vscode -Filter "*.vsix" -File | Remove-Item -Force
 
-Invoke-Build -Name "Kilo CLI" -Path $cli -Command "bun" -Arguments @("script/build.ts", "--single", "--skip-install")
+Invoke-Build -Name "Kilo CLI" -Path $cli -Command "bun" -Arguments @("script/build.ts", "--single", "--skip-install") -Retries 3
 
-$binary = Join-Path $cli "dist\@kilocode\cli-windows-x64\bin\kilo.exe"
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$bundle = Join-Path $cli "dist\@kilocode\cli-windows-x64\bin"
+$binary = Join-Path $bundle "kilo.exe"
 if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) {
     throw "CLI artifact was not produced at $binary."
 }
-Copy-Item -LiteralPath $binary -Destination (Join-Path $stage "kilo.exe")
+
+$maps = @(Get-ChildItem -LiteralPath $bundle -Filter "*.map" -File -Recurse)
+if ($maps.Count -gt 0) {
+    Write-Host "Removing $($maps.Count) development source map(s) from the CLI archive."
+    $maps | Remove-Item -Force
+}
+
+$cliArchive = Join-Path $stage "kilo-windows-x64.zip"
+New-KiloArchive -Source $bundle -Destination $cliArchive
 
 Invoke-Build -Name "Kilo VS Code extension" -Path $vscode -Command "bun" -Arguments @("run", "package")
 Invoke-Build -Name "Kilo VSIX" -Path $vscode -Command "bun" -Arguments @(
@@ -144,7 +232,6 @@ if (-not (Test-Path -LiteralPath $vsix -PathType Leaf)) {
     throw "VSIX artifact was not produced at $vsix."
 }
 
-Add-Type -AssemblyName System.IO.Compression.FileSystem
 $standalone = Get-Sha256 -Path $binary
 $package = [System.IO.Compression.ZipFile]::OpenRead($vsix)
 try {
