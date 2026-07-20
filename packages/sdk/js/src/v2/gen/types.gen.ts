@@ -429,6 +429,7 @@ export type Session = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -1985,6 +1986,7 @@ export type GlobalSession = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
   project: ProjectSummary | null
   worktreeName?: string
@@ -2367,6 +2369,7 @@ export type Session1 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2420,6 +2423,7 @@ export type Session2 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2480,6 +2484,7 @@ export type Session3 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2533,6 +2538,7 @@ export type Session4 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2586,6 +2592,7 @@ export type Session5 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2639,6 +2646,7 @@ export type Session6 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2692,6 +2700,7 @@ export type Session7 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2799,6 +2808,7 @@ export type Session8 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -2852,6 +2862,7 @@ export type Session9 = {
     partID?: string
     snapshot?: string
     diff?: string
+    workspace?: "restored" | "snapshots-disabled" | "unavailable"
   }
 }
 
@@ -3127,6 +3138,10 @@ export type EffectHttpApiErrorUnauthorized = {
 
 export type EffectHttpApiErrorServiceUnavailable = {
   _tag: "ServiceUnavailable"
+}
+
+export type CloudSessionImportError = {
+  error: string
 }
 
 export type AgentRequirementResult = {
@@ -12490,6 +12505,10 @@ export type KiloCloudSessionImportErrors = {
    * Not found
    */
   404: NotFoundError
+  /**
+   * CloudSessionImportError
+   */
+  500: CloudSessionImportError
 }
 
 export type KiloCloudSessionImportError = KiloCloudSessionImportErrors[keyof KiloCloudSessionImportErrors]
@@ -13377,6 +13396,7 @@ export type KilocodeSessionImportSessionData = {
       partID?: string
       snapshot?: string
       diff?: string
+      workspace?: "restored" | "snapshots-disabled" | "unavailable"
     }
     permission?: {
       [key: string]: unknown
