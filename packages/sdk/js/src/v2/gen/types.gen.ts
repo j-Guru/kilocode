@@ -767,6 +767,9 @@ export type StepStartPart = {
   messageID: string
   type: "step-start"
   snapshot?: string
+  time?: {
+    start: number
+  }
 }
 
 export type StepFinishPart = {
@@ -779,6 +782,16 @@ export type StepFinishPart = {
   model?: {
     providerID: string
     modelID: string
+  }
+  metrics?: {
+    prompt?: number
+    generation?: number
+    source: "provider" | "computed"
+  }
+  time?: {
+    start: number
+    end: number
+    elapsed: number
   }
   cost: number
   tokens: {
@@ -1397,7 +1410,7 @@ export type ProviderConfig = {
      */
     headerTimeout?: number | false
     /**
-     * Timeout in milliseconds between streamed SSE chunks for this provider. If no chunk arrives within this window, the request is aborted. Set to false to disable the idle watchdog.
+     * Timeout in milliseconds between streamed SSE chunks for this provider. If no chunk arrives within this window, the request is aborted. Set to false to disable the idle watchdog. The pre-content bound is only shape-aware for OpenAI-compatible SSE and otherwise uses the request `timeout` budget.
      */
     chunkTimeout?: number | false
     [key: string]: unknown | string | boolean | number | false | number | false | number | false | undefined
