@@ -783,6 +783,8 @@ export type StepFinishPart = {
     providerID: string
     modelID: string
   }
+  generationID?: string
+  vercelID?: string
   metrics?: {
     prompt?: number
     generation?: number
@@ -1409,11 +1411,8 @@ export type ProviderConfig = {
      * Timeout in milliseconds to wait for response headers. Provider integrations may set defaults. Set to false to disable timeout.
      */
     headerTimeout?: number | false
-    /**
-     * Timeout in milliseconds between streamed SSE chunks for this provider. If no chunk arrives within this window, the request is aborted. Set to false to disable the idle watchdog. The pre-content bound is only shape-aware for OpenAI-compatible SSE and otherwise uses the request `timeout` budget.
-     */
-    chunkTimeout?: number | false
-    [key: string]: unknown | string | boolean | number | false | number | false | number | false | undefined
+    chunkTimeout?: number
+    [key: string]: unknown | string | boolean | number | false | number | false | number | undefined
   }
   models?: {
     [key: string]: {

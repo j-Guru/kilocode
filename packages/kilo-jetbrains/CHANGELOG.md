@@ -84,6 +84,21 @@
 
 ## [Unreleased]
 
+## [7.0.10] - 2026-07-24
+
+### Added
+
+- Render edit, write, and apply-patch tool results as expandable diff previews with clickable file links, change counts, syntax-highlighted diffs, and clearer multi-file patch sections.
+
+### Fixed
+
+- Improve session performance for large transcripts.
+- Fix Kilo Core failures caused by strict OpenAI-compatible compaction requests, unexpected provider finish reasons, read-only database files at startup, AWS profile credentials, and config files being rewritten just by reading them.
+
+### Changed
+
+- Update the JetBrains CLI pin from Kilo Core 7.4.13 to 7.4.15.
+
 ## [7.0.9] - 2026-07-21
 
 ### Added
