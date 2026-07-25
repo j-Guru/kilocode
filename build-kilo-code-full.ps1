@@ -170,6 +170,11 @@ $backup = "$out.previous"
 $cli = Join-Path $root "packages\opencode"
 $vscode = Join-Path $root "packages\kilo-vscode"
 $jetbrains = Join-Path $root "packages\kilo-jetbrains"
+$manifest = Get-Content -LiteralPath (Join-Path $vscode "package.json") -Raw | ConvertFrom-Json
+$release = [string]$manifest.version
+if ($release -notmatch "^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$") {
+    throw "Invalid VS Code extension version '$release'."
+}
 $before = Get-TrackedState -Path $root
 
 if (Test-Path -LiteralPath $backup) {
@@ -205,13 +210,21 @@ if (-not (Test-Path -LiteralPath $binary -PathType Leaf)) {
     throw "CLI artifact was not produced at $binary."
 }
 
+$cliVersion = (& $binary --version | Select-Object -Last 1).Trim()
+if ($LASTEXITCODE -ne 0) {
+    throw "Could not read the built Kilo CLI version."
+}
+if ($cliVersion -ne $release) {
+    throw "Kilo CLI version mismatch: expected $release, built $cliVersion."
+}
+
 $maps = @(Get-ChildItem -LiteralPath $bundle -Filter "*.map" -File -Recurse)
 if ($maps.Count -gt 0) {
     Write-Host "Removing $($maps.Count) development source map(s) from the CLI archive."
     $maps | Remove-Item -Force
 }
 
-$cliArchive = Join-Path $stage "kilo-windows-x64.zip"
+$cliArchive = Join-Path $stage "kilo-windows-x64-$release.zip"
 New-KiloArchive -Source $bundle -Destination $cliArchive
 
 Invoke-Build -Name "Kilo VS Code extension" -Path $vscode -Command "bun" -Arguments @("run", "package")
@@ -224,10 +237,10 @@ Invoke-Build -Name "Kilo VSIX" -Path $vscode -Command "bun" -Arguments @(
     "--target",
     "win32-x64",
     "-o",
-    (Join-Path $stage "kilo-code-win32-x64.vsix")
+    (Join-Path $stage "kilo-code-win32-x64-$release.vsix")
 )
 
-$vsix = Join-Path $stage "kilo-code-win32-x64.vsix"
+$vsix = Join-Path $stage "kilo-code-win32-x64-$release.vsix"
 if (-not (Test-Path -LiteralPath $vsix -PathType Leaf)) {
     throw "VSIX artifact was not produced at $vsix."
 }
