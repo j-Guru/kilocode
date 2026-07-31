@@ -16,8 +16,8 @@ There are currently no `.cursor/rules/`, `.cursorrules`, or `.github/copilot-ins
 
 - **Dev**: `bun run dev` (runs from root) or `bun run --cwd packages/opencode --conditions=browser src/index.ts`
 - **Dev with params**: `bun dev -- help`
-- **Extension**: `bun run extension` (build + launch VS Code with the extension in dev mode). Pass `--no-build` to skip the build.
-- **Typecheck**: `bun turbo typecheck` (uses `tsgo`, not `tsc`). Includes the JetBrains plugin — requires Java 21. Check with `java -version` before running. If missing, install via SDKMAN: `sdk install java 21-tem && sdk use java 21-tem`. If SDKMAN is not installed, see https://sdkman.io/install.
+- **Extension**: `bun run extension` (build + launch VS Code with the extension in dev mode). Pass `--no-build` to skip the build. When asked to run an isolated VS Code/Kilo environment, use the CLI scripts instead of interactive launch configs: `bun run extension:isolated` reuses `.kilo-dev/`, and `bun run extension:isolated:clean` clears `.kilo-dev/` first. Pass an optional workspace path after `--`, for example `bun run extension:isolated -- ../sample-project`.
+- **Typecheck**: `bun turbo typecheck` (uses `tsgo`, not `tsc`). Includes the JetBrains plugin and requires Java 21; do not run `java -version` as a routine preflight. Only check Java when a Gradle/Java command fails with a Java-version or missing-Java error. If missing, install via SDKMAN: `sdk install java 21-tem && sdk use java 21-tem`. If SDKMAN is not installed, see https://sdkman.io/install.
 - **Test**: `bun test` from `packages/opencode/` (NOT from root -- root blocks tests)
 - **Single test**: `bun test test/tool/tool.test.ts` from `packages/opencode/`
 - **CLI build artifact size check**: after `bun run script/build.ts --single --skip-install` in `packages/opencode/`, use `du -h dist/*/*/bin/kilo` (scoped package output lives under `dist/@kilocode/`)
