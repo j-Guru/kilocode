@@ -471,7 +471,9 @@ export function message(msgs: ModelMessage[], model: Provider.Model, options: Re
   if (
     options.store !== true &&
     key &&
-    ["@ai-sdk/openai", "@ai-sdk/azure", "@ai-sdk/amazon-bedrock/mantle"].includes(model.api.npm)
+    ["@ai-sdk/openai", "@ai-sdk/azure", "@ai-sdk/amazon-bedrock/mantle", "@ai-sdk/github-copilot"].includes(
+      model.api.npm,
+    )
   ) {
     msgs = mapProviderOptions(msgs, (options) => {
       if (!options?.[key] || !("itemId" in options[key])) return options
@@ -1264,9 +1266,17 @@ function reasoningEffort(model: Provider.Model, effort: string) {
       return { reasoningEffort: effort, reasoningSummary: "auto", include: INCLUDE_ENCRYPTED_REASONING }
     case "@ai-sdk/openai":
     case "@ai-sdk/amazon-bedrock/mantle":
-      return { reasoningEffort: effort, reasoningSummary: reasoningSummary(model), include: INCLUDE_ENCRYPTED_REASONING } // kilocode_change - keep gpt-5.6 detailed summaries
+      return {
+        reasoningEffort: effort,
+        reasoningSummary: reasoningSummary(model),
+        include: INCLUDE_ENCRYPTED_REASONING,
+      } // kilocode_change - keep gpt-5.6 detailed summaries
     case "@ai-sdk/azure":
-      return { reasoningEffort: effort, reasoningSummary: reasoningSummary(model), include: INCLUDE_ENCRYPTED_REASONING } // kilocode_change
+      return {
+        reasoningEffort: effort,
+        reasoningSummary: reasoningSummary(model),
+        include: INCLUDE_ENCRYPTED_REASONING,
+      } // kilocode_change
     case "@jerome-benoit/sap-ai-provider-v2":
       if (model.id.includes("anthropic"))
         return { modelParams: { thinking: { type: "adaptive", display: "summarized" }, output_config: { effort } } }
@@ -1337,7 +1347,8 @@ function reasoningBudget(model: Provider.Model, budget: number) {
     case "@ai-sdk/alibaba":
       return { enableThinking: true, thinkingBudget: budget }
     case "@jerome-benoit/sap-ai-provider-v2":
-      if (model.id.includes("anthropic")) return { modelParams: { thinking: { type: "enabled", budget_tokens: budget } } }
+      if (model.id.includes("anthropic"))
+        return { modelParams: { thinking: { type: "enabled", budget_tokens: budget } } }
       if (model.id.includes("gemini"))
         return { modelParams: { thinkingConfig: { includeThoughts: true, thinkingBudget: budget } } }
       return
@@ -1440,9 +1451,7 @@ export function options(input: {
   // kilocode_change start
   if (
     input.providerOptions?.setCacheKey !== false &&
-    (input.model.providerID === "openai" ||
-      input.model.api.npm === "@ai-sdk/xai" ||
-      input.providerOptions?.setCacheKey)
+    (input.model.providerID === "openai" || input.model.api.npm === "@ai-sdk/xai" || input.providerOptions?.setCacheKey)
   ) {
     result["promptCacheKey"] = input.sessionID
   }
@@ -1590,6 +1599,16 @@ const SLUG_OVERRIDES: Record<string, string> = {
 }
 
 export function providerOptions(model: Provider.Model, options: { [x: string]: any }) {
+  const usesOpenAIReasoningGate =
+    model.api.npm === "@ai-sdk/openai" ||
+    model.api.npm === "@ai-sdk/azure" ||
+    model.api.npm === "@ai-sdk/amazon-bedrock/mantle"
+  const normalized =
+    usesOpenAIReasoningGate &&
+    (model.capabilities.reasoning || options.reasoningEffort !== undefined || options.reasoningSummary !== undefined)
+      ? { ...options, forceReasoning: true }
+      : options
+
   if (model.api.npm === "@ai-sdk/gateway") {
     // Gateway providerOptions are split across two namespaces:
     // - `gateway`: gateway-native routing/caching controls (order, only, byok, etc.)
@@ -1599,8 +1618,8 @@ export function providerOptions(model: Provider.Model, options: { [x: string]: a
     const i = model.api.id.indexOf("/")
     const rawSlug = i > 0 ? model.api.id.slice(0, i) : undefined
     const slug = rawSlug ? (SLUG_OVERRIDES[rawSlug] ?? rawSlug) : undefined
-    const gateway = options.gateway
-    const rest = Object.fromEntries(Object.entries(options).filter(([k]) => k !== "gateway"))
+    const gateway = normalized.gateway
+    const rest = Object.fromEntries(Object.entries(normalized).filter(([k]) => k !== "gateway"))
     const has = Object.keys(rest).length > 0
 
     const result: Record<string, any> = {}
@@ -1643,13 +1662,13 @@ export function providerOptions(model: Provider.Model, options: { [x: string]: a
   if (model.api.npm === "@ai-sdk/azure") {
     // kilocode_change start - Azure third-party deployments can reject OpenAI's cache routing hint
     const opts =
-      options.promptCacheKey === false
-        ? Object.fromEntries(Object.entries(options).filter(([key]) => key !== "promptCacheKey"))
-        : options
+      normalized.promptCacheKey === false
+        ? Object.fromEntries(Object.entries(normalized).filter(([key]) => key !== "promptCacheKey"))
+        : normalized
     // kilocode_change end
     return { openai: opts, azure: opts }
   }
-  return { [key]: options }
+  return { [key]: normalized }
 }
 
 export function maxOutputTokens(model: Provider.Model, outputTokenMax = OUTPUT_TOKEN_MAX): number {
