@@ -465,6 +465,8 @@ export type IndexingWarning = {
 export type SnapshotFileDiff = {
   file?: string
   patch?: string
+  before?: string
+  after?: string
   additions: number
   deletions: number
   status?: "added" | "deleted" | "modified"
@@ -2556,6 +2558,7 @@ export type Config = {
   terminal_command_display?: "expanded" | "collapsed"
   code_edit_display?: "expanded" | "collapsed"
   hide_prompt_training_models?: boolean
+  privacy_mode?: boolean
   /**
    * Sandbox configuration for agent tools
    */
@@ -2889,11 +2892,11 @@ export type WorktreeResetInput = {
 export type WorktreeDiffItem = {
   file?: string
   patch?: string
+  before: string
+  after: string
   additions: number
   deletions: number
   status?: "added" | "deleted" | "modified"
-  before: string
-  after: string
   tracked: boolean
   generatedLike: boolean
   summarized: boolean
@@ -13163,6 +13166,8 @@ export type SessionDiffData = {
     directory?: string
     workspace?: string
     messageID?: string
+    file?: string
+    full?: "true" | "false"
   }
   url: "/session/{sessionID}/diff"
 }
