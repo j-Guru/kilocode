@@ -17,7 +17,7 @@ import { KiloSessionPromptQueue } from "@/kilocode/session/prompt-queue"
 import { Permission } from "@/permission"
 import { PermissionProvenance } from "@/kilocode/permission/provenance"
 import { Question } from "@/question"
-import { environmentDetails } from "@/kilocode/editor-context"
+import { environmentDetails, isEnvironmentDetails } from "@/kilocode/editor-context"
 import { Identifier } from "@/id/id"
 import { Filesystem } from "@/util/filesystem"
 import NATIVE_PLAN_PROMPT from "@/kilocode/session/native-plan-prompt.txt"
@@ -356,16 +356,24 @@ export namespace KiloSessionPrompt {
   }
 
   /**
-   * Ephemerally injects dynamic editor context (visible files, open tabs, etc.)
-   * into the last user message. Caches the result per user message ID so repeated
-   * loop iterations produce byte-identical messages (prompt caching).
+   * Persists dynamic editor context (visible files, open tabs, etc.) as a synthetic
+   * text part on the last user message. Persisting — instead of injecting ephemerally —
+   * makes later turns replay the sent bytes verbatim, so provider prompt-cache
+   * breakpoints stay matchable across turns (Azure rewrites the full prompt otherwise).
+   * Caches the block per user message ID so repeated loop iterations build
+   * byte-identical parts.
    */
-  export function injectEditorContext(input: {
+  export const persistEditorContext = Effect.fn("KiloSessionPrompt.persistEditorContext")(function* (input: {
     msgs: MessageV2.WithParts[]
     lastUser: MessageV2.User
     sessionID: SessionID
     cache: EnvCache
+    sessions: Session.Interface
   }) {
+    const idx = input.msgs.findLastIndex((m) => m.info.role === "user")
+    if (idx === -1) return
+    if (input.msgs[idx].parts.some((part) => part.type === "text" && part.synthetic && isEnvironmentDetails(part.text)))
+      return
     if (input.cache.user !== input.lastUser.id) {
       const ctx = (() => {
         try {
@@ -381,23 +389,16 @@ export namespace KiloSessionPrompt {
       input.cache.user = input.lastUser.id
     }
     if (!input.cache.block) return
-    const idx = input.msgs.findLastIndex((m) => m.info.role === "user")
-    if (idx === -1) return
-    input.msgs[idx] = {
-      ...input.msgs[idx],
-      parts: [
-        ...input.msgs[idx].parts,
-        {
-          id: PartID.make(Identifier.ascending("part")),
-          sessionID: input.sessionID,
-          messageID: input.msgs[idx].info.id,
-          type: "text",
-          text: input.cache.block,
-          synthetic: true,
-        } satisfies MessageV2.TextPart,
-      ],
-    }
-  }
+    const part = yield* input.sessions.updatePart({
+      id: PartID.make(Identifier.ascending("part")),
+      sessionID: input.sessionID,
+      messageID: input.msgs[idx].info.id,
+      type: "text",
+      text: input.cache.block,
+      synthetic: true,
+    })
+    input.msgs[idx] = { ...input.msgs[idx], parts: [...input.msgs[idx].parts, part] }
+  })
 
   /**
    * Ensures the plan file directory exists. Pre-checks with `Filesystem.isDir`

@@ -1642,6 +1642,11 @@ export const layer = Layer.effect(
           Effect.provideService(Session.Service, sessions),
         )
 
+        // kilocode_change start - persist per-turn editor context so replayed history
+        // stays byte-identical and provider prompt caches remain matchable
+        yield* KiloSessionPrompt.persistEditorContext({ msgs, lastUser, sessionID, cache: envCache, sessions })
+        // kilocode_change end
+
         const msg: MessageV2.Assistant = {
           id: MessageID.ascending(),
           parentID: lastUser.id,
@@ -1720,10 +1725,10 @@ export const layer = Layer.effect(
 
           yield* plugin.trigger("experimental.chat.messages.transform", {}, { messages: msgs })
 
-          // kilocode_change start — ephemeral context injection + post-summary
-          // media strip (keeps outgoing body under the gateway body-size limit
-          // even when filterCompacted couldn't trim the pre-summary history).
-          KiloSessionPrompt.injectEditorContext({ msgs, lastUser, sessionID, cache: envCache })
+          // kilocode_change start — post-summary media strip (keeps outgoing body
+          // under the gateway body-size limit even when filterCompacted couldn't
+          // trim the pre-summary history). Editor context is persisted earlier,
+          // next to SessionReminders.apply, so replayed turns stay byte-identical.
           msgs = KiloSessionPrompt.maybeStripHistoricalMedia(msgs)
           // kilocode_change end
 
@@ -1747,7 +1752,6 @@ export const layer = Layer.effect(
             msgs = KiloSessionPromptQueue.scope(sessionID, msgs)
             msgs = KiloSessionPrompt.trimBeforeLastSummary(msgs)
             yield* plugin.trigger("experimental.chat.messages.transform", {}, { messages: msgs })
-            KiloSessionPrompt.injectEditorContext({ msgs, lastUser, sessionID, cache: envCache })
             msgs = KiloSessionPrompt.maybeStripHistoricalMedia(msgs)
             modelMsgs = yield* MessageV2.toModelMessagesEffect(msgs, model).pipe(
               Effect.provideService(Database.Service, database),

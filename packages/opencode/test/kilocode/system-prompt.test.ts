@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { SystemPrompt } from "../../src/session/system"
-import { environmentDetails } from "../../src/kilocode/editor-context"
+import { environmentDetails, isEnvironmentDetails } from "../../src/kilocode/editor-context"
 import { ProviderTest } from "../fake/provider"
 
 import PROMPT_ANTHROPIC from "../../src/session/prompt/anthropic.txt"
@@ -140,5 +140,12 @@ describe("environmentDetails", () => {
     expect(result).toContain("Working directory: /repo/.kilo/worktrees/feature")
     expect(result).toContain("Workspace root folder: /repo/.kilo/worktrees/feature")
     expect(result).toContain("Active file: src/app.ts")
+  })
+
+  test("isEnvironmentDetails round-trips the injected block", () => {
+    const block = environmentDetails({ directory: "/repo", activeFile: "src/app.ts" })
+    expect(isEnvironmentDetails(block)).toBe(true)
+    expect(isEnvironmentDetails(`hey\n${block}`)).toBe(false)
+    expect(isEnvironmentDetails("")).toBe(false)
   })
 })

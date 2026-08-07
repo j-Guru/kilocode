@@ -41,6 +41,11 @@ function timestamp(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}${sign}${h}:${m}`
 }
 
+/** Matches a whole text part that is an injected <environment_details> block. */
+export function isEnvironmentDetails(text: string): boolean {
+  return /^\s*<environment_details>[\s\S]*<\/environment_details>\s*$/i.test(text)
+}
+
 export function environmentDetails(ctx?: EditorContext): string {
   const lines: string[] = [`Current time: ${timestamp()}`]
   if (ctx?.directory) {

@@ -1587,13 +1587,17 @@ PART_MAPPING["text"] = function TextPartDisplay(props) {
     () => props.message.role === "assistant" && typeof (props.message as AssistantMessage).time.completed !== "number",
   )
   const text = () => readPartText(data.store.part_text_accum_delta, part())
+  // kilocode_change start
+  const showSyntheticPart = createMemo(() => !part().synthetic || streaming())
+  // kilocode_change end
   const isLastTextPart = createMemo(() => {
     const last = (data.store.part?.[props.message.id] ?? [])
-      .filter((item): item is TextPart => item?.type === "text" && !!item.text?.trim())
+      .filter((item): item is TextPart => item?.type === "text" && !!item.text?.trim() && !item.synthetic) // kilocode_change
       .at(-1)
     return last?.id === part().id
   })
   const showCopy = createMemo(() => {
+    if (part().synthetic) return false // kilocode_change
     if (props.message.role !== "assistant") return isLastTextPart()
     if (props.showAssistantCopyPartID === null) return false
     if (typeof props.showAssistantCopyPartID === "string") return props.showAssistantCopyPartID === part().id
@@ -1611,7 +1615,7 @@ PART_MAPPING["text"] = function TextPartDisplay(props) {
   }
 
   return (
-    <Show when={text()}>
+    <Show when={text() && showSyntheticPart() /* kilocode_change */}>
       <div data-component="text-part" data-timeline-part-id={part().id}>
         <div data-slot="text-part-body">
           <Show when={streaming()} fallback={<Markdown text={text()} cacheKey={part().id} streaming={false} />}>
