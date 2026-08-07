@@ -82,3 +82,4 @@ packages/opencode/.artifacts/
 !/src/webview-ui/
 /src/webview-ui/*
 !/src/webview-ui/.gitignore
+/tmp-azure-analysis/*
