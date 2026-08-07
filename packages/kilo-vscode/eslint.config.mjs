@@ -44,10 +44,11 @@ export default [
   {
     files: ["webview-ui/agent-manager/AgentManagerApp.tsx"],
     // Lowered 3210 → 2800 after extracting the sidebar body (SidebarBody.tsx)
-    // and the tab bar (TabBar.tsx) into components. Raised 2800 → 2850 after
-    // an upstream merge landed the file at 2829 lines on Kilo-Org/kilocode
-    // main itself; keep shrinking as more logic moves out, do not raise further.
-    rules: { complexity: ["error", 74], "max-lines": ["error", 2850] },
+    // and the tab bar (TabBar.tsx) into components. The keybinding defaults
+    // (keybind-defaults.ts) extraction further offset later additions; file
+    // sits at 2713 lines after merge. Keep shrinking as more logic moves out,
+    // do not raise.
+    rules: { complexity: ["error", 74], "max-lines": ["error", 2800] },
   },
   {
     files: ["src/agent-manager/AgentManagerProvider.ts"],
