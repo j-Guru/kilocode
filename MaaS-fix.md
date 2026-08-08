@@ -33,17 +33,17 @@ Defines all Vertex AI MaaS models and a `maasModel()` factory function.
 
 **Models added:**
 
-| Model                          | Publisher   | Context   | Output  | Notes                                 |
-| ------------------------------ | ----------- | --------- | ------- | ------------------------------------- |
-| Llama 4 Maverick 17B           | meta        | 1,310,720 | 8,192   |                                       |
-| Llama 4 Scout 17B              | meta        | 1,310,720 | 8,192   |                                       |
-| GPT OSS 120B                   | openai      | 131,072   | 32,768  |                                       |
-| Qwen3 Coder 480B A35B Instruct | qwen        | 262,144   | 32,768  |                                       |
-| Kimi K2 Thinking               | moonshotai  | 262,144   | 16,384  | reasoning (`reasoning_content` field) |
-| MiniMax M2                     | minimaxai   | 192,000   | 16,384  |                                       |
-| DeepSeek V3.2                  | deepseek-ai | 163,840   | 32,768  |                                       |
-| DeepSeek R1 0528               | deepseek-ai | 163,840   | 32,768  | reasoning (`reasoning_content` field) |
-| GLM-5                          | zai-org     | 200,000   | 128,000 | image input, prompt caching           |
+| Model | Publisher | Context | Output | Notes |
+|---|---|---|---|---|
+| Llama 4 Maverick 17B | meta | 1,310,720 | 8,192 | |
+| Llama 4 Scout 17B | meta | 1,310,720 | 8,192 | |
+| GPT OSS 120B | openai | 131,072 | 32,768 | |
+| Qwen3 Coder 480B A35B Instruct | qwen | 262,144 | 32,768 | |
+| Kimi K2 Thinking | moonshotai | 262,144 | 16,384 | reasoning (`reasoning_content` field) |
+| MiniMax M2 | minimaxai | 192,000 | 16,384 | |
+| DeepSeek V3.2 | deepseek-ai | 163,840 | 32,768 | |
+| DeepSeek R1 0528 | deepseek-ai | 163,840 | 32,768 | reasoning (`reasoning_content` field) |
+| GLM-5 | zai-org | 200,000 | 128,000 | image input, prompt caching |
 
 ---
 
