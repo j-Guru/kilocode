@@ -135,15 +135,43 @@ const sandbox = `  /**
     writable_paths?: Array<string>
   }
 `
-const legacyPatched = legacySource.includes(sandbox)
+const hasSandbox = /^  sandbox\?: \{/m.test(legacySource)
+const legacyPatched = hasSandbox
   ? legacySource
   : legacySource.replace("  experimental?: {\n", sandbox + "  experimental?: {\n")
-if (!legacyPatched.includes(sandbox)) {
+if (!/^  sandbox\?: \{/m.test(legacyPatched)) {
   throw new Error(`Legacy Config sandbox patch did not apply (${legacyTypesPath})`)
 }
 await Bun.write(legacyTypesPath, legacyPatched)
 
-await $`bun prettier --write src/gen src/v2`
+// kilocode_change start - Prettier can fail replacing large generated files concurrently on Windows
+if (process.platform === "win32") {
+  const prettier = await import("prettier")
+  const glob = new Bun.Glob("src/{gen,v2}/**/*.ts")
+  const files = [...glob.scanSync({ cwd: dir })].sort()
+  const retry = async <T>(task: () => Promise<T>, target: string) => {
+    for (let attempt = 1; attempt <= 20; attempt++) {
+      try {
+        return await task()
+      } catch (err) {
+        if (attempt === 20) throw err
+        console.warn(`Retrying locked generated file (${attempt}/20): ${target}`)
+        await Bun.sleep(250)
+      }
+    }
+    throw new Error(`Unable to access generated file: ${target}`)
+  }
+  for (const file of files) {
+    const target = path.resolve(dir, file)
+    const source = await retry(() => Bun.file(target).text(), target)
+    const cfg = await prettier.resolveConfig(target)
+    const formatted = await prettier.format(source, { ...cfg, filepath: target })
+    await retry(() => Bun.write(target, formatted), target)
+  }
+} else {
+  await $`bun prettier --write src/gen src/v2`
+}
+// kilocode_change end
 await $`rm -rf dist tsconfig.tsbuildinfo`
 await $`bun tsc`
 await $`rm openapi.json`

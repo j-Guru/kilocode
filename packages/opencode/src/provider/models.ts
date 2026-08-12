@@ -146,6 +146,7 @@ export const layer: Layer.Layer<Service, never, Core.Service | Config.Service | 
 
       const get = Effect.fn("ModelsDev.get")(function* () {
         const providers = overlay(yield* core.get())
+        const fallback = providers.kilo
         delete providers.kilo
         ensureZai(providers) // kilocode_change
         ensureMoonshot(providers) // kilocode_change
@@ -186,7 +187,8 @@ export const layer: Layer.Layer<Service, never, Core.Service | Config.Service | 
           ...(url ? { baseURL: url } : {}),
           ...(org ? { kilocodeOrganizationId: org } : {}),
         }
-        const models = yield* cache.fetch("kilo", fetch).pipe(Effect.catch(() => Effect.succeed({})))
+        const fetched = yield* cache.fetch("kilo", fetch).pipe(Effect.catch(() => Effect.succeed({})))
+        const models = Object.keys(fetched).length > 0 ? fetched : (fallback?.models ?? {})
         providers.kilo = {
           id: "kilo",
           name: "Kilo Gateway",
@@ -195,7 +197,7 @@ export const layer: Layer.Layer<Service, never, Core.Service | Config.Service | 
           npm: "@kilocode/kilo-gateway",
           models,
         }
-        if (Object.keys(models).length === 0) yield* cache.refresh("kilo", fetch).pipe(Effect.ignore, Effect.forkDetach)
+        if (Object.keys(fetched).length === 0) yield* cache.refresh("kilo", fetch).pipe(Effect.ignore, Effect.forkDetach)
         yield* addApertis()
         return providers
       })
