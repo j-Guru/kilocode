@@ -27280,6 +27280,10 @@
               },
               "diff": {
                 "type": "string"
+              },
+              "workspace": {
+                "type": "string",
+                "enum": ["restored", "snapshots-disabled", "unavailable"]
               }
             },
             "required": ["messageID"],
@@ -33980,9 +33984,6 @@
                 "type": "boolean"
               },
               "batch_tool": {
-                "type": "boolean"
-              },
-              "codebase_search": {
                 "type": "boolean"
               },
               "image_generation": {
@@ -43993,6 +43994,10 @@
             "items": {
               "$ref": "#/components/schemas/FileDiff"
             }
+          },
+          "workspace": {
+            "type": "string",
+            "enum": ["restored", "snapshots-disabled", "unavailable"]
           }
         },
         "required": ["messageID"],

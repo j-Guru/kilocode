@@ -106,6 +106,7 @@ type Generate = (model: Provider.Model) => Variants
 
 export function customProviderVariants(model: Provider.Model, npm: unknown, generate: Generate): Variants {
   if (model.variants && Object.keys(model.variants).length > 0) return model.variants
+  if (model.reasoning_control === "none") return {}
 
   const supported = typeof npm === "string" && CUSTOM_PROVIDER_PACKAGES.has(npm) && model.api.npm === npm
   const variants = generate(model)
