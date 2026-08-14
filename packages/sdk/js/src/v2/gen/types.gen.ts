@@ -3930,6 +3930,10 @@ export type CommitMessageNoChangesError = {
   message: string
 }
 
+export type CommitMessageFailedError = {
+  message: string
+}
+
 export type ConfigOverlayResponse = {
   scope: "global" | "project"
   effective: Config
@@ -15143,9 +15147,9 @@ export type CommitMessageGenerateErrors = {
    */
   400: EffectHttpApiErrorBadRequest | InvalidRequestError
   /**
-   * CommitMessageNoChangesError
+   * CommitMessageNoChangesError | CommitMessageFailedError
    */
-  422: CommitMessageNoChangesError
+  422: CommitMessageNoChangesError | CommitMessageFailedError
 }
 
 export type CommitMessageGenerateError = CommitMessageGenerateErrors[keyof CommitMessageGenerateErrors]
@@ -16662,6 +16666,7 @@ export type KilocodeRemoveSkillResponse = KilocodeRemoveSkillResponses[keyof Kil
 export type KilocodeRemoveAgentData = {
   body?: {
     name: string
+    scope?: "global" | "project"
   }
   path?: never
   query?: {
