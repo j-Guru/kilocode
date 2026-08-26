@@ -426,6 +426,7 @@ interface PRStatusOutMessage {
 
 interface PRErrorOutMessage {
   type: "agentManager.prError"
+  projectId?: string
   error: "gh_missing" | "gh_auth" | "fetch_failed"
 }
 
@@ -767,6 +768,15 @@ interface RequestWorktreeDiffFileIn {
   file: string
   scope?: string
   /** Active session for the session scope (ctx alone is a worktree/local id). */
+  diffSessionId?: string
+}
+
+interface RequestWorktreeDiffFilesIn {
+  type: "agentManager.requestWorktreeDiffFiles"
+  projectId?: string
+  sessionId: string
+  files: string[]
+  scope?: string
   diffSessionId?: string
 }
 
@@ -1121,6 +1131,7 @@ export type AgentManagerInMessage =
   | ImportFromPRIn
   | RequestWorktreeDiffIn
   | RequestWorktreeDiffFileIn
+  | RequestWorktreeDiffFilesIn
   | ApplyWorktreeDiffIn
   | StartDiffWatchIn
   | StopDiffWatchIn

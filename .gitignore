@@ -61,6 +61,7 @@ tsconfig.tsbuildinfo
 .kilo/node_modules
 .kilo/plans/*
 .kilo/plans/*upstream-merge-report-*.md
+**/.kilo/jetbrains.json
 .kilocode/.gitignore
 .kilocode/package.json
 .kilocode/package-lock.json

@@ -1,8 +1,7 @@
 import { hashFileDiffs } from "./shared/hash"
 import { DIFF_POLL_INTERVAL_MS } from "./polling"
 import type { DiffSource, DiffSourceCapabilities, DiffSourceDescriptor, DiffSourceNotice } from "./sources/types"
-import type { DiffFile } from "./types"
-import type { PanelContext } from "./types"
+import type { DiffBatch, DiffFile, PanelContext } from "./types"
 
 type Messages = {
   available?: (descriptors: DiffSourceDescriptor[], id: string) => unknown
@@ -67,6 +66,7 @@ export class SourceController {
   private interval: ReturnType<typeof setInterval> | undefined
   private lastHash: string | undefined
   private epoch = 0
+  private readonly fetches = new Map<DiffSource, Promise<boolean>>()
 
   constructor(
     private readonly build: (id: string, ctx: PanelContext) => DiffSource,
@@ -91,6 +91,7 @@ export class SourceController {
   stop(): void {
     this.epoch++
     this.stopPolling()
+    this.fetches.clear()
     this.active?.dispose?.()
     this.active = undefined
     this.activeId = undefined
@@ -117,7 +118,7 @@ export class SourceController {
 
     if (opts.fetch === false) return
 
-    const keepPolling = await this.runFetch(source, epoch, true)
+    const keepPolling = await this.fetch(source, epoch, true)
     // Prevents the polling interval from starting after teardown or swap.
     if (this.epoch !== epoch || this.activeId !== id) return
     if (opts.poll !== false && keepPolling) this.startPolling(source, epoch)
@@ -151,7 +152,7 @@ export class SourceController {
     // Push fresh diffs immediately after a successful revert so the webview
     // doesn't have to wait for the next polling tick.
     if (result.ok && this.epoch === epoch && this.active === source) {
-      await this.runFetch(source, epoch, false)
+      await this.fetch(source, epoch, true, true)
     }
   }
 
@@ -160,7 +161,7 @@ export class SourceController {
     const source = this.active
     if (!source) return
     const epoch = this.epoch
-    await this.runFetch(source, epoch, true)
+    await this.fetch(source, epoch, true, true)
   }
 
   /**
@@ -180,6 +181,13 @@ export class SourceController {
       this.send(this.messages.diffFile(source, file, null))
       return
     }
+    // Yield once so a worktree switch can advance the epoch before queued
+    // detail work enters the shared Git semaphore.
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    if (this.epoch !== epoch || this.active !== source) {
+      this.send(this.messages.diffFile(source, file, null))
+      return
+    }
     const diff = await source.fetchFile(file).catch(() => null)
     // Discard stale content after disposal/swap, but still complete the request
     // so consumers can clear per-file loading state.
@@ -188,6 +196,43 @@ export class SourceController {
       return
     }
     this.send(this.messages.diffFile(source, file, diff))
+  }
+
+  async requestFiles(files: readonly string[]): Promise<void> {
+    const values = [...new Set(files.filter(Boolean))]
+    if (values.length === 0) return
+    const source = this.active
+    const epoch = this.epoch
+    if (!source || (!source.fetchFiles && !source.fetchFile)) {
+      for (const file of values) this.send(this.messages.diffFile(source, file, null))
+      return
+    }
+    await new Promise<void>((resolve) => setTimeout(resolve, 0))
+    if (this.epoch !== epoch || this.active !== source) {
+      for (const file of values) this.send(this.messages.diffFile(source, file, null))
+      return
+    }
+    const result: DiffBatch<DiffFile> = source.fetchFiles
+      ? await source.fetchFiles(values).catch(() => ({ entries: new Map(), deferred: new Set(values) }))
+      : {
+          entries: new Map(
+            await Promise.all(
+              values.map(async (file) => [file, await source.fetchFile!(file).catch(() => null)] as const),
+            ),
+          ),
+          deferred: new Set(),
+        }
+    for (const file of values) {
+      if (this.epoch !== epoch || this.active !== source) {
+        this.send(this.messages.diffFile(source, file, null))
+        continue
+      }
+      const diff = result.deferred.has(file)
+        ? await source.fetchFile?.(file).catch(() => null)
+        : result.entries.get(file)
+      const stale = this.epoch !== epoch || this.active !== source
+      this.send(this.messages.diffFile(source, file, stale ? null : (diff ?? null)))
+    }
   }
 
   dispose(): void {
@@ -239,10 +284,15 @@ export class SourceController {
 
   private startPolling(source: DiffSource, epoch: number): void {
     this.stopPolling()
+    let busy = false
     this.interval = setInterval(async () => {
+      if (busy) return
+      busy = true
       // Self-cancel when the tick reports the source is done
-      const keep = await this.runFetch(source, epoch, false)
-      if (!keep) this.stopPolling()
+      const keep = await this.fetch(source, epoch, false).finally(() => {
+        busy = false
+      })
+      if (!keep && this.epoch === epoch && this.active === source) this.stopPolling()
     }, DIFF_POLL_INTERVAL_MS)
   }
 
@@ -251,5 +301,23 @@ export class SourceController {
       clearInterval(this.interval)
       this.interval = undefined
     }
+  }
+
+  private fetch(source: DiffSource, epoch: number, initial: boolean, force = false): Promise<boolean> {
+    const current = this.fetches.get(source)
+    if (current && !force) return current
+    if (current) {
+      return current.then(() => {
+        if (this.epoch !== epoch || this.active !== source) return false
+        return this.fetch(source, epoch, initial)
+      })
+    }
+    const work = this.runFetch(source, epoch, initial)
+    this.fetches.set(source, work)
+    const clear = () => {
+      if (this.fetches.get(source) === work) this.fetches.delete(source)
+    }
+    void work.finally(clear).catch(() => undefined)
+    return work
   }
 }

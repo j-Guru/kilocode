@@ -346,6 +346,36 @@ describe("SourceController.requestFile", () => {
     controller.stop()
   })
 
+  it("does not start queued detail work after the source changes", async () => {
+    let details = 0
+    const workspace: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFile() {
+        details++
+        return null
+      },
+    }
+    const session: DiffSource = {
+      descriptor: SESSION_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+    }
+    const { controller } = make({ workspace, "session:s1": session })
+
+    controller.setContext({ workspaceRoot: "/repo", sessionId: "s1" })
+    await controller.activate("workspace")
+    const request = controller.requestFile("foo.ts")
+    await controller.activate("session:s1")
+    await request
+
+    expect(details).toBe(0)
+    controller.stop()
+  })
+
   it("posts null when a pending fetchFile result is invalidated by stop", async () => {
     let release: () => void = () => {}
     const workspace: DiffSource = {
@@ -378,6 +408,195 @@ describe("SourceController.requestFile", () => {
     expect(files).toHaveLength(1)
     expect(files[0]!.file).toBe("foo.ts")
     expect(files[0]!.diff).toBeNull()
+  })
+})
+
+describe("SourceController.requestFiles", () => {
+  it("loads unique files in one source request and emits existing detail messages", async () => {
+    const calls: string[][] = []
+    const source: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFiles(files) {
+        calls.push([...files])
+        return {
+          entries: new Map(
+            files.map((file) => [file, { file, before: "old", after: "new", additions: 1, deletions: 1 }]),
+          ),
+          deferred: new Set(),
+        }
+      },
+    }
+    const { controller, posted } = make({ workspace: source })
+    controller.setContext({ workspaceRoot: "/repo" })
+    await controller.activate("workspace")
+    posted.length = 0
+    await controller.requestFiles(["one.ts", "two.ts", "one.ts"])
+
+    expect(calls).toEqual([["one.ts", "two.ts"]])
+    const messages = byType(posted, "diffViewer.diffFile")
+    expect(messages.map((message) => message.file)).toEqual(["one.ts", "two.ts"])
+    expect(messages.every((message) => message.diff !== null)).toBe(true)
+    controller.stop()
+  })
+
+  it("loads explicitly deferred bulk entries without retrying failed files", async () => {
+    const calls: string[] = []
+    const source: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFiles(files) {
+        return {
+          entries: new Map([
+            [files[0]!, { file: files[0]!, before: "old", after: "new", additions: 1, deletions: 1 }],
+            ["failed.ts", null],
+          ]),
+          deferred: new Set(files.slice(1).filter((file) => file !== "failed.ts")),
+        }
+      },
+      async fetchFile(file) {
+        calls.push(file)
+        return { file, before: "old", after: "new", additions: 1, deletions: 1 }
+      },
+    }
+    const { controller, posted } = make({ workspace: source })
+    controller.setContext({ workspaceRoot: "/repo" })
+    await controller.activate("workspace")
+    posted.length = 0
+    await controller.requestFiles(["one.ts", "two.ts", "three.ts", "failed.ts"])
+
+    expect(calls).toEqual(["two.ts", "three.ts"])
+    const messages = byType(posted, "diffViewer.diffFile")
+    expect(messages.map((message) => message.file)).toEqual(["one.ts", "two.ts", "three.ts", "failed.ts"])
+    expect(messages.slice(0, 3).every((message) => message.diff !== null)).toBe(true)
+    expect(messages[3]!.diff).toBeNull()
+    controller.stop()
+  })
+
+  it("falls back to singular details when a bulk source fails", async () => {
+    const calls: string[] = []
+    const source: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFiles() {
+        throw new Error("batch failed")
+      },
+      async fetchFile(file) {
+        calls.push(file)
+        return { file, before: "old", after: "new", additions: 1, deletions: 1 }
+      },
+    }
+    const { controller, posted } = make({ workspace: source })
+    controller.setContext({ workspaceRoot: "/repo" })
+    await controller.activate("workspace")
+    posted.length = 0
+    await controller.requestFiles(["one.ts", "two.ts"])
+
+    expect(calls).toEqual(["one.ts", "two.ts"])
+    expect(byType(posted, "diffViewer.diffFile").every((message) => message.diff !== null)).toBe(true)
+    controller.stop()
+  })
+
+  it("uses singular loading for sources without a bulk implementation", async () => {
+    const calls: string[] = []
+    const source: DiffSource = {
+      descriptor: SESSION_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFile(file) {
+        calls.push(file)
+        return { file, before: "old", after: "new", additions: 1, deletions: 1 }
+      },
+    }
+    const { controller, posted } = make({ "session:s1": source })
+    controller.setContext({ workspaceRoot: "/repo", sessionId: "s1" })
+    await controller.activate("session:s1")
+    posted.length = 0
+    await controller.requestFiles(["one.ts", "two.ts"])
+
+    expect(calls).toEqual(["one.ts", "two.ts"])
+    expect(byType(posted, "diffViewer.diffFile")).toHaveLength(2)
+    controller.stop()
+  })
+
+  it("does not start queued bulk work after switching sources", async () => {
+    const calls: string[][] = []
+    const workspace: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFiles(files) {
+        calls.push([...files])
+        return { entries: new Map(), deferred: new Set() }
+      },
+    }
+    const session: DiffSource = {
+      descriptor: SESSION_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+    }
+    const { controller, posted } = make({ workspace, "session:s1": session })
+    controller.setContext({ workspaceRoot: "/repo", sessionId: "s1" })
+    await controller.activate("workspace")
+    posted.length = 0
+    const request = controller.requestFiles(["one.ts", "two.ts"])
+    await controller.activate("session:s1")
+    await request
+
+    expect(calls).toEqual([])
+    const messages = byType(posted, "diffViewer.diffFile")
+    expect(messages.map((message) => message.file)).toEqual(["one.ts", "two.ts"])
+    expect(messages.every((message) => message.diff === null)).toBe(true)
+    controller.stop()
+  })
+
+  it("completes every pending file with null when the source stops", async () => {
+    let release!: () => void
+    let started!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    const ready = new Promise<void>((resolve) => {
+      started = resolve
+    })
+    const source: DiffSource = {
+      descriptor: WORKSPACE_DESC,
+      async fetch() {
+        return { diffs: [] }
+      },
+      async fetchFiles(files) {
+        started()
+        await gate
+        return {
+          entries: new Map(
+            files.map((file) => [file, { file, before: "old", after: "new", additions: 1, deletions: 1 }]),
+          ),
+          deferred: new Set(),
+        }
+      },
+    }
+    const { controller, posted } = make({ workspace: source })
+    controller.setContext({ workspaceRoot: "/repo" })
+    await controller.activate("workspace")
+    posted.length = 0
+    const request = controller.requestFiles(["one.ts", "two.ts"])
+    await ready
+    controller.stop()
+    release()
+    await request
+
+    const messages = byType(posted, "diffViewer.diffFile")
+    expect(messages.map((message) => message.file)).toEqual(["one.ts", "two.ts"])
+    expect(messages.every((message) => message.diff === null)).toBe(true)
   })
 })
 
@@ -457,6 +676,31 @@ describe("SourceController.refresh", () => {
     expect(diffs[0]!.diffs).toEqual([{ file: "file-2.ts" }])
     expect(byType(posted, "diffViewer.loading").map((m) => m.loading)).toEqual([true, false])
 
+    controller.stop()
+  })
+
+  it("runs a forced refresh after an in-flight fetch", async () => {
+    let release!: () => void
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    let fetches = 0
+    const source: DiffSource = {
+      descriptor: SESSION_DESC,
+      async fetch() {
+        fetches++
+        await gate
+        return { diffs: [] }
+      },
+    }
+    const { controller } = make({ "session:s1": source })
+    controller.setContext({ workspaceRoot: "/repo", sessionId: "s1" })
+    const activation = controller.activate("session:s1", { poll: false })
+    const refresh = controller.refresh()
+    release()
+    await Promise.all([activation, refresh])
+
+    expect(fetches).toBe(2)
     controller.stop()
   })
 })
