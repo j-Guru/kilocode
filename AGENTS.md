@@ -252,6 +252,7 @@ Do not use these markers in paths that already contain `kilo` in the directory o
 ## Code Style
 
 - Avoid possibly out-of-bounds array access. Instead of `array[index] ?? {}`, use `array.at(index) ?? {}`. Instead of `array[array.length - 1]`, use `array.at(-1)`
+- Prefer `Promise.withResolvers<T>()` for deferreds when runtime/types support it; allow callback/event executors, not async executors or redundant Promise wrapping.
 
 ### Prefer ternary over reassignment
 
