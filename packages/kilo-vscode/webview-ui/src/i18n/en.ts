@@ -55,6 +55,14 @@ export const anacondaDesktopDict = {
 export const dict = {
   ...anacondaDesktopDict,
   ...cloudProviderDict,
+  "task.swarm.title": "Board",
+  "task.swarm.refresh": "Refresh",
+  "task.swarm.reset": "Reset board",
+  "task.swarm.resetTitle": "Reset this board?",
+  "task.swarm.resetDescription":
+    "Clear visible messages? Conversations and running tasks stay unchanged. Agents can post new messages.",
+  "task.swarm.loading": "Loading board...",
+  "task.swarm.failed": "Could not load or reset the board. Try refreshing it.",
 
   "command.provider.connect": "Connect provider",
 
@@ -696,6 +704,17 @@ export const dict = {
   "session.outcome.interrupted": "Turn interrupted.",
   "session.outcome.error": "Turn failed.",
   "session.outcome.finish": "Technical finish reason: {{reason}}",
+  "session.goal.label": "Goal",
+  "prompt.goal.set": "Set goal",
+  "prompt.goal.start": "Start goal",
+  "session.goal.active": "Active",
+  "session.goal.complete": "Complete (model-reported)",
+  "session.goal.blocked": "Blocked",
+  "session.goal.restart": "Restart goal",
+  "session.goal.paused": "Paused",
+  "session.goal.pause": "Pause",
+  "session.goal.resume": "Resume",
+  "session.goal.clear": "Clear goal",
   "session.costAlert.header": "Session Cost Alert",
   "session.costAlert.continue": "Continue",
   "session.costAlert.question":
@@ -826,7 +845,17 @@ export const dict = {
   "settings.notifications.enable.title": "Enable Sound Notifications",
   "settings.notifications.enable.description":
     "Play sounds when sessions complete, encounter an error, or need your input",
+  "settings.notifications.workbench.title": "Enable VS Code Notifications",
+  "settings.notifications.workbench.description":
+    "Show VS Code notifications when Kilo completes a task or needs your input",
+  "settings.notifications.os.title": "Enable OS Notifications",
+  "settings.notifications.os.description":
+    "Show native OS notification alerts when Kilo completes a task or needs your input while VS Code is not active.",
   "settings.notifications.testSound": "Test",
+  "settings.notifications.testOS": "Test",
+  "settings.notifications.testOS.testing": "Sending test notification…",
+  "settings.notifications.testOS.success": "Test notification sent.",
+  "settings.notifications.testOS.error": "Test notification failed",
   "settings.notifications.sound.default": "Default",
   "settings.notifications.sound.system": "System",
   "settings.notifications.sound.description":
@@ -845,6 +874,9 @@ export const dict = {
   "settings.experimental.batch.description": "Enable batching of multiple tool calls",
   "settings.experimental.imageGeneration.title": "Image Generation",
   "settings.experimental.imageGeneration.description": "Enable AI image generation",
+  "settings.experimental.sharedAgentBoard.title": "Kilo Swarm",
+  "settings.experimental.sharedAgentBoard.description":
+    "Share a board between a main session and its task subagents, including nested subagents. Use it for parallel solution attempts or complementary work, not every task.",
   "settings.experimental.imageGenerationModel.title": "Image Model",
   "settings.experimental.imageGenerationModel.description": "Image Generation Model",
   "settings.experimental.imageGenerationModel.placeholder": "Default (Auto Router)",
@@ -930,6 +962,9 @@ export const dict = {
   "settings.agentBehaviour.instructionFiles": "Additional Instruction Files",
   "settings.agentBehaviour.instructionFiles.description":
     "Paths to additional instruction files that are included in the system prompt",
+  "settings.agentBehaviour.pushFixes.title": "Push Pull Request Fixes",
+  "settings.agentBehaviour.pushFixes.description":
+    "When you send pull request CI failures or review comments to the agent, or update a worktree from its base, ask it to commit and push so the pull request updates. Permission prompts still apply. Turn off to keep commits manual.",
   "settings.agentBehaviour.claudeCompat.heading": "Claude Code Compatibility",
   "settings.agentBehaviour.claudeCompat.title": "Load Claude Code Files",
   "settings.agentBehaviour.claudeCompat.description":
@@ -1203,6 +1238,7 @@ export const dict = {
   "task.backgroundAgents.running.one": "1 background agent",
   "task.backgroundAgents.running.many": "{{count}} background agents",
   "task.backgroundAgents.open": "Open background agent",
+  "task.backgroundAgents.openAll": "Open all background agents",
   "task.backgroundAgents.cancel": "Stop",
   "task.backgroundAgents.continueInBackground": "Continue in background",
   "task.backgroundAgents.waiting": "A background agent needs your input",

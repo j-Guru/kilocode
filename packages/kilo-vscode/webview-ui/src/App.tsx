@@ -6,7 +6,7 @@ import { useVSCode } from "./context/vscode"
 import { useServer } from "./context/server"
 import { useProvider } from "./context/provider"
 import { WorkStyleProvider } from "./context/work-style"
-import { useSession } from "./context/session"
+import { useSession, useSessionVisibility } from "./context/session"
 import { LocalTabsProvider, useLocalTabs } from "./context/local-tabs"
 import { ProviderShell } from "./context/provider-shell"
 import { ChatView } from "./components/chat"
@@ -18,6 +18,7 @@ import { useWorktreeMode } from "./context/worktree-mode"
 import { useDiffStyle } from "./context/diff-style"
 import { dispatchAgentManagerEditPreview } from "./utils/agent-manager-events"
 import { strongest } from "./utils/session-activity"
+import { planOpens } from "./utils/open-plan"
 import type { PermissionFileDiff } from "./types/messages"
 
 // Override the upstream "task" tool renderer with the fully-expanded version
@@ -33,6 +34,7 @@ import "./styles/chat.css"
 
 type ViewType = "newTask" | "history" | "profile" | "settings" | "subAgentViewer"
 const VALID_VIEWS = new Set<string>(["newTask", "history", "profile", "settings", "subAgentViewer"])
+const opened = new Set<string>()
 
 /**
  * Bridge our session store to the DataProvider's expected Data shape.
@@ -136,6 +138,16 @@ export const DataBridge: Component<{ children: any }> = (props) => {
     vscode.postMessage({ type: "openFile", filePath, line, column, sessionID })
   }
 
+  const unsubscribePlans = vscode.onMessage((message) => {
+    for (const plan of planOpens(message, session.currentSessionID())) {
+      const id = `${plan.sessionID}:${plan.id}`
+      if (opened.has(id)) continue
+      opened.add(id)
+      queueMicrotask(() => open(plan.path, undefined, undefined, plan.sessionID))
+    }
+  })
+  onCleanup(unsubscribePlans)
+
   const openDiff = (diff: PermissionFileDiff) => {
     if (worktree) {
       dispatchAgentManagerEditPreview({
@@ -231,6 +243,11 @@ const AppContent: Component = () => {
     strongest([session.currentSessionID(), ...(tabs?.ids() ?? [])].map(session.activityFor)),
   )
   createEffect(() => vscode.postMessage({ type: "sessionActivity", state: activity() }))
+  useSessionVisibility(() =>
+    !migration() && (currentView() === "newTask" || currentView() === "subAgentViewer")
+      ? session.currentSessionID()
+      : undefined,
+  )
 
   const handleViewAction = (action: string) => {
     switch (action) {
@@ -287,6 +304,14 @@ const AppContent: Component = () => {
     if (message.type === "selectKiloModel") setCurrentView("newTask")
   }
 
+  const open = (message: { type?: string; sessionID?: string }) => {
+    if (message.type !== "openSession" || !message.sessionID) return
+    console.log("[Kilo New] App: opening local session:", message.sessionID)
+    if (tabs) tabs.open(message.sessionID, { scrollToBottom: true })
+    if (!tabs) session.selectSession(message.sessionID, { scrollToBottom: true })
+    setCurrentView("newTask")
+  }
+
   onMount(() => {
     const handler = (event: MessageEvent) => {
       const message = event.data
@@ -306,6 +331,7 @@ const AppContent: Component = () => {
         session.selectCloudSession(message.sessionId)
         setCurrentView("newTask")
       }
+      open(message)
       handleKiloModel(message)
       handleForked(message)
       if (message?.type === "viewSubAgentSession" && message.sessionID) {

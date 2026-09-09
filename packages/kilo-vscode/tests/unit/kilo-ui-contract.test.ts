@@ -302,6 +302,11 @@ describe("Bash tool static terminal preview (source)", () => {
 })
 
 describe("Expanded tool motion and typography (source)", () => {
+  const reasoning =
+    fs
+      .readFileSync(KILO_MESSAGE_PART_FILE, "utf-8")
+      .match(/PART_MAPPING\["reasoning"\][\s\S]*?(?=\nfunction useToolReveal)/)?.[0] ?? ""
+
   it("animates completed rolling shell details", () => {
     const src = fs.readFileSync(SHELL_ROLLING_FILE, "utf-8")
     expect(src).toContain("useCollapsible({")
@@ -315,6 +320,28 @@ describe("Expanded tool motion and typography (source)", () => {
       /html\[data-theme="kilo-vscode"\] \[data-component="reasoning-part"\][\s\S]*?(?=@keyframes reasoning-pulse)/,
     )?.[0]
     expect(block).toMatch(/\[data-component="markdown"\]\s*\{[^}]*line-height:\s*160%;/)
+  })
+
+  it("animates reasoning details with the mounted collapsible hook", () => {
+    // forceMount is a Collapsible root prop; on Content it is a no-op attribute
+    // and Kobalte presence unmounts the details before the close can animate.
+    expect(reasoning).toMatch(/<Collapsible[^>]*\bforceMount\b[^>]*>/)
+    expect(reasoning).not.toMatch(/<Collapsible\.Content[^>]*forceMount/)
+    expect(reasoning).toContain("useCollapsible(")
+  })
+
+  it("keeps the reasoning viewport capped until a manual open", () => {
+    const css = fs.readFileSync(KILO_MESSAGE_PART_CSS_FILE, "utf-8")
+    const cap = css.match(
+      /\[data-component="reasoning-part"\]\[data-auto-collapse\]:not\(\[data-manual\]\)\s+\[data-slot="reasoning-content"\]\s*\{[^}]*\}/,
+    )?.[0]
+    expect(cap).toContain("max-height: 120px")
+    expect(cap).not.toContain("data-streaming")
+  })
+
+  it("does not smooth streaming reasoning scroll updates", () => {
+    const css = fs.readFileSync(KILO_MESSAGE_PART_CSS_FILE, "utf-8")
+    expect(css).not.toContain("scroll-behavior: smooth")
   })
 })
 

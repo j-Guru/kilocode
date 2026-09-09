@@ -11,6 +11,7 @@ import ai.kilocode.client.agentManager.worktree.GhBanner
 import ai.kilocode.client.agentManager.worktree.WorktreeController
 import ai.kilocode.client.agentManager.worktree.WorktreeDataKeys
 import ai.kilocode.client.agentManager.worktree.WorktreeIcons
+import ai.kilocode.client.agentManager.worktree.WorktreeRunBinding
 import ai.kilocode.client.agentManager.worktree.WorktreeStatusBinding
 import ai.kilocode.client.agentManager.worktree.WorktreeStatusService
 import ai.kilocode.client.agentManager.worktree.WorktreeNameCache
@@ -28,6 +29,9 @@ import ai.kilocode.client.session.ui.popup.HeaderPopupBody
 import ai.kilocode.client.ui.PrIcons
 import ai.kilocode.client.ui.checksTooltip
 import ai.kilocode.client.ui.checksUrl
+import ai.kilocode.client.ui.commentsCount
+import ai.kilocode.client.ui.commentsTooltip
+import ai.kilocode.client.ui.conflicted
 import ai.kilocode.client.ui.popup.SidePopupContent
 import ai.kilocode.client.ui.popup.SidePopupController
 import ai.kilocode.client.ui.popup.SidePopupFit
@@ -68,7 +72,6 @@ import com.intellij.openapi.Disposable
 import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.actionSystem.ActionGroup
 import com.intellij.openapi.actionSystem.ActionUpdateThread
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.DataSink
@@ -80,6 +83,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.FileEditorManagerEvent
 import com.intellij.openapi.fileEditor.FileEditorManagerListener
 import com.intellij.openapi.ide.CopyPasteManager
+import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.VirtualFile
@@ -153,6 +157,7 @@ class AgentManagerPanel(
     private var stats: Map<String, WorktreeStatsDto> = emptyMap()
     private var prs: Map<String, WorktreePrDto> = emptyMap()
     private var dirty: Map<String, WorktreeDirtyDto> = emptyMap()
+    private var running: Set<String> = emptySet()
     private var hovered: String? = null
 
     init {
@@ -209,7 +214,7 @@ class AgentManagerPanel(
         return object : BorderLayoutPanel() {
             override fun getBackground(): Color = activeListToolWindowBackground()
         }.apply {
-            border = JBUI.Borders.empty(UiStyle.Gap.sm())
+            border = JBUI.Borders.empty(UiStyle.Gap.SM)
             addToCenter(list)
         }
     }
@@ -245,7 +250,8 @@ class AgentManagerPanel(
         }
     }
 
-    internal fun move(sessionId: String?, directory: String) = controller.move(sessionId, directory)
+    internal fun move(sessionId: String?, directory: String, surface: String = "sidebar") =
+        controller.move(sessionId, directory, surface)
 
     private fun remove(item: WorktreeDto, force: Boolean) {
         controller.remove(item, force, onFailure = { result -> notifyFailed(item, result, force) })
@@ -503,6 +509,7 @@ class AgentManagerPanel(
                 // The main checkout can sit on a PR branch just like a worktree can.
                 pr = prs[normalizeWorktreePath(item.path)],
                 current = true,
+                running = running.contains(normalizeWorktreePath(item.path)),
             )
         }
         list.update(
@@ -518,6 +525,7 @@ class AgentManagerPanel(
                     stats[key],
                     pull,
                     dirty[key],
+                    running = running.contains(key),
                 )
             },
             ActiveListSelection.Preserve,
@@ -568,22 +576,18 @@ class AgentManagerPanel(
     }
 
     /**
-     * The hover detail for one row, or null when the row has nothing to detail. A pull request is not the
-     * bar: a worktree that has no pull request yet is exactly the one whose changes are still uncommitted,
-     * and this popup is the only place that breaks those out. What it will not do is follow the pointer
-     * down a list of untouched worktrees as an empty balloon.
+     * The hover detail for one row, or null when the row has no pull request. This popup is the pull
+     * request view — state, title, verdicts — so a worktree that has none is left alone: its counts are
+     * already painted on the row, and opening for it means the pointer trails a balloon with nothing but
+     * a base-branch behind-count down a list of local worktrees.
      */
     @RequiresEdt
     private fun request(row: WorktreeRow): SidePopupRequest? {
         if (project == null || row.progress != null) return null
+        val pull = row.pr ?: return null
         val key = normalizeWorktreePath(row.dto.path)
-        val pull = row.pr
         val base = stats[key]
         val local = dirty[key]
-        val any = pull != null ||
-            (local != null && local.files > 0) ||
-            (base != null && (base.files > 0 || base.ahead > 0 || base.behind > 0))
-        if (!any) return null
         return SidePopupRequest(
             build = {
                 val disposable = Disposer.newDisposable("Worktree row popup")
@@ -651,6 +655,7 @@ class AgentManagerPanel(
             // so a poll has to rebuild them. Row equality keeps a poll that found nothing new from churning.
             onDirty = { value -> dirty = value; sync() },
         )
+        WorktreeRunBinding(target, this) { value -> running = value; sync() }
     }
 
     override fun dispose() {
@@ -686,7 +691,7 @@ class AgentManagerPanel(
         }
     }
 
-    private inner class RenameAction : AnAction(
+    private inner class RenameAction : DumbAwareAction(
         KiloBundle.message("worktree.rename.action"),
         null,
         AllIcons.Actions.Edit,
@@ -719,27 +724,33 @@ class AgentManagerPanel(
         val pr: WorktreePrDto?,
         val dirty: WorktreeDirtyDto? = null,
         val current: Boolean = false,
+        val running: Boolean = false,
     ) : ActiveListItem {
         override val key: String get() = dto.id
         override val identity: Any get() = if (current) "local:${dto.path}" else "worktree:${dto.path}"
         override val title: String get() = if (current) dto.branch else WorktreeTitle.text(dto.name, dto.path, pr)
         override val description: String get() = WorktreeTitle.fallback(dto.path)
         override val tooltip: String? get() = null
-        override val icon = WorktreeIcons.forRow(progress != null, kind, dto.locked, current)
+        override val icon = WorktreeIcons.forRow(progress != null, kind, dto.locked, current, running)
         override val tinted: Boolean get() = WorktreeIcons.neutral(icon)
         override val section: String? get() = if (current) null else KiloBundle.message("worktree.section.local")
         override val search: String get() = listOfNotNull(dto.name, dto.branch, dto.path, dto.lockReason).joinToString(" ")
 
         /**
-         * Review then CI verdict, on the title line so they stay readable without hovering the row.
-         * Both are glyphs rather than pills: they are the states a reviewer scans a worktree list for,
-         * and GitHub's own icons say it faster than words at this size.
+         * Unresolved review conversations, review verdict, then CI verdict, on the title line so they stay
+         * readable without hovering the row. All three are glyphs rather than pills: they are the states a
+         * reviewer scans a worktree list for, and GitHub's own icons say it faster than words at this size.
+         *
+         * Conversations lead because they are the one entry that needs a person: a build result and a review
+         * verdict are outcomes to read, while an unresolved thread is somebody waiting on a reply. The glyph
+         * carries a number for the same reason — "waiting on a reply" is not worth acting on until you know
+         * whether that is one comment or twelve.
          */
         override val badges: List<ActiveListBadge>
             get() {
                 if (progress != null) return emptyList()
                 val p = pr ?: return emptyList()
-                return listOfNotNull(reviewBadge(p), checksBadge(p))
+                return listOfNotNull(commentsBadge(p), reviewBadge(p), checksBadge(p))
             }
 
         private fun reviewBadge(p: WorktreePrDto): ActiveListBadge? {
@@ -761,6 +772,18 @@ class AgentManagerPanel(
                 tooltip = checksTooltip(p.checks),
                 // The checks tab rather than the conversation: someone clicking a red build wants the log.
                 action = { BrowserUtil.browse(checksUrl(p)) },
+                icon = glyph,
+            )
+        }
+
+        private fun commentsBadge(p: WorktreePrDto): ActiveListBadge? {
+            val glyph = PrIcons.comments(p.comments) ?: return null
+            return ActiveListBadge(
+                commentsCount(p.comments),
+                id = "pr-comments",
+                tooltip = commentsTooltip(p.comments),
+                // The conversation tab, which is where GitHub lists the threads themselves.
+                action = { BrowserUtil.browse(p.url) },
                 icon = glyph,
             )
         }
@@ -793,6 +816,7 @@ class AgentManagerPanel(
                     additions = stats?.additions ?: 0,
                     deletions = stats?.deletions ?: 0,
                     base = stats?.base.orEmpty(),
+                    conflict = conflicted(pr),
                     onChanges = { openDiff(dto) },
                     localFiles = dirty?.files ?: 0,
                     localAdditions = dirty?.additions ?: 0,
@@ -809,7 +833,8 @@ class AgentManagerPanel(
                 stats == row.stats &&
                 pr == row.pr &&
                 dirty == row.dirty &&
-                current == row.current
+                current == row.current &&
+                running == row.running
         }
 
         override fun hashCode(): Int {
@@ -820,6 +845,7 @@ class AgentManagerPanel(
             result = 31 * result + (pr?.hashCode() ?: 0)
             result = 31 * result + (dirty?.hashCode() ?: 0)
             result = 31 * result + current.hashCode()
+            result = 31 * result + running.hashCode()
             return result
         }
     }

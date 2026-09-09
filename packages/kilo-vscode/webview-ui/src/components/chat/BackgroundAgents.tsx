@@ -12,8 +12,10 @@
 
 import { Component, For, Show, createMemo, createSignal, onCleanup, onMount, createEffect, on } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
+import { AgentAvatar } from "@kilocode/kilo-ui/agent-avatar"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
+import { Tooltip } from "@kilocode/kilo-ui/tooltip"
 import { Spinner } from "@kilocode/kilo-ui/spinner"
 import type { BackgroundJobInfo } from "../../types/messages"
 import { useLanguage } from "../../context/language"
@@ -235,15 +237,8 @@ export const BackgroundAgents: Component<{ readonly?: boolean }> = (props) => {
               aria-expanded={open()}
               onClick={() => setOpen((value) => !value)}
             >
-              <Show
-                when={waiting() > 0}
-                fallback={
-                  <Show when={icon(state())} fallback={<Spinner />}>
-                    {(name) => <Icon name={name()} size="small" />}
-                  </Show>
-                }
-              >
-                <Icon name="warning" size="small" />
+              <Show when={icon(state())} fallback={<Spinner />}>
+                {(name) => <Icon name={name()} size="small" />}
               </Show>
               <span data-slot="task-header-todos-summary">{caption()}</span>
             </Button>
@@ -263,16 +258,7 @@ export const BackgroundAgents: Component<{ readonly?: boolean }> = (props) => {
                         aria-label={tooltip(agent())}
                         onClick={() => openAgent(agent())}
                       >
-                        <Show
-                          when={agent().permission || agent().question}
-                          fallback={
-                            <Show when={icon(agent().status)} fallback={<Spinner />}>
-                              {(name) => <Icon name={name()} size="small" />}
-                            </Show>
-                          }
-                        >
-                          <Icon name="warning" size="small" />
-                        </Show>
+                        <AgentAvatar id={agent().id} status={agent().status === "running" ? "running" : undefined} />
                         <span dir="auto">{label(agent())}</span>
                       </Button>
                     )}
@@ -304,7 +290,6 @@ export const BackgroundAgents: Component<{ readonly?: boolean }> = (props) => {
             ref={toggle}
             variant="ghost"
             size="small"
-            icon={waiting() > 0 ? "warning" : undefined}
             aria-label={accessible()}
             title={accessible()}
             aria-expanded={open()}
@@ -334,12 +319,21 @@ export const BackgroundAgents: Component<{ readonly?: boolean }> = (props) => {
               onClick={hideFinished}
             />
           </Show>
+          <Tooltip value={language.t("task.backgroundAgents.openAll")} placement="bottom">
+            <IconButton
+              icon="square-arrow-top-right"
+              data-slot="task-header-agents-open-all"
+              variant="ghost"
+              size="small"
+              aria-label={language.t("task.backgroundAgents.openAll")}
+              onClick={() => visible().forEach(openAgent)}
+            />
+          </Tooltip>
         </div>
         <Show when={open()}>
           <div data-slot="task-header-todos-list" ref={list}>
             <Show when={visible().some((agent) => agent.permission || agent.question)}>
               <div data-slot="task-header-agent-attention">
-                <Icon name="warning" size="small" />
                 <span>{language.t("task.backgroundAgents.waiting")}</span>
               </div>
             </Show>
@@ -348,9 +342,7 @@ export const BackgroundAgents: Component<{ readonly?: boolean }> = (props) => {
                 <Show when={visible().find((agent) => agent.jobID === id)}>
                   {(agent) => (
                     <div data-slot="task-header-agent" data-status={agent().status}>
-                      <Show when={icon(agent().status)} fallback={<Spinner />}>
-                        {(name) => <Icon name={name()} size="small" data-slot="task-header-agent-status" />}
-                      </Show>
+                      <AgentAvatar id={agent().id} status={agent().status === "running" ? "running" : undefined} />
                       <button
                         data-slot="task-header-agent-main"
                         title={`${language.t("task.backgroundAgents.open")}: ${label(agent())}`}
