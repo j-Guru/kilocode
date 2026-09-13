@@ -161,12 +161,12 @@ export function PRChecks(props: { pr: PRStatus; worktreeId?: string; activeTermi
                     aria-expanded={groupOpen(group.bucket)}
                     onClick={() => toggleGroup(group.bucket)}
                   >
+                    <span>{groupLabel(group.bucket, group.checks.length)}</span>
                     <Icon
                       name={groupOpen(group.bucket) ? "chevron-down" : "chevron-right"}
                       size="small"
                       class="am-pr-section-chevron"
                     />
-                    <span>{groupLabel(group.bucket, group.checks.length)}</span>
                   </button>
                   <Show when={groupOpen(group.bucket)}>
                     <div class="am-pr-check-group-items am-pr-col">

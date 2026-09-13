@@ -9,6 +9,8 @@ import type { PRStatus } from "../../src/types/messages"
 import { useConfig } from "../../src/context/config"
 import { useLanguage } from "../../src/context/language"
 import { sendReviewComments } from "../../diff-viewer/review-annotations"
+import { PRAvatar } from "./PRAvatar"
+import { PRMerge } from "./PRMerge"
 import { checkFeedback } from "./pr-check-feedback"
 import { SEND_LIMIT } from "./pr-comment-payload"
 import { commentState } from "./pr-comment-state"
@@ -18,6 +20,8 @@ import { type JumpTarget, actionableConversation, sendConversation, sendThreads,
 interface PRSummaryProps {
   pr: PRStatus
   worktreeId: string
+  projectId?: string
+  sessionId?: string
   activeTerminalId?: string
   onJump?: (target: JumpTarget) => void
 }
@@ -29,6 +33,7 @@ interface Row {
   target?: JumpTarget
   /** Secondary marks lower-confidence feedback, like general discussion. */
   action?: { label: string; run: () => void; variant?: "primary" | "secondary" }
+  avatars?: Array<{ login: string; avatar?: string }>
 }
 
 const JUMP_KEY: Record<JumpTarget, string> = {
@@ -73,15 +78,28 @@ export function PRSummary(props: PRSummaryProps) {
 
   const review = (): Row | undefined => {
     const value = props.pr.review
-    if (!value) return
-    const status = value === "approved" ? "success" : value === "changes_requested" ? "failure" : "pending"
+    const approved = props.pr.reviewers.filter((reviewer) => reviewer.state === "approved")
+    if (!value && approved.length === 0) return
+    const status =
+      value === "changes_requested" ? "failure" : value === "approved" || approved.length > 0 ? "success" : "pending"
     const key =
       status === "success"
         ? "agentManager.pr.summary.approved"
         : status === "failure"
           ? "agentManager.pr.summary.changesRequested"
           : "agentManager.pr.summary.reviewPending"
-    return { icon: statusIcon(status), label: t(key), status }
+    const label =
+      approved.length > 0
+        ? t(
+            approved.length === 1
+              ? "agentManager.pr.summary.approvedCount.one"
+              : "agentManager.pr.summary.approvedCount.other",
+            {
+              count: approved.length,
+            },
+          )
+        : t(key)
+    return { icon: statusIcon(status), label, status, avatars: approved }
   }
 
   const threads = (): Row | undefined => {
@@ -144,10 +162,10 @@ export function PRSummary(props: PRSummaryProps) {
     }
   }
 
-  const rows = createMemo(() => [checks(), review(), threads(), conversation()].filter((row) => row !== undefined))
+  const rows = createMemo(() => [review(), checks(), threads(), conversation()].filter((row) => row !== undefined))
 
   return (
-    <Show when={rows().length > 0}>
+    <Show when={rows().length > 0 || !!props.pr.merge}>
       <div class="am-pr-summary">
         <div class="am-pr-summary-header am-pr-row">
           <span class="am-pr-summary-title">{t("agentManager.pr.summary.title")}</span>
@@ -164,6 +182,13 @@ export function PRSummary(props: PRSummaryProps) {
           </span>
         </div>
         <div class="am-pr-summary-rows am-pr-col">
+          <PRMerge
+            pr={props.pr}
+            worktreeId={props.worktreeId}
+            projectId={props.projectId}
+            sessionId={props.sessionId}
+            mode="status"
+          />
           <For each={rows()}>
             {(row) => (
               <div class="am-pr-summary-row am-pr-row" data-status={row.status} data-target={row.target}>
@@ -171,6 +196,17 @@ export function PRSummary(props: PRSummaryProps) {
                   {(icon) => <Icon name={icon()} size="small" class="am-pr-summary-icon" />}
                 </Show>
                 <span class="am-pr-summary-label">{row.label}</span>
+                <Show when={row.avatars?.length}>
+                  <span class="am-pr-summary-avatars">
+                    <For each={row.avatars}>
+                      {(reviewer) => (
+                        <span title={reviewer.login}>
+                          <PRAvatar author={reviewer.login} avatar={reviewer.avatar} />
+                        </span>
+                      )}
+                    </For>
+                  </span>
+                </Show>
                 <Show when={row.action || (row.target && props.onJump)}>
                   <span class="am-pr-summary-actions am-pr-row">
                     <Show when={row.action}>
@@ -205,6 +241,13 @@ export function PRSummary(props: PRSummaryProps) {
             )}
           </For>
         </div>
+        <PRMerge
+          pr={props.pr}
+          worktreeId={props.worktreeId}
+          projectId={props.projectId}
+          sessionId={props.sessionId}
+          mode="footer"
+        />
       </div>
     </Show>
   )

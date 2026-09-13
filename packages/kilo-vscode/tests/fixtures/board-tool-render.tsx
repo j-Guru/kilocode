@@ -30,7 +30,8 @@ const { createStore } = await import("solid-js/store")
 const { render } = await import("solid-js/web")
 const { Part } = await import("@kilocode/kilo-ui/message-part")
 const { AgentAvatarPalette } = await import("@kilocode/kilo-ui/agent-avatar")
-const { BoardRoute } = await import("@kilocode/kilo-ui/board-message")
+const { BoardMessage, BoardRoute } = await import("@kilocode/kilo-ui/board-message")
+const { BoardNavigationProvider } = await import("@kilocode/kilo-ui/context/board-navigation")
 const { MarkedProvider, createMarkedParser } = await import("@kilocode/kilo-ui/context/marked")
 
 const labels = ["initial", "hidden", "latest", "reopened", "search", "search-updated"]
@@ -88,16 +89,21 @@ const broadcastRoot = document.createElement("div")
 document.body.append(broadcastRoot)
 const workerBroadcastRoot = document.createElement("div")
 document.body.append(workerBroadcastRoot)
+const directRoot = document.createElement("div")
+document.body.append(directRoot)
+const opened: Array<{ id: string; title?: string }> = []
 const dispose = render(
   () => (
-    <MarkedProvider
-      nativeParser={async (text) => {
-        parsed.push(text)
-        return parser.parse(text)
-      }}
-    >
-      <Part part={part} message={message} forceOpen={search()} />
-    </MarkedProvider>
+    <BoardNavigationProvider open={() => {}}>
+      <MarkedProvider
+        nativeParser={async (text) => {
+          parsed.push(text)
+          return parser.parse(text)
+        }}
+      >
+        <Part part={part} message={message} forceOpen={search()} />
+      </MarkedProvider>
+    </BoardNavigationProvider>
   ),
   root,
 )
@@ -116,6 +122,20 @@ const disposeWorkerBroadcast = render(
     </AgentAvatarPalette>
   ),
   workerBroadcastRoot,
+)
+const disposeDirect = render(
+  () => (
+    <MarkedProvider
+      nativeParser={async (text) => {
+        return parser.parse(text)
+      }}
+    >
+      <BoardNavigationProvider open={(id, title) => opened.push({ id, title })}>
+        <BoardMessage from="main" to="worker" fromLabel="Coordinator" toLabel="Worker" body="body" />
+      </BoardNavigationProvider>
+    </MarkedProvider>
+  ),
+  directRoot,
 )
 const settle = async () => {
   await Promise.resolve()
@@ -152,6 +172,24 @@ try {
   assert(workerRecipient)
   assert.equal(workerRecipient.querySelectorAll('[data-component="board-participant-stack"]').length, 0)
   assert.equal(workerRecipient.querySelectorAll('[data-component="icon"]').length, 2)
+  const headerAvatar = root.querySelector<HTMLElement>(
+    '[data-component="board-participant-stack"] [data-slot="board-route-avatar"]',
+  )
+  assert(headerAvatar)
+  assert.equal(headerAvatar.getAttribute("role"), null)
+  assert.equal(headerAvatar.getAttribute("tabindex"), null)
+  const headerTrigger = headerAvatar.closest<HTMLElement>('[data-slot="collapsible-trigger"]')
+  assert(headerTrigger)
+  const expanded = headerTrigger.getAttribute("aria-expanded")
+  headerAvatar.click()
+  await settle()
+  assert.equal(headerTrigger.getAttribute("aria-expanded"), expanded)
+  const avatar = directRoot.querySelector<HTMLElement>('[data-slot="board-route-avatar"]')
+  assert(avatar)
+  assert.equal(avatar.getAttribute("role"), "button")
+  avatar.click()
+  await settle()
+  assert.deepEqual(opened, [{ id: "worker", title: "Worker" }])
   for (const index of [0, 1, 2]) {
     if (index) await update(index)
     assert.equal(trigger().getAttribute("aria-expanded"), "false")
@@ -186,6 +224,7 @@ try {
   dispose()
   disposeBroadcast()
   disposeWorkerBroadcast()
+  disposeDirect()
   JSON.parse = decode
   await window.happyDOM.cancelAsync()
   await window.happyDOM.close()

@@ -34,8 +34,9 @@ import { DeferredPopover } from "../components/shared/DeferredPopover"
 import { ProjectSelect } from "../../agent-manager/ProjectSelect"
 import { PRComments } from "../../agent-manager/pr/PRComments"
 import { PRConversation } from "../../agent-manager/pr/PRConversation"
-import type { PRComment, PRTimelineItem } from "../../agent-manager/pr/pr-types"
 import { PRPanel } from "../../agent-manager/pr/PRPanel"
+import { PRReviewers } from "../../agent-manager/pr/PRReviewers"
+import type { PRComment, PRReviewer, PRTimelineItem } from "../../agent-manager/pr/pr-types"
 import { For, createSignal, onCleanup, onMount, type JSX } from "solid-js"
 import type {
   AgentProjectSnapshot,
@@ -2068,6 +2069,24 @@ const prComments: NonNullable<PRStatus["comments"]> = {
   ],
 }
 
+const prReviewers: PRReviewer[] = [
+  { login: "marius-kilocode", state: "approved" },
+  { login: "reviewer-changes", state: "changes_requested" },
+  { login: "reviewer-comment", state: "commented" },
+  { login: "reviewer-pending", state: "pending" },
+]
+
+export const PRPanelReviewers: Story = {
+  name: "PR panel — reviewers",
+  render: () => (
+    <StoryProviders noPadding>
+      <div style={{ background: "var(--vscode-editor-background)", width: "320px" }}>
+        <PRReviewers reviewers={prReviewers} />
+      </div>
+    </StoryProviders>
+  ),
+}
+
 export const PRPanelComments: Story = {
   name: "PR panel — review comments",
   render: () => (
@@ -2100,6 +2119,63 @@ export const PRPanelComments200: Story = {
           onOpenFile={() => {}}
           onOpenDiff={() => {}}
           onOpenUrl={() => {}}
+        />
+      </div>
+    </StoryProviders>
+  ),
+}
+
+const prPanelStatus: PRStatus = {
+  number: 13945,
+  title: "fix(cli): prevent snapshot progress session hangs",
+  url: "https://github.com/org/repo/pull/13945",
+  state: "open",
+  review: "pending",
+  checks: {
+    status: "success",
+    total: 3,
+    passed: 3,
+    failed: 0,
+    pending: 0,
+    checks: [
+      { name: "Kilo Code Review", status: "success", duration: "2m 41s" },
+      { name: "build", status: "success", duration: "1m 12s" },
+      { name: "test", status: "success", duration: "4m 03s" },
+    ],
+  },
+  reviewers: [{ login: "octocat", state: "pending" }],
+  comments: prComments,
+  additions: 219,
+  deletions: 6,
+  files: 9,
+  body: [
+    "## What Problem This Solves",
+    "",
+    "Snapshot initialization could remain visible after a mid-session snapshot operation, and an interrupted progress part could be replayed into the next provider request.",
+    "",
+    "## Why This Change Was Made",
+    "",
+    "- Preserve the project Effect context for delayed snapshot progress updates and cleanup.",
+    "- Skip snapshot lock acquisition when snapshots are disabled.",
+    "",
+    "## Evidence",
+    "",
+    "- 39 focused snapshot, history, and fork regression tests pass.",
+  ].join("\n"),
+}
+
+export const PRPanelOverview: Story = {
+  name: "PR panel — overview layout",
+  render: () => (
+    <StoryProviders noPadding>
+      <div style={{ height: "700px", background: "var(--vscode-sideBar-background)" }}>
+        <PRPanel
+          pr={prPanelStatus}
+          worktree={{ ...baseWorktree, branch: "fix-snapshot-initialization-hang" }}
+          worktreeId="wt-a1"
+          onClose={() => {}}
+          onRefresh={() => {}}
+          onOpenExternal={() => {}}
         />
       </div>
     </StoryProviders>

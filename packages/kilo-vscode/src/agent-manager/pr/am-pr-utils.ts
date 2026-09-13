@@ -6,6 +6,9 @@ import type {
   PRComment,
   PRCommentReply,
   PRConversationComment,
+  PRMergeability,
+  PRMergeMethod,
+  PRMergeState,
   PRReaction,
   PRReactionContent,
   PRReviewer,
@@ -31,6 +34,7 @@ export function parsePRResult(json: string): PRResult | null {
   if (!data.number) return null
   const state = data.isDraft ? "draft" : (data.state?.toLowerCase() ?? "open")
   const review = reviewValue(data.reviewDecision)
+  const merge = parseMerge(data)
   const result: PRResult = {
     id: data.id,
     number: data.number,
@@ -43,6 +47,7 @@ export function parsePRResult(json: string): PRResult | null {
     url: data.url ?? "",
     state,
     review,
+    ...(merge ? { merge } : {}),
     additions: data.additions ?? 0,
     deletions: data.deletions ?? 0,
     files: data.changedFiles ?? 0,
@@ -52,6 +57,47 @@ export function parsePRResult(json: string): PRResult | null {
     result.reviewers = parseReviewers(data.reviewRequests as GhReviewRequest[], data.reviews as GhReview[])
   }
   return result
+}
+
+function parseMerge(data: Record<string, unknown>): PRResult["merge"] {
+  const mergeable = mergeability(data.mergeable)
+  const state = mergeState(data.mergeStateStatus)
+  const auto = mergeMethod((data.autoMergeRequest as Record<string, unknown> | undefined)?.mergeMethod)
+  if (!mergeable && !state && auto === undefined) return undefined
+  return {
+    mergeable: mergeable ?? "unknown",
+    state: state ?? "unknown",
+    auto: auto ?? null,
+  }
+}
+
+function mergeability(value: unknown): PRMergeability | undefined {
+  if (value === "MERGEABLE") return "mergeable"
+  if (value === "CONFLICTING") return "conflicting"
+  if (value === "UNKNOWN") return "unknown"
+  return undefined
+}
+
+function mergeState(value: unknown): PRMergeState | undefined {
+  if (typeof value !== "string") return undefined
+  const values: Record<string, PRMergeState> = {
+    CLEAN: "clean",
+    BEHIND: "behind",
+    BLOCKED: "blocked",
+    DIRTY: "dirty",
+    UNSTABLE: "unstable",
+    DRAFT: "draft",
+    HAS_HOOKS: "has_hooks",
+    UNKNOWN: "unknown",
+  }
+  return values[value]
+}
+
+function mergeMethod(value: unknown): PRMergeMethod | undefined {
+  if (value === "MERGE") return "merge"
+  if (value === "SQUASH") return "squash"
+  if (value === "REBASE") return "rebase"
+  return undefined
 }
 
 function reviewValue(value: unknown): ReviewDecision | null {
@@ -370,7 +416,7 @@ export function signature(pr: PRStatus): string {
       pr.checks.total,
       pr.checks.checks.map((check) => [check.name, check.status, check.url ?? "", check.duration ?? ""]),
     ],
-    pr.reviewers.map((r) => [r.login, r.state]),
+    pr.reviewers.map((r) => [r.login, r.state, r.avatar ?? ""]),
     pr.body ?? "",
     [
       pr.comments?.total ?? null,

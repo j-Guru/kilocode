@@ -166,6 +166,46 @@ describe("PRStatusPoller batched GitHub queries", () => {
     poller.stop()
   })
 
+  it("merges reviewer avatars from the GraphQL query and caches them per login", async () => {
+    const poller = new PRStatusPoller({
+      getWorktrees: () => [],
+      getWorkspaceRoot: () => "/repo",
+      onStatus: () => undefined,
+      log: () => undefined,
+    })
+    const internal = poller as unknown as {
+      reviewers: (
+        pr: { number: number; reviewers?: Array<{ login: string; state: string; avatar?: string }> },
+        cwd: string,
+      ) => Promise<Array<{ login: string; state: string; avatar?: string }>>
+      fetchReviewers: (
+        number: number,
+        cwd: string,
+      ) => Promise<{
+        items: Array<{ login: string; state: string; avatar?: string }>
+        ok: boolean
+      }>
+    }
+    const fetches: number[] = []
+    internal.fetchReviewers = async (number) => {
+      fetches.push(number)
+      return {
+        items: [{ login: "eshurakov", state: "commented", avatar: "https://avatar/eshurakov" }],
+        ok: true,
+      }
+    }
+    const result = [{ login: "eshurakov", state: "approved", avatar: "https://avatar/eshurakov" }]
+
+    expect(
+      await internal.reviewers({ number: 7, reviewers: [{ login: "eshurakov", state: "approved" }] }, "/repo"),
+    ).toEqual(result)
+    expect(
+      await internal.reviewers({ number: 7, reviewers: [{ login: "eshurakov", state: "approved" }] }, "/repo"),
+    ).toEqual(result)
+    expect(fetches).toEqual([7])
+    poller.stop()
+  })
+
   it("forwards the actual branch for null PR results", async () => {
     const values: Array<{ pr: PRStatus | null; branch?: string }> = []
     const branches: string[] = []
@@ -359,6 +399,8 @@ describe("PRStatusPoller unresolved threads", () => {
     nodes.at(100)?.comments.nodes.push({ id: "reply", body: "Agreed" })
     internal.gh = async (args) => {
       if (args[0] === "repo") return { stdout: JSON.stringify({ owner: { login: "x" }, name: "y" }), stderr: "" }
+      if (args[0] === "api" && args[1] !== "graphql")
+        return { stdout: JSON.stringify({ allow_auto_merge: true }), stderr: "" }
       if (args[0] === "pr") {
         return { stdout: JSON.stringify({ ...pr, statusCheckRollup: [], reviewRequests: [], reviews: [] }), stderr: "" }
       }

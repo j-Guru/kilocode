@@ -1,4 +1,4 @@
-import type { PRState, PRStatus, ReviewDecision } from "../types"
+import type { PRMergeability, PRMergeMethod, PRMergeState, PRState, PRStatus, ReviewDecision } from "../types"
 
 // Raw shapes returned by `gh pr view --json`
 
@@ -123,6 +123,7 @@ export interface PRResult {
   url: string
   state: PRState
   review: ReviewDecision | null
+  merge?: { mergeable: PRMergeability; state: PRMergeState; auto: PRMergeMethod | null }
   additions: number
   deletions: number
   files: number

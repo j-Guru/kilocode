@@ -66,6 +66,7 @@ import type {
   PRComment,
   PRReviewer,
   PRTimelineItem,
+  PRMergeStatus,
 } from "../../../agent-manager/pr/pr-types"
 export type {
   PRState,
@@ -84,6 +85,10 @@ export type {
   PRTimelineItem,
   PRReaction,
   PRReactionContent,
+  PRMergeMethod,
+  PRMergeability,
+  PRMergeState,
+  PRMergeStatus,
 } from "../../../agent-manager/pr/pr-types"
 
 export type RunState = "idle" | "running" | "stopping"

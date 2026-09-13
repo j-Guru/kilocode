@@ -78,6 +78,20 @@ export interface PRComment {
 
 export type ReviewerState = "approved" | "changes_requested" | "pending" | "commented"
 
+export type PRMergeMethod = "merge" | "squash" | "rebase"
+export type PRMergeability = "mergeable" | "conflicting" | "unknown"
+export type PRMergeState = "clean" | "behind" | "blocked" | "dirty" | "unstable" | "draft" | "has_hooks" | "unknown"
+
+export interface PRMergeStatus {
+  mergeable: PRMergeability
+  state: PRMergeState
+  auto: PRMergeMethod | null
+  methods: PRMergeMethod[]
+  method: PRMergeMethod
+  autoAllowed: boolean
+  canWrite: boolean
+}
+
 export interface PRReviewer {
   login: string
   avatar?: string
@@ -97,6 +111,7 @@ export interface PRStatus {
   url: string
   state: PRState
   review: ReviewDecision | null
+  merge?: PRMergeStatus
   checks: {
     status: AggregateCheckStatus
     total: number

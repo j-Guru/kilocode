@@ -182,6 +182,19 @@ describe("parsePRResult", () => {
     expect(parsePRResult(JSON.stringify(raw))?.review).toBe("pending")
   })
 
+  it("parses GitHub mergeability and auto-merge state", () => {
+    const result = parsePRResult(
+      JSON.stringify({
+        number: 1,
+        state: "OPEN",
+        mergeable: "CONFLICTING",
+        mergeStateStatus: "DIRTY",
+        autoMergeRequest: { mergeMethod: "SQUASH" },
+      }),
+    )
+    expect(result?.merge).toEqual({ mergeable: "conflicting", state: "dirty", auto: "squash" })
+  })
+
   it("returns null review for unknown decision", () => {
     const raw = {
       number: 1,
@@ -638,6 +651,13 @@ describe("PR signature", () => {
   it("keeps free text and reviewer fields separate in the snapshot", () => {
     expect(signature({ ...pr, reviewers: [{ login: "alice", state: "approved" }] })).not.toBe(signature(pr))
     expect(signature({ ...pr, title: "A:B", body: "C" })).not.toBe(signature({ ...pr, title: "A", body: "B:C" }))
+  })
+
+  it("changes when a reviewer avatar becomes available", () => {
+    const before = signature(pr)
+    expect(signature({ ...pr, reviewers: [{ login: "alice", state: "pending", avatar: "https://avatar" }] })).not.toBe(
+      before,
+    )
   })
 
   it("changes when either captured PR ref changes", () => {

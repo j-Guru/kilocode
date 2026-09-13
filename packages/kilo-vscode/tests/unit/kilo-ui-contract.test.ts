@@ -343,6 +343,16 @@ describe("Expanded tool motion and typography (source)", () => {
     const css = fs.readFileSync(KILO_MESSAGE_PART_CSS_FILE, "utf-8")
     expect(css).not.toContain("scroll-behavior: smooth")
   })
+
+  it("settles encrypted reasoning summaries once the stream moved past them", () => {
+    // Encrypted reasoning items only set time.end on their summaries when the
+    // whole item finishes, so the transcript settles them from the part order.
+    expect(reasoning).toContain("if (props.settled) return true")
+    const src = fs.readFileSync(ASSISTANT_MESSAGE_FILE, "utf-8")
+    expect(src).toContain("if (props.message.time.completed) return true")
+    expect(src).toContain("return index >= 0 && index < all.length - 1")
+    expect(src).toContain("settled={settled()}")
+  })
 })
 
 describe("HighlightedText @mention regex fallback and click handler (source)", () => {
@@ -395,6 +405,15 @@ describe("AssistantMessage visible row contract (source)", () => {
 
   it("uses the plan exit card only when plan metadata is renderable", () => {
     expect(src).toContain("if (!planExitInfo(part)) return")
+  })
+
+  it("keeps reasoning parts out of the wrapper grow-in clip", () => {
+    // The reasoning header and body bleed 6px past the wrapper, so a grow-in
+    // clip trims their sides while the text streams and releases them when it
+    // stops, resizing the block at the end of the stream.
+    const live = src.match(/const live =[\s\S]*?useGrowIn\(/)?.[0] ?? ""
+    expect(live).toContain('part.type === "text" && !!part.time && !part.time.end')
+    expect(live).not.toContain('part.type === "reasoning"')
   })
 
   it("uses the native recall tool without a separate memory badge", () => {

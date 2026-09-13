@@ -935,7 +935,7 @@ const release = render(
             openKeybind=""
             pr={badge()}
             onOpenComments={() => navigation.open(target)}
-            onOpenPR={() => clicked.push("external")}
+            onOpenPR={() => navigation.open(target)}
             onClick={() => clicked.push("row")}
             onDelete={noop}
             onStartRename={noop}
@@ -965,6 +965,16 @@ const release = render(
   second,
 )
 const indicator = () => second.querySelector<HTMLButtonElement>(".am-pr-badge-comments")
+second.querySelector<HTMLElement>(".am-pr-badge")!.click()
+setProject(target.projectId)
+setSelection(target.worktreeId)
+await window.happyDOM.waitUntilComplete()
+assert.equal(visible(), true)
+assert.deepEqual(clicked, ["select", "refresh"])
+setVisible(false)
+clicked.length = 0
+setProject("project-a")
+setSelection("local")
 assert.equal(indicator(), null)
 setBadge({ ...base, unresolvedThreads: 1 })
 assert.equal(indicator()?.getAttribute("aria-label"), "1 unresolved review thread")
@@ -980,13 +990,23 @@ assert.equal(jumps, 0)
 const pushButton = second.querySelector<HTMLButtonElement>(".am-pr-panel-mode")
 assert.ok(pushButton)
 assert.equal(pushButton.getAttribute("aria-pressed"), "true")
+assert.equal(pushButton.hasAttribute("data-active"), true)
+assert.equal(pushButton.disabled, false)
 pushButton.click()
 await window.happyDOM.waitUntilComplete()
 assert.deepEqual(settings.at(-1), { type: "updateSetting", key: "agentManager.pushFixes", value: false })
 assert.equal(pushButton.getAttribute("aria-pressed"), "false")
+assert.equal(pushButton.hasAttribute("data-active"), false)
+assert.equal(pushButton.disabled, false)
 pushButton.click()
 await window.happyDOM.waitUntilComplete()
+assert.deepEqual(settings.at(-1), { type: "updateSetting", key: "agentManager.pushFixes", value: true })
 assert.equal(pushButton.getAttribute("aria-pressed"), "true")
+assert.equal(pushButton.hasAttribute("data-active"), true)
+post({ type: "pushFixesSettingLoaded", enabled: false })
+await window.happyDOM.waitUntilComplete()
+assert.equal(pushButton.getAttribute("aria-pressed"), "false")
+assert.equal(pushButton.hasAttribute("data-active"), false)
 const snippet = {
   patch:
     '@@ -396,0 +414,7 @@\n+                      size="small"\n+                      class="session-goal-trigger"\n+                      disabled={props.readonly}\n+                      aria-label={language.t("session.goal.label")}\n+                    >\n+                      <Icon name="chevron-down" size="small" />\n+                      <span>',
@@ -1153,7 +1173,7 @@ await window.happyDOM.waitUntilComplete()
 assert.equal(second.querySelector(".am-pr-panel-title")?.textContent, "Updated")
 assert.equal(jumps, 2)
 second.querySelector<HTMLElement>(".am-pr-badge-number")!.click()
-assert.equal(clicked.at(-1), "external")
+assert.equal(clicked.at(-1), "refresh")
 assert.ok(!clicked.includes("row"))
 setBadge((prev) => ({ ...prev, unresolvedThreads: 0 }))
 assert.equal(indicator(), null)
