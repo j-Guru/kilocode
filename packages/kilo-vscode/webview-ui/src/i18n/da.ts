@@ -201,6 +201,7 @@ export const dict = {
   "prompt.action.send.recording": "Transskriber og send",
   "prompt.action.stop": "Stop",
   "prompt.action.enhance": "Forbedr prompt",
+  "prompt.paste.expand": "Klik for at udvide den indsatte tekst",
   "prompt.action.autoApprove.enable": "Aktiver automatisk godkendelse",
   "prompt.action.autoApprove.disable": "Deaktiver automatisk godkendelse",
   "prompt.action.autoApprove.enabled":
@@ -321,7 +322,6 @@ export const dict = {
   "sidebar.topBar.newTask": "Ny Opgave",
   "sidebar.topBar.history": "Historik",
   "sidebar.topBar.agentManager": "Agent Manager",
-  "sidebar.topBar.kiloClaw": "KiloClaw",
   "sidebar.topBar.marketplace": "Markedsplads",
   "sidebar.topBar.profile": "Profil",
   "sidebar.topBar.settings": "Indstillinger",
@@ -681,6 +681,7 @@ export const dict = {
   "profile.usage.source.direct": "Direkte",
   "profile.usage.state.stale": "Viser de senest opdaterede forbrugsdata.",
   "profile.usage.state.unavailable": "Forbrugsdata er ikke tilgængelige.",
+  "profile.usage.state.empty": "Ingen forbrugsgrænser rapporteret.",
   "profile.usage.plan.pastDue": "Abonnement: Betaling forfalden",
   "profile.usage.plan.canceling": "Abonnement: Opsiges ved periodens udgang",
   "profile.usage.plan.unknown": "Abonnement: Status ukendt",
@@ -844,7 +845,7 @@ export const dict = {
   "settings.agentBehaviour.subtab.skills": "Færdigheder",
 
   "settings.browser.description":
-    "Når aktiveret kan AI-agenten interagere med websider — navigere, klikke, skrive og tage skærmbilleder. Et Chrome-vindue åbnes, så du kan se agenten arbejde.",
+    "Konfigurér indbygget browserautomatisering drevet af Playwright. Kilo kan navigere, interagere med og tage skærmbilleder af websider i dine sessioner.",
   "settings.browser.enable.title": "Aktivér browserautomatisering",
   "settings.browser.enable.description": "Registrér Playwright MCP-serveren hos CLI-backend'en.",
   "settings.browser.systemChrome.title": "Brug system-Chrome",
@@ -919,6 +920,8 @@ export const dict = {
   "settings.models.speechToTextApiKey.placeholder": "sk-...",
   "settings.models.speechToText.disabledDescription":
     "Aktivér og log ind på Kilo-udbyderen for at bruge Speech to Text, eller angiv en egen transskriptions-basis-URL nedenfor.",
+  "settings.models.speechToText.remoteDescription":
+    "Stemmeinput er ikke tilgængelig i fjernvinduer. Åbn Kilo i et lokalt vindue for at bruge mikrofonen.",
   "settings.models.speechToTextModel.title": "Model til tale til tekst",
   "settings.models.speechToTextModel.description": "Vælg Kilo Gateway-transskriptionsmodellen til stemmeinput.",
   "settings.experimental.nativeNotebookTools.title": "Indbyggede notebook-værktøjer",
@@ -1353,5 +1356,11 @@ export const dict = {
   "chat.search.close": "Luk søgning",
   "chat.search.invalidRegex": "Ugyldigt regulært udtryk",
   "chat.search.noResults": "Ingen resultater",
+  "settings.experimental.browserAutomation.title": "Integreret browser",
+  "settings.experimental.browserAutomation.description":
+    "Vis forhåndsvisninger af lokale applikationer i Agent Manager, og gør værktøjet browser_open tilgængeligt for Agent Manager-sessioner.",
+  "settings.experimental.browserAutomation.systemChrome.title": "Brug system-Chrome",
+  "settings.experimental.browserAutomation.systemChrome.description":
+    "Brug den installerede Google Chrome til den integrerede browser. Deaktivér kun, når en kompatibel Playwright Chromium-browser allerede er installeret.",
   "chat.search.searchingHistory": "Søger i tidligere beskeder…",
 }

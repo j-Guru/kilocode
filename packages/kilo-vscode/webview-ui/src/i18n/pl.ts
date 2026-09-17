@@ -201,6 +201,7 @@ export const dict = {
   "prompt.action.send.recording": "Transkrybuj i wyślij",
   "prompt.action.stop": "Zatrzymaj",
   "prompt.action.enhance": "Ulepsz prompt",
+  "prompt.paste.expand": "Kliknij, aby rozwinąć wklejony tekst",
   "prompt.action.autoApprove.enable": "Włącz automatyczne zatwierdzanie",
   "prompt.action.autoApprove.disable": "Wyłącz automatyczne zatwierdzanie",
   "prompt.action.autoApprove.enabled":
@@ -322,7 +323,6 @@ export const dict = {
   "sidebar.topBar.newTask": "Nowe Zadanie",
   "sidebar.topBar.history": "Historia",
   "sidebar.topBar.agentManager": "Agent Manager",
-  "sidebar.topBar.kiloClaw": "KiloClaw",
   "sidebar.topBar.marketplace": "Marketplace",
   "sidebar.topBar.profile": "Profil",
   "sidebar.topBar.settings": "Ustawienia",
@@ -639,6 +639,7 @@ export const dict = {
   "profile.usage.source.direct": "Bezpośrednio",
   "profile.usage.state.stale": "Wyświetlane są ostatnio zaktualizowane dane o wykorzystaniu.",
   "profile.usage.state.unavailable": "Dane o wykorzystaniu są niedostępne.",
+  "profile.usage.state.empty": "Nie zgłoszono limitów wykorzystania.",
   "profile.usage.plan.pastDue": "Plan: Zaległa płatność",
   "profile.usage.plan.canceling": "Plan: Zostanie anulowany z końcem okresu",
   "profile.usage.plan.unknown": "Plan: Status nieznany",
@@ -802,7 +803,7 @@ export const dict = {
   "settings.agentBehaviour.subtab.skills": "Umiejętności",
 
   "settings.browser.description":
-    "Po włączeniu agent AI może wchodzić w interakcję ze stronami internetowymi — nawigować, klikać, pisać i robić zrzuty ekranu. Otworzy się okno Chrome, abyś mógł obserwować pracę agenta.",
+    "Skonfiguruj wbudowaną automatyzację przeglądarki opartą na Playwright. Kilo może nawigować po stronach internetowych, wchodzić z nimi w interakcję i robić zrzuty ekranu w Twoich sesjach.",
   "settings.browser.enable.title": "Włącz automatyzację przeglądarki",
   "settings.browser.enable.description": "Zarejestruj serwer Playwright MCP w backendzie CLI.",
   "settings.browser.systemChrome.title": "Użyj systemowego Chrome",
@@ -876,6 +877,8 @@ export const dict = {
   "settings.models.speechToTextApiKey.placeholder": "sk-...",
   "settings.models.speechToText.disabledDescription":
     "Włącz i zaloguj się do dostawcy Kilo, aby korzystać ze Speech to Text, albo ustaw poniżej własny bazowy adres URL transkrypcji.",
+  "settings.models.speechToText.remoteDescription":
+    "Wprowadzanie głosowe nie jest dostępne w zdalnych oknach. Otwórz Kilo w lokalnym oknie, aby użyć mikrofonu.",
   "settings.models.speechToTextModel.title": "Model mowy na tekst",
   "settings.models.speechToTextModel.description":
     "Wybierz model transkrypcji Kilo Gateway dla wprowadzania głosowego.",
@@ -1358,5 +1361,11 @@ export const dict = {
   "chat.search.close": "Zamknij wyszukiwanie",
   "chat.search.invalidRegex": "Nieprawidłowe wyrażenie regularne",
   "chat.search.noResults": "Brak wyników",
+  "settings.experimental.browserAutomation.title": "Zintegrowana przeglądarka",
+  "settings.experimental.browserAutomation.description":
+    "Wyświetlaj podglądy lokalnych aplikacji w Agent Manager i udostępniaj narzędzie browser_open sesjom Agent Manager.",
+  "settings.experimental.browserAutomation.systemChrome.title": "Użyj systemowego Chrome",
+  "settings.experimental.browserAutomation.systemChrome.description":
+    "Użyj zainstalowanej przeglądarki Google Chrome dla zintegrowanej przeglądarki. Wyłącz tylko wtedy, gdy zgodna przeglądarka Playwright Chromium jest już zainstalowana.",
   "chat.search.searchingHistory": "Wyszukiwanie we wcześniejszych wiadomościach…",
 }

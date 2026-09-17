@@ -202,6 +202,7 @@ export const dict = {
   "prompt.action.send.recording": "رونویسی و ارسال",
   "prompt.action.stop": "توقف",
   "prompt.action.enhance": "بهبود پرامپت",
+  "prompt.paste.expand": "برای بازکردن متن جایگذاری‌شده کلیک کنید",
   "prompt.action.indexing": "تنظیمات ایندکس‌گذاری",
   "prompt.action.autoApprove.enable": "فعال‌سازی تأیید خودکار",
   "prompt.action.autoApprove.disable": "غیرفعال‌سازی تأیید خودکار",
@@ -595,6 +596,7 @@ export const dict = {
   "profile.usage.source.direct": "مستقیم",
   "profile.usage.state.stale": "آخرین میزان استفاده به‌روزشده نمایش داده می‌شود.",
   "profile.usage.state.unavailable": "میزان استفاده در دسترس نیست.",
+  "profile.usage.state.empty": "هیچ محدودیتی برای استفاده گزارش نشده است.",
   "profile.usage.plan.pastDue": "طرح: سررسید گذشته",
   "profile.usage.plan.canceling": "طرح: در پایان دوره لغو می‌شود",
   "profile.usage.plan.unknown": "طرح: وضعیت نامشخص",
@@ -732,7 +734,6 @@ export const dict = {
   "sidebar.topBar.newTask": "وظیفه جدید",
   "sidebar.topBar.history": "تاریخچه",
   "sidebar.topBar.agentManager": "مدیر عامل‌ها",
-  "sidebar.topBar.kiloClaw": "KiloClaw",
   "sidebar.topBar.marketplace": "بازارچه",
   "sidebar.topBar.profile": "پروفایل",
   "sidebar.topBar.settings": "تنظیمات",
@@ -825,7 +826,7 @@ export const dict = {
   "settings.agentBehaviour.subtab.skills": "مهارت‌ها",
 
   "settings.browser.description":
-    "وقتی فعال است، عامل هوش مصنوعی می‌تواند با صفحات وب تعامل داشته باشد — پیمایش، کلیک، تایپ و گرفتن اسکرین‌شات. یک پنجره Chrome باز می‌شود تا بتوانید عملکرد عامل را مشاهده کنید.",
+    "پیکربندی اتوماسیون مرورگر داخلی با پشتیبانی Playwright. Kilo می‌تواند در جلسات شما در صفحات وب پیمایش کند، با آن‌ها تعامل داشته باشد و اسکرین‌شات بگیرد.",
   "settings.browser.enable.title": "فعال‌سازی اتوماسیون مرورگر",
   "settings.browser.enable.description": "سرور Playwright MCP را با بک‌اند CLI ثبت کنید.",
   "settings.browser.systemChrome.title": "استفاده از Chrome سیستم",
@@ -903,6 +904,8 @@ export const dict = {
   "settings.models.speechToTextApiKey.placeholder": "sk-...",
   "settings.models.speechToText.disabledDescription":
     "برای استفاده از تبدیل گفتار به متن، ارائه‌دهنده Kilo را فعال کرده و وارد شوید، یا در پایین یک نشانی پایه رونویسی دلخواه تعیین کنید.",
+  "settings.models.speechToText.remoteDescription":
+    "ورودی صوتی در پنجره‌های راه دور در دسترس نیست. برای استفاده از میکروفون، Kilo را در یک پنجره محلی باز کنید.",
   "settings.models.speechToTextModel.title": "مدل تبدیل گفتار به متن",
   "settings.models.speechToTextModel.description": "مدل رونویسی Kilo Gateway را برای ورودی صوتی انتخاب کنید.",
   "settings.experimental.nativeNotebookTools.title": "ابزارهای بومی Notebook",
@@ -1353,5 +1356,11 @@ export const dict = {
   "chat.search.close": "بستن جستجو",
   "chat.search.invalidRegex": "عبارت منظم نامعتبر",
   "chat.search.noResults": "نتیجه‌ای یافت نشد",
+  "settings.experimental.browserAutomation.title": "مرورگر یکپارچه",
+  "settings.experimental.browserAutomation.description":
+    "پیش‌نمایش برنامه‌های محلی را در Agent Manager نشان دهید و ابزار browser_open را در اختیار جلسات Agent Manager قرار دهید.",
+  "settings.experimental.browserAutomation.systemChrome.title": "استفاده از Chrome سیستم",
+  "settings.experimental.browserAutomation.systemChrome.description":
+    "از Google Chrome نصب‌شده برای مرورگر یکپارچه استفاده کنید. فقط زمانی غیرفعال کنید که مرورگر Playwright Chromium سازگار از قبل نصب شده باشد.",
   "chat.search.searchingHistory": "در حال جستجو در پیام‌های قبلی…",
 }
