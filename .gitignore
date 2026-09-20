@@ -41,6 +41,10 @@ target
 packages/kilo-jetbrains/build-tasks/.gradle/
 
 # Local dev files
+.agents/
+.claude/
+.codegraph/
+.zed/
 opencode-dev
 .kilo-dev/
 UPCOMING_CHANGELOG.md
