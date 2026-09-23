@@ -1,14 +1,24 @@
 // kilocode_change - new file
-import { beforeEach, describe, expect, spyOn, test } from "bun:test"
+import { beforeEach, describe, expect, mock, spyOn, test } from "bun:test"
 import { EOL } from "node:os"
 import { Effect } from "effect"
 
+// Mock @/kilo-sessions/pr-link-poller before importing the command so the
+// status handler's explicit refresh call doesn't spawn `gh` or touch git.
+const realPoller = await import("@/kilo-sessions/pr-link-poller")
+const refresh = mock(async (_worktree: string) => undefined)
+
+void mock.module("@/kilo-sessions/pr-link-poller", () => ({
+  ...realPoller,
+  refreshPrLink: refresh,
+}))
+
 import { prStatusHandler } from "../../src/cli/cmd/pr"
+import { InstanceRef } from "../../src/effect/instance-ref"
+import type { InstanceContext } from "../../src/project/instance-context"
 
 let override: { platform: string; prUrl: string; prNumber: number } | { cleared: true } | undefined
 let detected: { platform: string; prUrl: string; prNumber: number } | undefined
-import { InstanceRef } from "../../src/effect/instance-ref"
-import type { InstanceContext } from "../../src/project/instance-context"
 
 const writeSpy = spyOn(process.stderr, "write")
 
@@ -33,6 +43,7 @@ describe("pr status", () => {
   beforeEach(() => {
     override = undefined
     detected = undefined
+    refresh.mockClear()
     writeSpy.mockClear()
   })
 
