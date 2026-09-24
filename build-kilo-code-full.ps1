@@ -201,7 +201,7 @@ try {
 }
 Get-ChildItem -LiteralPath $vscode -Filter "*.vsix" -File | Remove-Item -Force
 
-Invoke-Build -Name "Kilo CLI" -Path $cli -Command "bun" -Arguments @("script/build.ts", "--single", "--skip-install") -Retries 3
+Invoke-Build -Name "Kilo CLI" -Path $cli -Command "bun" -Arguments @("script/build.ts", "--single", "--skip-install", "--release-build") -Retries 3
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $bundle = Join-Path $cli "dist\@kilocode\cli-windows-x64\bin"
