@@ -96,6 +96,8 @@ export const dict = {
     "مکالمه بازگردانده شد. وضعیت بازیابی فضای کاری برای این بازگردانی قدیمی‌تر در دسترس نیست.",
   "revert.banner.workspace.enableSnapshots": "فعال‌سازی اسنپ‌شات‌ها",
   "revert.disabled.agentBusy": "منتظر بمانید تا عامل کارش تمام شود",
+  "revert.error.body":
+    "ممکن است مخزن در حال استفاده باشد. دوباره تلاش کنید یا برای جزئیات گزارش‌های Kilo را بررسی کنید.",
   "command.session.compact": "فشرده‌سازی جلسه",
   "command.session.export": "صدور رونوشت جلسه",
 
@@ -204,6 +206,8 @@ export const dict = {
   "prompt.action.send.blocked": "ابتدا به سؤال در انتظار پاسخ دهید یا آن را رد کنید",
   "prompt.action.send.recording": "رونویسی و ارسال",
   "prompt.action.stop": "توقف",
+  "prompt.action.stop.background": "توقف عامل اصلی. عامل‌های پس‌زمینه به اجرا ادامه می‌دهند.",
+  "prompt.agents.show": "نمایش عامل‌های پس‌زمینه",
   "prompt.action.enhance": "بهبود پرامپت",
   "prompt.paste.expand": "برای بازکردن متن جایگذاری‌شده کلیک کنید",
   "prompt.action.indexing": "تنظیمات ایندکس‌گذاری",
@@ -426,6 +430,7 @@ export const dict = {
   "provider.custom.models.toggleImages": "تغییر وضعیت تصویر برای همه",
   "provider.custom.models.remove": "حذف مدل",
   "provider.custom.models.add": "افزودن مدل",
+  "provider.custom.models.fetch.button": "دریافت مدل‌ها",
   "provider.custom.models.fetch.authError": "احراز هویت ناموفق بود. کلید API بالا را بررسی کرده و دوباره امتحان کنید.",
   "provider.custom.models.fetch.empty": "هیچ مدلی در این سرور یافت نشد.",
   "provider.custom.models.fetch.added": "{{count}} مدل اضافه شد.",
@@ -821,7 +826,8 @@ export const dict = {
   "settings.browser.description":
     "پیکربندی اتوماسیون مرورگر داخلی با پشتیبانی Playwright. Kilo می‌تواند در جلسات شما در صفحات وب پیمایش کند، با آن‌ها تعامل داشته باشد و اسکرین‌شات بگیرد.",
   "settings.browser.enable.title": "فعال‌سازی اتوماسیون مرورگر",
-  "settings.browser.enable.description": "سرور Playwright MCP را با بک‌اند CLI ثبت کنید.",
+  "settings.browser.enable.description":
+    "مرورگر Agent Manager مختص هر جلسه را برای برنامه‌های محلی و صفحات عمومی HTTPS فعال کنید.",
   "settings.browser.systemChrome.title": "استفاده از Chrome سیستم",
   "settings.browser.systemChrome.description":
     "به جای یک نمونه Chromium جداگانه، از مرورگر Chrome نصب‌شده شما استفاده کنید.",
@@ -1125,6 +1131,9 @@ export const dict = {
   "settings.autoCleanup.runNow": "اجرای پاکسازی الآن",
   "settings.autoCleanup.runNow.confirm":
     "حذف دائمی جلسه‌های منقضی‌شده در همهٔ پروژه‌ها و همهٔ سرویس‌گیرنده‌های Kilo روی این رایانه؟",
+  "settings.autoCleanup.stop": "توقف پاکسازی",
+  "settings.autoCleanup.progress.cancelling": "در حال توقف پاکسازی نشست‌ها...",
+  "settings.autoCleanup.lastRun.cancelled": "قطع‌شده",
 
   "settings.context.autoCompaction.title": "فشرده‌سازی خودکار",
   "settings.context.autoCompaction.description": "قبل از رسیدن به محدودیت، زمینه را به‌طور خودکار فشرده کنید",
@@ -1303,14 +1312,12 @@ export const dict = {
   "task.todos.allDone": "{{count}} کار انجام شد",
   "task.backgroundAgents.running.one": "1 عامل پس‌زمینه",
   "task.backgroundAgents.running.many": "{{count}} عامل پس‌زمینه",
-  "task.backgroundAgents.more": "+{{count}} بیشتر",
   "task.backgroundAgents.open": "باز کردن عامل پس‌زمینه",
   "task.backgroundAgents.openAll": "باز کردن همه عامل‌های پس‌زمینه",
   "task.backgroundAgents.cancel": "توقف",
   "task.backgroundAgents.continueInBackground": "ادامه در پس‌زمینه",
   "task.backgroundAgents.waiting": "یک عامل پس‌زمینه به ورودی شما نیاز دارد",
   "task.backgroundAgents.needsInput": "ورودی لازم است",
-  "task.backgroundAgents.dismiss": "رد کردن",
   "task.backgroundAgents.clearFinished": "پاک کردن موارد تکمیل‌شده",
   "task.backgroundAgents.summary": "{{running}} از {{total}} عامل پس‌زمینه در حال اجرا هستند",
   "task.backgroundAgents.status.running": "در حال اجرا",
@@ -1319,6 +1326,8 @@ export const dict = {
   "task.backgroundAgents.status.error": "خطا",
   "task.backgroundAgents.untitled": "عامل پس‌زمینه",
   "task.backgroundAgents.stopAll": "توقف همه ({{count}})",
+  "task.backgroundAgents.finished": "عامل‌های پس‌زمینه به پایان رسیدند",
+  "task.stop": "توقف زیرعامل",
 
   "settings.saveBar.unsavedChanges": "تغییرات ذخیره‌نشده",
   "settings.saveBar.discard": "رد کردن",

@@ -789,9 +789,9 @@ manage pull requests
 
 Commands:
   kilo pr checkout <number>  fetch and checkout a GitHub PR branch, then run kilo
-  kilo pr link <url>         link the current worktree to a pull request
-  kilo pr unlink             clear the linked pull request
-  kilo pr status             show the linked pull request
+  kilo pr link <url>         link a session to a pull request
+  kilo pr unlink             clear a session's linked pull request
+  kilo pr status             show a session's linked pull request
 
 Options:
   --help     Show help  [boolean]
@@ -814,34 +814,37 @@ Options:
 ### kilo pr link
 
 ```
-link the current worktree to a pull request
+link a session to a pull request
 
 Positionals:
   url  PR URL to link  [string]
 
 Options:
-  --help     Show help  [boolean]
-  --version  Show version number  [boolean]
+      --help     Show help  [boolean]
+      --version  Show version number  [boolean]
+  -s, --session  session id to apply the PR link to  [string]
 ```
 
 ### kilo pr unlink
 
 ```
-clear the linked pull request
+clear a session's linked pull request
 
 Options:
-  --help     Show help  [boolean]
-  --version  Show version number  [boolean]
+      --help     Show help  [boolean]
+      --version  Show version number  [boolean]
+  -s, --session  session id to apply the PR link to  [string]
 ```
 
 ### kilo pr status
 
 ```
-show the linked pull request
+show a session's linked pull request
 
 Options:
-  --help     Show help  [boolean]
-  --version  Show version number  [boolean]
+      --help     Show help  [boolean]
+      --version  Show version number  [boolean]
+  -s, --session  session id to apply the PR link to  [string]
 ```
 
 ## kilo session
@@ -1041,8 +1044,6 @@ Options:
   --stream        connect to the WebSocket stream and print events as JSONL  [boolean]
 ```
 
-Provide exactly one of `--prompt` or `--prompt-stdin`. For example, read a multiline prompt from a file with `kilo cloud start --repo owner/repo --prompt-stdin < prompt.txt`.
-
 ### kilo cloud send
 
 ```
@@ -1055,8 +1056,6 @@ Options:
   --prompt-stdin  read the prompt from standard input  [boolean] [default: false]
   --session-id    Cloud Agent session ID  [string] [required]
 ```
-
-Provide exactly one of `--prompt` or `--prompt-stdin`, as with `kilo cloud start`.
 
 ### kilo cloud status
 

@@ -46,9 +46,8 @@ export default [
     files: ["webview-ui/agent-manager/AgentManagerApp.tsx"],
     // Lowered 3210 → 2800 after extracting the sidebar body (SidebarBody.tsx)
     // and the tab bar (TabBar.tsx) into components. The keybinding defaults
-    // (keybind-defaults.ts) extraction further offset later additions; file
-    // sits at 2713 lines after merge. Keep shrinking as more logic moves out,
-    // do not raise.
+    // (keybind-defaults.ts) extraction offsets the terminal-ux additions; keep
+    // shrinking as more logic moves out; do not raise.
     rules: { complexity: ["error", 74], "max-lines": ["error", 2800] },
   },
   {
@@ -71,9 +70,10 @@ export default [
     files: ["webview-ui/src/context/session.tsx"],
     // Raised from the default 3000 as this session context grew past the cap
     // after upstream merges; kept as a targeted override rather than loosening
-    // the global limit. Raised 3100 → 3150 after another upstream merge landed
-    // the file at 3124 lines on Kilo-Org/kilocode main itself.
-    rules: { complexity: ["error", 31], "max-lines": ["error", 3150] },
+    // the global limit. Pinned to the file's current size, so growth is a
+    // deliberate edit here; shrink it when logic moves out, do not raise it
+    // for convenience.
+    rules: { complexity: ["error", 31], "max-lines": ["error", 3109] },
   },
   {
     files: ["src/services/autocomplete/classic-auto-complete/AutocompleteInlineCompletionProvider.ts"],
