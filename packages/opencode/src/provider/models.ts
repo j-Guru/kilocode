@@ -17,7 +17,9 @@ export type Provider = Core.Provider
 export const CatalogModelStatus = Core.CatalogModelStatus
 export type CatalogModelStatus = Core.CatalogModelStatus
 
-export interface Interface extends Core.Interface {}
+export interface Interface extends Core.Interface {
+  readonly getFailure: ModelCache.Interface["getFailure"]
+}
 
 // kilocode_change start
 const glm51: Model = {
@@ -205,7 +207,7 @@ export const layer: Layer.Layer<Service, never, Core.Service | Config.Service | 
         return providers
       })
 
-      return Service.of({ get, refresh: core.refresh })
+      return Service.of({ get, refresh: core.refresh, getFailure: cache.getFailure })
     }),
   )
 
